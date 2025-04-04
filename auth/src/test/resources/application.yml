@@ -37,6 +37,6 @@ eureka:
 
 logging:
   level:
-    root: WARN
+    root: DEBUG
     org.springframework: INFO
     com.onevoice: DEBUG
