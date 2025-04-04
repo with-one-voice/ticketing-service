@@ -1,6 +1,6 @@
-name: "🐛 Fix"
-description: "버그 수정"
-labels: ["버그"]
+name: "📝 docs"
+description: "문서 추가/수정"
+labels: ["문서"]
 body:
   - type: textarea
     attributes:
