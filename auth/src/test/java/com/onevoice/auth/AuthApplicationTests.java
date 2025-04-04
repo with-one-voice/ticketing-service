@@ -8,7 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+	"spring.config.import=optional:classpath:/",
+	"spring.cloud.config.enabled=false",
+	"eureka.client.enabled=false"
+})
 @ActiveProfiles("test")
 class AuthApplicationTests {
 
