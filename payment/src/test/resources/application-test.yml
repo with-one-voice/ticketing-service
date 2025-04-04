@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: test-app
+
+  profiles:
+    active: test
+
+  datasource:
+    url: jdbc:h2:mem:paymentDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  sql:
+    init:
+      mode: always  # schema.sql, data.sql 자동 실행
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 테스트마다 테이블 생성/삭제
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true  # SQL 초기화가 JPA보다 먼저 되지 않도록
+
+  cloud:
+    config:
+      enabled: false  # Config Server 비활성화
+
+eureka:
+  client:
+    enabled: false  # Eureka Client 비활성화
+
+logging:
+  level:
+    root: WARN
+    org.springframework: INFO
+    com.onevoice: DEBUG
