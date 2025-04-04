@@ -30,16 +30,4 @@ jobs:
       # 도메인 모듈 테스트 (Config/Eureka 무시)
       - name: 🧪 Build & Test domain modules (with Spring Cloud disabled)
         run: |
-          ./gradlew \
-            -Dspring.cloud.config.enabled=false \
-            -Deureka.client.enabled=false \
-            --no-daemon \
-            :auth:test \
-            :user:test \
-            :show:test \
-            :venue:test \
-            :ticket:test \
-            :seat:test \
-            :payment:test \
-            :notification:test \
-            :admin:test
+          ./gradlew :auth:test :user:test :show:test :venue:test :ticket:test :seat:test :payment:test :notification:test :admin:test -Dspring.cloud.config.enabled=false -Deureka.client.enabled=false --no-daemon
