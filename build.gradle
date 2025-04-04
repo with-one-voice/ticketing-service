@@ -50,8 +50,11 @@ configure(sharedModules) {
 	dependencies {
 		// 공통 의존성
 		if (!project.hasProperty('excludeCloud')) {
+			println("[INFO] ✅ Cloud config & eureka dependencies included")
 			implementation 'org.springframework.cloud:spring-cloud-starter-config'
 			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+		} else {
+			println("[INFO] 🚫 Cloud config & eureka dependencies excluded")
 		}
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
