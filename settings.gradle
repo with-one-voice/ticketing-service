@@ -1,0 +1,28 @@
+rootProject.name = 'root'
+
+include 'config'
+include 'eureka'
+include 'gateway'
+include 'auth'
+include 'user'
+include 'show'
+include 'venue'
+include 'ticket'
+include 'seat'
+include 'payment'
+include 'notification'
+include 'admin'
+
+
+project(':config').projectDir = file('config')
+project(':eureka').projectDir = file('eureka')
+project(':gateway').projectDir = file('gateway')
+project(':auth').projectDir = file('auth')
+project(':user').projectDir = file('user')
+project(':show').projectDir = file('show')
+project(':venue').projectDir = file('venue')
+project(':ticket').projectDir = file('ticket')
+project(':seat').projectDir = file('seat')
+project(':payment').projectDir = file('payment')
+project(':notification').projectDir = file('notification')
+project(':admin').projectDir = file('admin')
