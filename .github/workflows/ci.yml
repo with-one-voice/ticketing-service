@@ -26,6 +26,11 @@ jobs:
       - name: 📦 Build infra modules (config, eureka, gateway) – test 제외
         run: ./gradlew :config:build :eureka:build :gateway:build -x test --no-daemon
 
+      - name: 🧾 Show bootstrap.yml for debug
+        run: |
+          cat auth/src/test/resources/bootstrap.yml || echo "❌ bootstrap.yml NOT FOUND"
+
+
       - name: 🧪 Build & Test domain modules (Spring Cloud excluded)
         run: |
           ./gradlew \
