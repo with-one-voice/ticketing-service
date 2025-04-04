@@ -8,7 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+	"spring.config.import=optional:classpath:/",
+	"spring.cloud.config.enabled=false",
+	"eureka.client.enabled=false"
+})
 @ActiveProfiles("test")
 class AuthApplicationTests {
 
@@ -16,10 +20,10 @@ class AuthApplicationTests {
 	Environment env;
 
 	@PostConstruct
-	void init() {
-		System.out.println(">>> Active profile: " + Arrays.toString(env.getActiveProfiles()));
-		System.out.println(">>> Property: config.enabled = " + env.getProperty("spring.cloud.config.enabled"));
-		System.out.println(">>> Property: eureka.client.enabled = " + env.getProperty("eureka.client.enabled"));
+	void logEnv() {
+		System.out.println("🔎 active profiles: " + Arrays.toString(env.getActiveProfiles()));
+		System.out.println("🔎 spring.config.import: " + env.getProperty("spring.config.import"));
+		System.out.println("🔎 spring.cloud.config.enabled: " + env.getProperty("spring.cloud.config.enabled"));
 	}
 
 	@Test

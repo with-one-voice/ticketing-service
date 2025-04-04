@@ -51,6 +51,9 @@ jobs:
       - name: 🛠️ Grant permission to gradlew
         run: chmod +x ./gradlew
 
+      - name: 📄 Show application-test.yml
+        run: cat auth/src/test/resources/application-test.yml || echo "❌ NOT FOUND"
+
       - name: 🧪 Run test for ${{ matrix.module }}
         run: |
           echo "🧪 Testing module: ${{ matrix.module }}"
