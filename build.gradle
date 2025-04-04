@@ -49,8 +49,10 @@ configure(sharedModules) {
 
 	dependencies {
 		// 공통 의존성
-		implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-		implementation 'org.springframework.cloud:spring-cloud-starter-config'
+		if (!project.hasProperty('excludeCloud')) {
+			implementation 'org.springframework.cloud:spring-cloud-starter-config'
+			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+		}
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
 		implementation 'org.springframework.boot:spring-boot-starter-actuator'

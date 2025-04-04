@@ -23,11 +23,23 @@ jobs:
       - name: 🛠️ Grant permission to gradlew
         run: chmod +x ./gradlew
 
-      # 인프라 모듈은 테스트 제외하고 빌드만
-      - name: 📦 Build infra modules (config, eureka, gateway)
+      - name: 📦 Build infra modules (config, eureka, gateway) – test 제외
         run: ./gradlew :config:build :eureka:build :gateway:build -x test --no-daemon
 
-      # 도메인 모듈 테스트 (Config/Eureka 무시)
-      - name: 🧪 Build & Test domain modules (with Spring Cloud disabled)
+      - name: 🧪 Build & Test domain modules (Spring Cloud excluded)
         run: |
-          ./gradlew :auth:test :user:test :show:test :venue:test :ticket:test :seat:test :payment:test :notification:test :admin:test -Dspring.cloud.config.enabled=false -Deureka.client.enabled=false --no-daemon
+          ./gradlew \
+            -PexcludeCloud \
+            -Dspring.config.import=optional:classpath:/ \
+            -Dspring.cloud.config.enabled=false \
+            -Deureka.client.enabled=false \
+            --no-daemon \
+            :auth:test \
+            :user:test \
+            :show:test \
+            :venue:test \
+            :ticket:test \
+            :seat:test \
+            :payment:test \
+            :notification:test \
+            :admin:test
