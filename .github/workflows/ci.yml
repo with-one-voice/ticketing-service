@@ -11,32 +11,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: 🔽 Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: ⚙️ Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Grant permission to gradlew
+      - name: 🛠️ Grant permission to gradlew
         run: chmod +x ./gradlew
 
-      # 테스트 없는 인프라 서비스 빌드만
-      - name: Build infra modules (config, eureka, gateway)
+      # 인프라 모듈은 테스트 제외하고 빌드만
+      - name: 📦 Build infra modules (config, eureka, gateway)
         run: ./gradlew :config:build :eureka:build :gateway:build -x test --no-daemon
 
-      # 테스트 포함 도메인 서비스 빌드 및 테스트
-      - name: Build & Test domain modules
+      # 도메인 모듈 테스트 (Config/Eureka 무시)
+      - name: 🧪 Build & Test domain modules (with Spring Cloud disabled)
         run: |
-          ./gradlew :auth:build \
-                     :user:build \
-                     :show:build \
-                     :venue:build \
-                     :ticket:build \
-                     :seat:build \
-                     :payment:build \
-                     :notification:build \
-                     :admin:build \
-                     --no-daemon
+          ./gradlew :auth:test \
+                     :user:test \
+                     :show:test \
+                     :venue:test \
+                     :ticket:test \
+                     :seat:test \
+                     :payment:test \
+                     :notification:test \
+                     :admin:test \
+            -Dspring.cloud.config.enabled=false \
+            -Deureka.client.enabled=false \
+            --no-daemon

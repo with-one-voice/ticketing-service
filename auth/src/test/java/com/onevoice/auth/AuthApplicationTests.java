@@ -19,6 +19,8 @@ class AuthApplicationTests {
 	@PostConstruct
 	void init() {
 		System.out.println(">>> Active profile: " + Arrays.toString(env.getActiveProfiles()));
+		System.out.println(">>> Property: config.enabled = " + env.getProperty("spring.cloud.config.enabled"));
+		System.out.println(">>> Property: eureka.client.enabled = " + env.getProperty("eureka.client.enabled"));
 	}
 
 	@Test
