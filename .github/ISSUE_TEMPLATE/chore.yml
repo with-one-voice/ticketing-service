@@ -1,6 +1,6 @@
-name: "♻️ Refactor"
-description: "코드 리팩토링"
-labels: ["리팩토링"]
+name: "🛠️ Chore"
+description: "빌드 설정, 패키지 매니저 설정 등 기타 작업"
+labels: ["빌드 설정"]
 body:
   - type: textarea
     attributes:

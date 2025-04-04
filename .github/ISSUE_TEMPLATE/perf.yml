@@ -1,6 +1,6 @@
-name: "♻️ Refactor"
-description: "코드 리팩토링"
-labels: ["리팩토링"]
+name: "⚡️ Perf"
+description: "성능 개선 관련 작업"
+labels: ["성능 개선"]
 body:
   - type: textarea
     attributes:
