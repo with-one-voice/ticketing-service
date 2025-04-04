@@ -2,6 +2,9 @@ spring:
   application:
     name: auth
 
+  config:
+    import: optional:classpath:/  # configserver import 무효화
+
   profiles:
     active: test
 
