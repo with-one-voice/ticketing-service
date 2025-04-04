@@ -1,18 +1,46 @@
-name: Java CI (Spring Boot MSA)
+name: Selective CI for MSA (Spring Boot)
 
 on:
-  push:
-    branches: [ "main", "develop", "release/**" ]
   pull_request:
     branches: [ "main", "develop", "release/**" ]
 
 jobs:
-  build-and-test:
+  detect-changes:
+    name: 🔍 Detect Changed Modules
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 📁 Detect changes in service modules
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            auth: 'auth/**'
+            user: 'user/**'
+            show: 'show/**'
+            venue: 'venue/**'
+            ticket: 'ticket/**'
+            seat: 'seat/**'
+            payment: 'payment/**'
+            notification: 'notification/**'
+            admin: 'admin/**'
+
+  build-and-test:
+    name: 🧪 Build & Test Changed Modules
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.matrix != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJSON(needs.detect-changes.outputs.matrix) }}
 
     steps:
       - name: 🔽 Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: ⚙️ Set up JDK 17
         uses: actions/setup-java@v3
@@ -23,28 +51,19 @@ jobs:
       - name: 🛠️ Grant permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: 📦 Build infra modules (config, eureka, gateway) – test 제외
-        run: ./gradlew :config:build :eureka:build :gateway:build -x test --no-daemon
-
-      - name: 🧾 Show bootstrap.yml for debug
+      - name: 🧪 Run test for ${{ matrix.module }}
         run: |
-          cat auth/src/test/resources/bootstrap.yml || echo "❌ bootstrap.yml NOT FOUND"
-
-
-      - name: 🧪 Build & Test domain modules (Spring Cloud excluded)
-        run: |
+          echo "🧪 Testing module: ${{ matrix.module }}"
           ./gradlew \
             -PexcludeCloud \
             -Dspring.config.import=optional:classpath:/ \
             -Dspring.cloud.config.enabled=false \
             -Deureka.client.enabled=false \
             --no-daemon \
-            :auth:test \
-            :user:test \
-            :show:test \
-            :venue:test \
-            :ticket:test \
-            :seat:test \
-            :payment:test \
-            :notification:test \
-            :admin:test
+            :${{ matrix.module }}:test
+
+      - name: 📄 Show test report if failed
+        if: failure()
+        run: |
+          echo "❗ Test failed for module: ${{ matrix.module }}"
+          find . -type f -path "*/build/reports/tests/test/index.html" || echo "❌ No test report found"

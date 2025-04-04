@@ -56,6 +56,7 @@ configure(sharedModules) {
 			implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 		} else {
 			println("[INFO][${project.name}] 🚫 Cloud config & eureka dependencies excluded")
+			runtimeOnly 'com.h2database:h2'
 		}
 
 		implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -69,7 +70,7 @@ configure(sharedModules) {
 		annotationProcessor 'org.projectlombok:lombok'
 
 		// 테스트
-		runtimeOnly 'com.h2database:h2'
+
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	}
