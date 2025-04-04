@@ -24,14 +24,6 @@ spring:
         format_sql: true
     defer-datasource-initialization: true  # SQL 초기화가 JPA보다 먼저 되지 않도록
 
-  cloud:
-    config:
-      enabled: false  # Config Server 비활성화
-
-eureka:
-  client:
-    enabled: false  # Eureka Client 비활성화
-
 logging:
   level:
     root: WARN
