@@ -1,18 +1,15 @@
 package com.onevoice.auth;
 
+import jakarta.annotation.PostConstruct;
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 
-import jakarta.annotation.PostConstruct;
-import java.util.Arrays;
-import org.springframework.test.context.TestPropertySource;
-
 @SpringBootTest
 @ActiveProfiles("test")
-@TestPropertySource(locations = {"classpath:application-test.yml"})
 class AuthApplicationTests {
 
 	@Autowired
