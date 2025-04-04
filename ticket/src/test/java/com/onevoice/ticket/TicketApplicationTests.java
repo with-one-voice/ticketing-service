@@ -30,5 +30,8 @@ class TicketApplicationTests {
 	@Test
 	void contextLoads() {
 		// 빈 테스트
+		log.info("🔎 active profiles: {}", Arrays.toString(env.getActiveProfiles()));
+		log.info("🔎 spring.config.import: {}", env.getProperty("spring.config.import"));
+		log.info("🔎 spring.cloud.config.enabled: {}", env.getProperty("spring.cloud.config.enabled"));
 	}
 }
