@@ -8,9 +8,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import jakarta.annotation.PostConstruct;
 import java.util.Arrays;
+import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@TestPropertySource(locations = {"classpath:application-test.yml"})
 class AuthApplicationTests {
 
 	@Autowired
