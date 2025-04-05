@@ -12,6 +12,7 @@ include 'seat'
 include 'payment'
 include 'notification'
 include 'admin'
+include 'common'
 
 
 project(':config').projectDir = file('config')
@@ -26,3 +27,4 @@ project(':seat').projectDir = file('seat')
 project(':payment').projectDir = file('payment')
 project(':notification').projectDir = file('notification')
 project(':admin').projectDir = file('admin')
+project(':common').projectDir = file('common')
