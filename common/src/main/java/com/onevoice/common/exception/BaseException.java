@@ -1,11 +1,8 @@
 package com.onevoice.common.exception;
 
 import com.onevoice.common.dto.ResponseCode;
-import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
-@Getter
-public class BaseException extends RuntimeException{
+public class BaseException extends RuntimeException {
     private final ResponseCode responseCode;
 
     public BaseException(ResponseCode responseCode) {
@@ -13,7 +10,7 @@ public class BaseException extends RuntimeException{
         this.responseCode = responseCode;
     }
 
-    public HttpStatus getStatus() {
-        return responseCode.getStatus();
+    public ResponseCode getResponseCode() {
+        return responseCode;
     }
 }

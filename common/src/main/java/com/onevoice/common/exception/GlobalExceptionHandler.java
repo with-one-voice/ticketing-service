@@ -13,32 +13,59 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 커스텀 예외 처리
+    /**
+     * 커스텀 예외 처리 (BaseException 상속 구조)
+     */
     @ExceptionHandler(BaseException.class)
-    public ResponseEntity<CommonResponse<Object>> handleBaseException(BaseException ex) {
-        log.warn("[BaseException] {}: {}", ex.getClass().getSimpleName(), ex.getMessage());
-        return CommonResponse.of(ex.getResponseCode(), null);
+    public ResponseEntity<CommonResponse<Void>> handleBaseException(BaseException ex) {
+        ResponseCode code = ex.getResponseCode();
+        log.warn("[BaseException] {} - {}", code.getCode(), code.getMessage(), ex);
+        return ResponseEntity
+            .status(code.getStatus())
+            .body(CommonResponse.createCommonResponse(code, null));
     }
 
-    //  @Valid 유효성 검증 실패
+    /**
+     * @Valid or @Validated 바인딩 실패
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<CommonResponse<Object>> handleValidationException(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        log.warn("[ValidationException] {}", errorMessage);
-        return CommonResponse.of(ResponseCode.BAD_REQUEST.getStatus(), null, errorMessage);
+    public ResponseEntity<CommonResponse<String>> handleValidationException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .findFirst()
+            .orElse("잘못된 요청입니다.");
+        log.warn("[Validation Error] {}", errorMessage);
+        return ResponseEntity
+            .status(ResponseCode.BAD_REQUEST.getStatus())
+            .body(CommonResponse.createCommonResponse(ResponseCode.BAD_REQUEST, errorMessage));
     }
 
-    // 제약조건 위반 예외
+    /**
+     * 단일 파라미터 @Validated 실패
+     */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<CommonResponse<Object>> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.warn("[ConstraintViolationException] {}", ex.getMessage());
-        return CommonResponse.of(ResponseCode.BAD_REQUEST.getStatus(), null, ex.getMessage());
+    public ResponseEntity<CommonResponse<String>> handleConstraintViolationException(ConstraintViolationException ex) {
+        String errorMessage = ex.getConstraintViolations()
+            .stream()
+            .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+            .findFirst()
+            .orElse("잘못된 요청입니다.");
+        log.warn("[ConstraintViolation] {}", errorMessage);
+        return ResponseEntity
+            .status(ResponseCode.BAD_REQUEST.getStatus())
+            .body(CommonResponse.createCommonResponse(ResponseCode.BAD_REQUEST, errorMessage));
     }
 
-    // 예상치 못한 모든 예외 처리
+    /**
+     * 그 외 모든 예외
+     */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponse<Object>> handleException(Exception ex) {
-        log.error("[UnhandledException] ", ex);
-        return CommonResponse.of(ResponseCode.INTERNAL_SERVER_ERRROR.getStatus(), null, ex.getMessage());
+    public ResponseEntity<CommonResponse<Void>> handleUnexpectedException(Exception ex) {
+        log.error("[Unhandled Exception]", ex);
+        return ResponseEntity
+            .status(ResponseCode.INTERNAL_ERROR.getStatus())
+            .body(CommonResponse.createCommonResponse(ResponseCode.INTERNAL_ERROR, null));
     }
 }
