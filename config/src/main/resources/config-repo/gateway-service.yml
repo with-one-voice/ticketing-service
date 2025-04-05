@@ -1,0 +1,95 @@
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true               # Eureka 기반 동적 라우팅 활성화
+          lower-case-service-id: true
+
+      routes:
+        #admin
+        - id: admin-service
+          uri: lb://admin-service
+          predicates:
+              - Path=/api/admin/**
+
+        #auth
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+
+        #notification
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+
+        #payment
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+
+        #seat
+        - id: seat-service
+          uri: lb://seat-service
+          predicates:
+            - Path=/api/seats/**
+
+        #show
+        - id: show-service
+          uri: lb://show-service
+          predicates:
+            - Path=/api/shows/**
+
+        #ticket
+        - id: ticket-service
+          uri: lb://ticket-service
+          predicates:
+            - Path=/api/tickets/**
+
+        #user
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+
+        #venue
+        - id: venue-service
+          uri: lb://venue-service
+          predicates:
+            - Path=/api/venues/**
+
+  config:
+    import: configserver:${CONFIG_SERVER_URL:http://localhost:19000}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+
+# CORS 기본 허용 (필요 시 커스터마이징 가능)
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+
+server:
+  port: 8080  # 게이트웨이 기본 포트 (도커 포트 매핑 시 고려)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: INFO

@@ -1,3 +1,6 @@
 spring:
   application:
     name: admin-service
+
+  config:
+    import: configserver:${CONFIG_SERVER_URL:http://localhost:19000}

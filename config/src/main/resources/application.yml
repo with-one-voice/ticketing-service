@@ -1,3 +1,37 @@
+server:
+  port: 19000
+
 spring:
   application:
-    name: config-service
+    name: config-server111
+
+  profiles:
+    active: git
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/with-one-voice/ticketing-service.git
+          default-label: develop
+          search-paths:
+            - config/src/main/resources/config-repo
+          clone-on-start: true
+          force-pull: true
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    org.springframework.cloud.config: DEBUG
