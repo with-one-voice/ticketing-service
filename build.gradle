@@ -22,6 +22,7 @@ allprojects {
 }
 
 // 공통 설정이 적용될 모듈만 지정
+// 인프라 모듈은 해당 모듈에서 직접 build.gradle설정 (eureka,config,gateway)
 def sharedModules = [
 		project(':user'),
 		project(':auth'),
@@ -32,7 +33,6 @@ def sharedModules = [
 		project(':payment'),
 		project(':notification'),
 		project(':admin')
-		// 추후 다른 모듈 추가
 ]
 
 configure(sharedModules) {
@@ -49,19 +49,31 @@ configure(sharedModules) {
 
 	dependencies {
 		// 공통 의존성
+		if (!project.hasProperty('excludeCloud')) {
+			println("[INFO][${project.name}] ✅ Cloud config & eureka dependencies included")
+			implementation 'org.springframework.cloud:spring-cloud-starter-config'
+			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+			implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+		} else {
+			println("[INFO][${project.name}] 🚫 Cloud config & eureka dependencies excluded")
+
+		}
+
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
 		implementation 'org.springframework.boot:spring-boot-starter-actuator'
 		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-		implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
 		implementation 'org.apache.commons:commons-lang3'
 
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
 
 		// 테스트
+
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+		testRuntimeOnly 'com.h2database:h2'
 	}
 
 	ext {
