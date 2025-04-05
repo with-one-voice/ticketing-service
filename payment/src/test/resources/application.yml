@@ -1,9 +1,9 @@
 spring:
   application:
-    name: seat-test
+    name: payment-test
 
   datasource:
-    url: jdbc:h2:mem:showDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:paymentDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -24,6 +24,8 @@ spring:
   cloud:
     config:
       enabled: false  # Config Server 비활성화
+  profiles:
+    active: test
 
 eureka:
   client:

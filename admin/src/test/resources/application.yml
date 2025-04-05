@@ -1,9 +1,9 @@
 spring:
   application:
-    name: venue-test
+    name: admin-test
 
   datasource:
-    url: jdbc:h2:mem:showDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:adminDb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password:
