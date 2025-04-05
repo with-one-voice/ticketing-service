@@ -1,7 +1,3 @@
 spring:
   application:
-    name: ticket
-
-logging:
-  level:
-    root: WARN
+    name: ticket-service
