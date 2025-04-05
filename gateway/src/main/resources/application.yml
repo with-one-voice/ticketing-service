@@ -3,4 +3,4 @@ spring:
     name: gateway-service
 
   config:
-    import: configserver:${CONFIG_SERVER_URL:http://localhost:19000}
+    import: configserver:http://localhost:19000
