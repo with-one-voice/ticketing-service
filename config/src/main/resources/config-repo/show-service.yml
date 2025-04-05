@@ -1,3 +1,6 @@
+server:
+  port: 8003
+
 spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/show_db

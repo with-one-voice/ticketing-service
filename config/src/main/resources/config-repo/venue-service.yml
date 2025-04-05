@@ -1,3 +1,6 @@
+server:
+  port: 8004
+
 spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/venue_db

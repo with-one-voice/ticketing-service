@@ -1,3 +1,6 @@
+server:
+  port: 8007
+
 spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/payment_db
