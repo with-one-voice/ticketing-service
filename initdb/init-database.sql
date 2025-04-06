@@ -6,3 +6,4 @@ CREATE DATABASE seat_db;
 CREATE DATABASE payment_db;
 CREATE DATABASE notification_db;
 CREATE DATABASE admin_db;
+CREATE DATABASE auth_db;
