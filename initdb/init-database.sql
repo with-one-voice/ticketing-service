@@ -1,4 +1,3 @@
-CREATE DATABASE auth_db;
 CREATE DATABASE user_db;
 CREATE DATABASE show_db;
 CREATE DATABASE venue_db;
