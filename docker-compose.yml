@@ -2,152 +2,18 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: sa
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - pg_data:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  eureka:
-    image: your-eureka-image
-    container_name: eureka
-    ports:
-      - "8761:8761"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  config:
-    image: your-config-image
-    container_name: config
-    ports:
-      - "8888:8888"
-    depends_on:
-      eureka:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  gateway:
-    image: your-gateway-image
-    container_name: gateway
-    ports:
-      - "8080:8080"
-    depends_on:
-      config:
-        condition: service_healthy
-
-  # 도메인 서비스
-  auth:
-    image: your-auth-image
-    container_name: auth
-    depends_on:
-      config:
-        condition: service_healthy
-
-  user:
-    image: your-user-image
-    container_name: user
-    depends_on:
-      config:
-        condition: service_healthy
-
-  show:
-    image: your-show-image
-    container_name: show
-    depends_on:
-      config:
-        condition: service_healthy
-
-  venue:
-    image: your-venue-image
-    container_name: venue
-    depends_on:
-      config:
-        condition: service_healthy
-
-  ticket:
-    image: your-ticket-image
-    container_name: ticket
-    depends_on:
-      config:
-        condition: service_healthy
-
-  seat:
-    image: your-seat-image
-    container_name: seat
-    depends_on:
-      config:
-        condition: service_healthy
-
-  payment:
-    image: your-payment-image
-    container_name: payment
-    depends_on:
-      config:
-        condition: service_healthy
-
-  notification:
-    image: your-notification-image
-    container_name: notification
-    depends_on:
-      config:
-        condition: service_healthy
-
-  admin:
-    image: your-admin-image
-    container_name: admin
-    depends_on:
-      config:
-        condition: service_healthy
-
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-storage:/var/lib/grafana
-
-volumes:
-  pg_data:
-  grafana-storage:
