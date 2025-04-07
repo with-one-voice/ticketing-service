@@ -55,12 +55,13 @@ configure(sharedModules) {
 			// 추후에는 변경하여 config,eureka와 함께 CI가 되도록 수정
 			implementation 'org.springframework.cloud:spring-cloud-starter-config'
 			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-			implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
 		} else {
 			println("[INFO][${project.name}] 🚫 Cloud config & eureka dependencies excluded")
 
 		}
 
+		implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
 		implementation 'org.springframework.boot:spring-boot-starter-actuator'
