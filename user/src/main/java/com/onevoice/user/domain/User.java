@@ -1,6 +1,6 @@
 package com.onevoice.user.domain;
 
-import com.onevoice.user.application.dto.SignupRequestDto;
+import com.onevoice.common.security.UserRole;
 import com.onevoice.user.domain.vo.Email;
 import com.onevoice.user.domain.vo.Password;
 import jakarta.persistence.Column;
@@ -37,7 +37,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    public User(String email,String encodedPassword,UserRole role){
+    public User(String email,String encodedPassword, UserRole role){
         this.email = new Email(email);
         this.password = new Password(encodedPassword);
         this.role = role;

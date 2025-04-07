@@ -79,6 +79,10 @@ configure(sharedModules) {
 		implementation 'org.springframework.boot:spring-boot-starter'
 		runtimeOnly 'org.postgresql:postgresql'
 
+		// security
+		implementation 'org.springframework.boot:spring-boot-starter-security'
+		testImplementation 'org.springframework.security:spring-security-test'
+
 		// 테스트
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
