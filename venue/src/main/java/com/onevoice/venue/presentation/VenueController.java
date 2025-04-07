@@ -5,6 +5,7 @@ import com.onevoice.venue.application.service.VenueService;
 import com.onevoice.venue.presentation.dto.request.CreateVenueRequestDto;
 import com.onevoice.venue.presentation.dto.response.CreateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.VenueResponseDto;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,13 @@ public class VenueController {
 
         VenueResponseDto responseDto = venueService.getOne(venueId);
         return CommonResponse.success(responseDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponse<List<VenueResponseDto>>> getAll() {
+
+        List<VenueResponseDto> responseDtoList = venueService.getAll();
+        return CommonResponse.success(responseDtoList);
     }
 
 }

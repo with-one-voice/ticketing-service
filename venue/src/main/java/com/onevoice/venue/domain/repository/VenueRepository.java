@@ -1,6 +1,7 @@
 package com.onevoice.venue.domain.repository;
 
 import com.onevoice.venue.domain.Venue;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ public interface VenueRepository {
 
     Optional<Venue> findById(UUID venueId);
 
-    Venue save(Venue venue);
+    List<Venue> findAll();
 
+    Venue save(Venue venue);
 }

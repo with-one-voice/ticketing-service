@@ -8,7 +8,9 @@ import com.onevoice.venue.exception.NotFoundVenueException;
 import com.onevoice.venue.presentation.dto.request.CreateVenueRequestDto;
 import com.onevoice.venue.presentation.dto.response.CreateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.VenueResponseDto;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,5 +47,14 @@ public class VenueServiceImpl implements VenueService {
         FindVenueQuery query = FindVenueQuery.of(venue);
 
         return VenueResponseDto.of(query);
+    }
+
+    @Override
+    public List<VenueResponseDto> getAll() {
+
+        List<FindVenueQuery> venueQueryList = venueRepository.findAll().stream()
+            .map(FindVenueQuery::of).toList();
+
+        return venueQueryList.stream().map(VenueResponseDto::of).collect(Collectors.toList());
     }
 }
