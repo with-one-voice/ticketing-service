@@ -3,7 +3,9 @@ package com.onevoice.venue.presentation;
 import com.onevoice.common.dto.CommonResponse;
 import com.onevoice.venue.application.service.VenueService;
 import com.onevoice.venue.presentation.dto.request.CreateVenueRequestDto;
+import com.onevoice.venue.presentation.dto.request.UpdateVenueRequestDto;
 import com.onevoice.venue.presentation.dto.response.CreateVenueResponseDto;
+import com.onevoice.venue.presentation.dto.response.UpdateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.VenueResponseDto;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +47,15 @@ public class VenueController {
 
         List<VenueResponseDto> responseDtoList = venueService.getAll();
         return CommonResponse.success(responseDtoList);
+    }
+
+    @PatchMapping("/{venueId}")
+    public ResponseEntity<CommonResponse<UpdateVenueResponseDto>> update(
+        @PathVariable("venueId") UUID venueId,
+        @RequestBody UpdateVenueRequestDto requestDto) {
+
+        UpdateVenueResponseDto responseDto = venueService.update(venueId, requestDto);
+        return CommonResponse.success(responseDto);
     }
 
 }

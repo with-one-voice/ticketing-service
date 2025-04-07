@@ -6,13 +6,16 @@ import com.onevoice.venue.domain.repository.VenueRepository;
 import com.onevoice.venue.exception.DuplicateVenueException;
 import com.onevoice.venue.exception.NotFoundVenueException;
 import com.onevoice.venue.presentation.dto.request.CreateVenueRequestDto;
+import com.onevoice.venue.presentation.dto.request.UpdateVenueRequestDto;
 import com.onevoice.venue.presentation.dto.response.CreateVenueResponseDto;
+import com.onevoice.venue.presentation.dto.response.UpdateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.VenueResponseDto;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class VenueServiceImpl implements VenueService {
     private final VenueRepository venueRepository;
 
     @Override
+    @Transactional
     public CreateVenueResponseDto create(CreateVenueRequestDto requestDto) {
 
         if (venueRepository.findByName(requestDto.name()).isPresent()) {
@@ -56,5 +60,18 @@ public class VenueServiceImpl implements VenueService {
             .map(FindVenueQuery::of).toList();
 
         return venueQueryList.stream().map(VenueResponseDto::of).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public UpdateVenueResponseDto update(UUID venueId, UpdateVenueRequestDto requestDto) {
+
+        Venue venue = venueRepository.findById(venueId).orElseThrow(NotFoundVenueException::new);
+
+        venue.update(requestDto);
+
+        FindVenueQuery query = FindVenueQuery.of(venue);
+
+        return UpdateVenueResponseDto.of(query);
     }
 }

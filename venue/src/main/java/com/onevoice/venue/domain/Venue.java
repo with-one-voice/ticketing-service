@@ -1,6 +1,7 @@
 package com.onevoice.venue.domain;
 
 import com.onevoice.common.entity.BaseEntity;
+import com.onevoice.venue.presentation.dto.request.UpdateVenueRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,4 +41,8 @@ public class Venue extends BaseEntity {
     @Column(nullable = false, name = "total_seat_count")
     private Integer totalSeatCount;
 
+    public void update(UpdateVenueRequestDto requestDto) {
+        this.description = requestDto.description();
+        this.totalSeatCount = requestDto.totalSeatCount();
+    }
 }
