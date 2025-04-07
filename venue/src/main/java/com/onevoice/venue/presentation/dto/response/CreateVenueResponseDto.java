@@ -1,10 +1,8 @@
 package com.onevoice.venue.presentation.dto.response;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.onevoice.venue.domain.Venue;
-import com.onevoice.venue.presentation.dto.request.CreateVenueRequestDto;
+import com.onevoice.venue.application.dto.FindVenueQuery;
 
 public record CreateVenueResponseDto(
 	UUID venueId,
@@ -13,13 +11,13 @@ public record CreateVenueResponseDto(
 	String description,
 	Integer totalSeatCount
 ) {
-	public static CreateVenueResponseDto of(Venue venue) {
+	public static CreateVenueResponseDto of(FindVenueQuery query) {
 		return new CreateVenueResponseDto(
-			venue.getId(),
-			venue.getName(),
-			venue.getLocation(),
-			venue.getDescription(),
-			venue.getTotalSeatCount()
+			query.venueId(),
+			query.name(),
+			query.location(),
+			query.description(),
+			query.totalSeatCount()
 		);
 	}
 }
