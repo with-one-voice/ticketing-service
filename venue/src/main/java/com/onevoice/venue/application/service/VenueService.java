@@ -17,4 +17,6 @@ public interface VenueService {
     List<VenueResponseDto> getAll();
 
     UpdateVenueResponseDto update(UUID venueId, UpdateVenueRequestDto requestDto);
+
+    void delete(UUID venueId);
 }

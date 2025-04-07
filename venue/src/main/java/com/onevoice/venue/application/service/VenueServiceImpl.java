@@ -74,4 +74,14 @@ public class VenueServiceImpl implements VenueService {
 
         return UpdateVenueResponseDto.of(query);
     }
+
+    @Override
+    @Transactional
+    public void delete(UUID venueId) {
+
+        Venue venue = venueRepository.findById(venueId).orElseThrow(NotFoundVenueException::new);
+
+        //TODO : security 적용 후 현재 로그인한 사용자 userId 넣기
+        venue.delete(UUID.randomUUID());
+    }
 }
