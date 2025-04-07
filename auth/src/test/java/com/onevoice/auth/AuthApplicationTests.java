@@ -3,6 +3,7 @@ package com.onevoice.auth;
 import com.onevoice.auth.application.client.UserClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -14,15 +15,12 @@ import org.springframework.context.annotation.Import;
 @EnableAutoConfiguration(exclude = {org.springframework.cloud.openfeign.FeignAutoConfiguration.class})
 class AuthApplicationTests {
 
-	private final UserClient userClient;
-
-	AuthApplicationTests(UserClient userClient) {
-		this.userClient = userClient;
-	}
-
+	@Autowired
+	private UserClient userClient;
 
 	@Test
 	void contextLoads() {
+		// userClient should be available here
 	}
 
 	@TestConfiguration
@@ -33,3 +31,4 @@ class AuthApplicationTests {
 		}
 	}
 }
+
