@@ -7,6 +7,8 @@ import com.onevoice.venue.presentation.dto.response.UpdateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.VenueResponseDto;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface VenueService {
 
@@ -19,4 +21,6 @@ public interface VenueService {
     UpdateVenueResponseDto update(UUID venueId, UpdateVenueRequestDto requestDto);
 
     void delete(UUID venueId);
+
+    Page<VenueResponseDto> search(String keyword, Pageable pageable);
 }

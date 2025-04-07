@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,5 +86,20 @@ public class VenueServiceImpl implements VenueService {
 
         //TODO : security 적용 후 현재 로그인한 사용자 userId 넣기
         venue.delete(UUID.randomUUID());
+    }
+
+    @Override
+    public Page<VenueResponseDto> search(String keyword, Pageable pageable) {
+
+        List<FindVenueQuery> queries = venueRepository.search(keyword, pageable)
+            .stream().map(FindVenueQuery::of).toList();
+
+        long total = venueRepository.getTotal(keyword);
+
+        List<VenueResponseDto> dtoList = queries.stream()
+            .map(VenueResponseDto::of)
+            .toList();
+
+        return new PageImpl<>(dtoList, pageable, total);
     }
 }

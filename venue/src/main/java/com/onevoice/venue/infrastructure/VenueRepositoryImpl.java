@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -47,10 +48,42 @@ public class VenueRepositoryImpl implements VenueRepository {
             .where(venue.deletedAt.isNull())
             .fetch();
     }
-    
+
     @Override
     public Venue save(Venue venue) {
         return jpaRepository.save(venue);
+    }
+
+    @Override
+    public List<Venue> search(String keyword, Pageable pageable) {
+        QVenue venue = QVenue.venue;
+
+        return queryFactory
+            .selectFrom(venue)
+            .where(
+                venue.name.containsIgnoreCase(keyword)
+                    .or(venue.location.containsIgnoreCase(keyword)
+                        .or(venue.description.containsIgnoreCase(keyword)))
+            )
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+    }
+
+    @Override
+    public long getTotal(String keyword) {
+        QVenue venue = QVenue.venue;
+
+        Long result = queryFactory
+            .select(venue.count())
+            .from(venue)
+            .where(
+                venue.name.containsIgnoreCase(keyword)
+                    .or(venue.location.containsIgnoreCase(keyword))
+            )
+            .fetchOne();
+
+        return result != null ? result : 0L;
     }
 
 }

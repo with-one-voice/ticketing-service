@@ -4,6 +4,7 @@ import com.onevoice.venue.domain.Venue;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 
 public interface VenueRepository {
 
@@ -14,4 +15,8 @@ public interface VenueRepository {
     List<Venue> findAll();
 
     Venue save(Venue venue);
+
+    List<Venue> search(String keyword, Pageable pageable);
+
+    long getTotal(String keyword);
 }
