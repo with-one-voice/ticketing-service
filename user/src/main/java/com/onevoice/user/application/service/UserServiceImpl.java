@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService{
         User user = User.createUser(command.email(), command.password(), UserRole.USER,
             passwordEncoder);
 
+
         User saved = userRepository.save(user);
 
         return Optional.of(FindUserQuery.of(saved));

@@ -1,2 +1,3 @@
 com.onevoice.common.config.SwaggerConfig
 com.onevoice.common.config.FeignSecurityHeaderConfig
+com.onevoice.common.config.audit.JpaAuditingConfig

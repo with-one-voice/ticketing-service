@@ -1,18 +1,14 @@
 package com.onevoice.user.domain;
 
+import com.onevoice.common.entity.BaseEntity;
 import com.onevoice.common.security.UserRole;
 import com.onevoice.user.domain.vo.Email;
 import com.onevoice.user.domain.vo.Password;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.UUID;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Entity
 @NoArgsConstructor
 @Table(name ="p_users")
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -49,4 +45,13 @@ public class User {
         return new User(email, encodedPassword, role);
     }
 
+    @PrePersist
+    public void onPrePersist(){
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+        if (this.createdBy == null){
+            this.createdBy = this.id;
+        }
+    }
 }
