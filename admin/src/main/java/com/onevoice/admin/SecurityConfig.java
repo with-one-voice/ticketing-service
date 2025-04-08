@@ -1,7 +1,6 @@
-package com.onevoice.auth.infrastructure.config;
+package com.onevoice.admin;
 
 import com.onevoice.common.security.CustomAuthorizationFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
