@@ -1,10 +1,10 @@
 package com.onevoice.user.application.service;
 
+import com.onevoice.common.security.UserRole;
 import com.onevoice.user.application.dto.FindUserQuery;
 import com.onevoice.user.application.dto.LoginRequestDto;
 import com.onevoice.user.application.dto.SignupRequestDto;
 import com.onevoice.user.domain.User;
-import com.onevoice.user.domain.UserRole;
 import com.onevoice.user.domain.repository.UserRepository;
 import com.onevoice.user.exception.DuplicateUserException;
 import com.onevoice.user.exception.PasswordNotMatchException;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService{
             throw new DuplicateUserException();
         }
 
-        User user = User.createUser(command.email(), command.password(), UserRole.CUSTOMER,
+        User user = User.createUser(command.email(), command.password(), UserRole.USER,
             passwordEncoder);
 
         User saved = userRepository.save(user);
