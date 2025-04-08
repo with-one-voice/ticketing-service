@@ -6,8 +6,12 @@ import com.onevoice.payment.application.dto.query.FindPaymentQuery;
 import com.onevoice.payment.application.service.PaymentService;
 import com.onevoice.payment.presentation.dto.request.CancelPaymentRequest;
 import com.onevoice.payment.presentation.dto.request.CreatePaymentRequest;
+import com.onevoice.payment.presentation.dto.request.RefundPaymentRequest;
+import com.onevoice.payment.presentation.dto.response.CancelPaymentResponse;
+import com.onevoice.payment.presentation.dto.response.RefundPaymentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -22,6 +26,8 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    // TODO: security 에서 userId를 받아와야 한다.
+
     /**
      * 결제 생성 API
      */
@@ -30,7 +36,6 @@ public class PaymentController {
             @RequestBody CreatePaymentRequest request
     ) {
         log.info("Create payment request: {}", request);
-        // TODO: security 에서 userId를 받아와야 한다.
         UUID paymentId = paymentService.create(request.toCommand(UUID.randomUUID()));
         URI location = UriComponentsBuilder.newInstance()
                 .path("/api/payments/{payment_id}")
@@ -43,9 +48,12 @@ public class PaymentController {
      * 결제 내역 조회 API
      */
     @GetMapping
-    public ResponseEntity<?> getList() {
+    public ResponseEntity<?> getList(
+            Pageable pageable
+    ) {
         log.info("Get list");
-        return CommonResponse.success("OK");
+        // TODO: 페이징 처리
+        return CommonResponse.success(paymentService.reads(pageable));
     }
 
     /**
@@ -69,6 +77,21 @@ public class PaymentController {
     ) {
         log.info("Cancel payment request: {}", paymentId);
         FindPaymentQuery cancel = paymentService.cancel(paymentId, request.reason());
-        return null;
+        CancelPaymentResponse response = CancelPaymentResponse.from(cancel);
+        return CommonResponse.success(response);
+    }
+
+    /**
+     * 환불 요청 API
+     */
+    @PutMapping("/{paymentId}/refund")
+    public ResponseEntity<?> refund(
+            @PathVariable UUID paymentId,
+            @RequestBody RefundPaymentRequest request
+    ) {
+        log.info("Refund payment request: {}", request);
+        FindPaymentQuery refund = paymentService.refund(paymentId, request.reason());
+        RefundPaymentResponse response = RefundPaymentResponse.from(refund);
+        return CommonResponse.success(response);
     }
 }

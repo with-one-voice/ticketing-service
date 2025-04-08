@@ -1,14 +1,14 @@
 package com.onevoice.payment.presentation.dto.request;
 
 import com.onevoice.payment.application.dto.command.CreatePaymentCommand;
-import com.onevoice.payment.domain.MethodType;
+import com.onevoice.payment.domain.PaymentMethod;
 
 import java.util.UUID;
 
 public record CreatePaymentRequest(
         UUID ticketId,
         Long amount,
-        MethodType methodType
+        PaymentMethod paymentMethod
 ) {
 
     public CreatePaymentCommand toCommand(UUID userId) {
@@ -16,7 +16,7 @@ public record CreatePaymentRequest(
                 .ticketId(ticketId)
                 .userId(userId)
                 .amount(amount)
-                .methodType(methodType)
+                .paymentMethod(paymentMethod)
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 package com.onevoice.payment.domain;
 
-public enum MethodType {
+public enum PaymentMethod {
     CARD,
     ACCOUNT,
 }

@@ -6,6 +6,8 @@ import com.onevoice.payment.domain.repository.PaymentRepository;
 import com.onevoice.payment.infrastructure.jpa.PaymentJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -21,6 +23,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public Payment save(Payment payment) {
         return jpaRepository.save(payment);
+    }
+
+    @Override
+    public Page<Payment> findAll(Pageable pageable) {
+        return jpaRepository.findAll(pageable);
     }
 
     @Override

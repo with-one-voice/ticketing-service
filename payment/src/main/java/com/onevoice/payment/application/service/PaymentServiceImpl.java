@@ -6,6 +6,8 @@ import com.onevoice.payment.domain.Payment;
 import com.onevoice.payment.domain.repository.PaymentRepository;
 import com.onevoice.payment.exception.PaymentNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -23,11 +25,17 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = Payment.createPayment(
                 command.ticketId(),
                 command.userId(),
-                command.methodType(),
+                command.paymentMethod(),
                 command.amount()
         );
         Payment saved = paymentRepository.save(payment);
         return saved.getPaymentId();
+    }
+
+    @Override
+    public Page<FindPaymentQuery> reads(Pageable pageable) {
+        Page<Payment> payments = paymentRepository.findAll(pageable);
+        return payments.map(FindPaymentQuery::from);
     }
 
     @Override
@@ -47,6 +55,18 @@ public class PaymentServiceImpl implements PaymentService {
         payment.cancel(reason);
 
         Payment cancelled = paymentRepository.save(payment);
+        return FindPaymentQuery.from(cancelled);
+    }
+
+    @Override
+    public FindPaymentQuery refund(UUID paymentId, String reason) {
+        // 요청된 결제 정보 가져오기
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(PaymentNotFoundException::new);
+
+        payment.refund(reason);
+
+        Payment refunded = paymentRepository.save(payment);
         return null;
     }
 }

@@ -1,5 +1,6 @@
 package com.onevoice.payment.domain;
 
+import com.onevoice.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,11 +29,11 @@ public class Payment extends BaseEntity {
 
     // 결제 방법
     @Enumerated(EnumType.STRING)
-    private MethodType methodType;
+    private PaymentMethod paymentMethod;
 
     // 결제 상태
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private PaymentStatus paymentStatus;
 
     // 결제 금액
     private Long amount;
@@ -45,17 +46,27 @@ public class Payment extends BaseEntity {
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Refund refund;
 
-    public Payment(UUID ticketId, UUID userId, MethodType methodType, Long amount) {
+    public Payment(
+            UUID ticketId,
+            UUID userId,
+            PaymentMethod paymentMethod,
+            Long amount
+    ) {
         this.ticketId = ticketId;
         this.userId = userId;
-        this.methodType = methodType;
-        this.status = Status.PENDING;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = PaymentStatus.PENDING;
         this.amount = amount;
     }
 
     // 결제 정보 생성
-    public static Payment createPayment(UUID ticketId, UUID userId, MethodType methodType, Long amount) {
-        return new Payment(ticketId, userId, methodType, amount);
+    public static Payment createPayment(
+            UUID ticketId,
+            UUID userId,
+            PaymentMethod paymentMethod,
+            Long amount
+    ) {
+        return new Payment(ticketId, userId, paymentMethod, amount);
     }
 
     // 취소 처리 메서드: 애그리거트 루트인 Payment 에서 Cancellation 을 조작한다.
@@ -67,7 +78,7 @@ public class Payment extends BaseEntity {
         cancellation.assignPayment(this);
     }
 
-    // 환불 처리 메서드:
+    // 환불 처리 메서드
     public void refund(String reason) {
         // 환불 생성은 환불 애그리거트에
         this.refund = Refund.create(reason);

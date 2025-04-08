@@ -44,11 +44,12 @@ public class Refund {
         // TODO: 환불 금액 계산하는 로직
     }
 
-    public static Refund create(String reason) {
+    // 접근제어자 package-private 사용
+    static Refund create(String reason) {
         return new Refund(reason);
     }
 
-    public void assignPayment(Payment payment) {
+    void assignPayment(Payment payment) {
         this.payment = payment;
     }
 }

@@ -33,11 +33,12 @@ public class Cancellation {
         this.requestedAt = LocalDateTime.now();
     }
 
-    public static Cancellation create(String reason) {
+    // 접근제어자 package-private 사용
+    static Cancellation create(String reason) {
         return new Cancellation(reason);
     }
 
-    public void assignPayment(Payment payment) {
+    void assignPayment(Payment payment) {
         this.payment = payment;
     }
 }
