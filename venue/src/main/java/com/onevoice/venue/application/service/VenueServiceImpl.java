@@ -80,12 +80,13 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     @Transactional
-    public void delete(UUID venueId) {
+    public void delete(UUID venueId, UUID userId) {
 
         Venue venue = venueRepository.findById(venueId).orElseThrow(NotFoundVenueException::new);
 
-        //TODO : security 적용 후 현재 로그인한 사용자 userId 넣기
-        venue.delete(UUID.randomUUID());
+        //TODO : security 적용 후 현재 로그인한 사용자 userId 넣기 -> security 적용 후 확인
+        venue.delete(userId);
+//        venue.delete(UUID.randomUUID());
     }
 
     @Override

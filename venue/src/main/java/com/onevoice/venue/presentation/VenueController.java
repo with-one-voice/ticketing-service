@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -65,10 +66,11 @@ public class VenueController {
 
     @DeleteMapping("/{venueId}")
     public ResponseEntity<CommonResponse<String>> delete(
-        @PathVariable("venueId") UUID venueId
+        @PathVariable("venueId") UUID venueId,
+        @AuthenticationPrincipal UUID userId
     ) {
 
-        venueService.delete(venueId);
+        venueService.delete(venueId, userId);
         return CommonResponse.success("공연장 삭제가 완료되었습니다.");
     }
 

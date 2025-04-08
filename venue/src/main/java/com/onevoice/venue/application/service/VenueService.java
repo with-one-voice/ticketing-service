@@ -20,7 +20,7 @@ public interface VenueService {
 
     UpdateVenueResponseDto update(UUID venueId, UpdateVenueRequestDto requestDto);
 
-    void delete(UUID venueId);
+    void delete(UUID venueId, UUID userId);
 
     Page<VenueResponseDto> search(String keyword, Pageable pageable);
 }
