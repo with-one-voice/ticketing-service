@@ -7,10 +7,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 class UserApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
-
+    @Test
+    void contextLoads() {
+    }
 
 }
