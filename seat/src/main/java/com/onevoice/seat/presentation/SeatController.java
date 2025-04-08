@@ -9,18 +9,17 @@ import com.onevoice.seat.presentation.dto.request.CreateSeatRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
 public class SeatController {
     private final SeatService seatService;
+
     @PostMapping("/create")
     public ResponseEntity<CommonResponse<List<SeatResponseDto>>> create(@Valid @RequestBody CreateSeatRequestDto request) {
         CreateSeatCommand command = new CreateSeatCommand(
@@ -29,4 +28,20 @@ public class SeatController {
         List<SeatResponseDto> responseList = seatService.createSeats(command);
         return CommonResponse.success(responseList);
     }
+    @GetMapping("/{sessionId}/{seatCode}")
+    public ResponseEntity<CommonResponse<SeatResponseDto>> getSeat(
+            @PathVariable UUID sessionId,
+            @PathVariable String seatCode
+    ) {
+        return CommonResponse.success(seatService.getSeat(sessionId, seatCode));
+    }
+
+    @GetMapping("/{sessionId}")
+    public ResponseEntity<CommonResponse<List<SeatResponseDto>>> getSeatsBySession(
+            @PathVariable UUID sessionId
+    ) {
+        return CommonResponse.success(seatService.getSeatsBySession(sessionId));
+    }
+
+
 }

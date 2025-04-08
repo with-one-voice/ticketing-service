@@ -14,8 +14,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.onevoice.seat.domain.QSeat.seat;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +47,27 @@ public class SeatServiceImpl implements SeatService {
                 ))
         );
 
+        return seats.stream().map(SeatResponseDto::of).toList();
+    }
+
+
+    @Override
+    public SeatResponseDto getSeat(UUID sessionId, String seatCode) {
+
+
+        SessionId session = new SessionId(sessionId);
+        SeatCode code = new SeatCode(seatCode);
+
+        Seat seat = seatRepository.findBySessionIdAndSeatCode(session, code)
+                .orElseThrow(() -> new RuntimeException("Seat not found"));
+
+        return SeatResponseDto.of(seat);
+    }
+    @Override
+    public List<SeatResponseDto> getSeatsBySession(UUID sessionId) {
+        SessionId session = new SessionId(sessionId);
+
+        List<Seat> seats = seatRepository.findAllBySessionId(session);
         return seats.stream().map(SeatResponseDto::of).toList();
     }
 }
