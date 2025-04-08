@@ -5,9 +5,13 @@ import com.onevoice.show.domain.Show;
 import com.onevoice.show.domain.repository.ShowRepository;
 import com.onevoice.show.exception.DuplicateShowException;
 import com.onevoice.show.exception.NotFoundShowException;
+import com.onevoice.show.exception.TicketingAlreadyStartedException;
 import com.onevoice.show.presentation.dto.request.CreateShowRequestDto;
+import com.onevoice.show.presentation.dto.request.UpdateShowRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateShowResponseDto;
 import com.onevoice.show.presentation.dto.response.ShowResponseDto;
+import com.onevoice.show.presentation.dto.response.UpdateShowResponseDto;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -61,5 +65,23 @@ public class ShowServiceImpl implements ShowService {
             .map(FindShowQuery::of).toList();
 
         return showQueryList.stream().map(ShowResponseDto::of).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public UpdateShowResponseDto update(UUID showId, UpdateShowRequestDto requestDto) {
+
+        Show show = showRepository.findById(showId)
+            .orElseThrow(NotFoundShowException::new);
+
+        if (!show.getTicketingStartTime().isAfter(LocalDateTime.now())) {
+            throw new TicketingAlreadyStartedException();
+        }
+
+        show.update(requestDto);
+
+        FindShowQuery query = FindShowQuery.of(show);
+
+        return UpdateShowResponseDto.of(query);
     }
 }

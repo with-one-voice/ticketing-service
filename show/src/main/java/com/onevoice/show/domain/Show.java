@@ -1,6 +1,7 @@
 package com.onevoice.show.domain;
 
 import com.onevoice.common.entity.BaseEntity;
+import com.onevoice.show.presentation.dto.request.UpdateShowRequestDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -76,5 +77,12 @@ public class Show extends BaseEntity {
         session.setShow(null);
     }
 
-
+    public void update(UpdateShowRequestDto requestDto) {
+        this.artist = requestDto.artist();
+        this.category = requestDto.category();
+        this.posterUrl = requestDto.posterUrl();
+        this.description = requestDto.description();
+        this.ticketingStartTime = requestDto.ticketingStartTime();
+        this.ticketingEndTime = requestDto.ticketingEndTime();
+    }
 }
