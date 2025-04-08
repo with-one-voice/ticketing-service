@@ -10,10 +10,10 @@ import java.util.UUID;
 /**
  * Payment 애그리거트 루트, 엔티티 클래스
  */
-@Getter
 @Entity
 @NoArgsConstructor
 @Table(name = "p_payments")
+@Getter
 public class Payment extends BaseEntity {
 
     @Id
@@ -87,3 +87,4 @@ public class Payment extends BaseEntity {
         refund.assignPayment(this);
     }
 }
+
