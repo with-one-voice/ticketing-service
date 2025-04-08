@@ -84,4 +84,18 @@ public class ShowServiceImpl implements ShowService {
 
         return UpdateShowResponseDto.of(query);
     }
+
+    @Override
+    @Transactional
+    public void delete(UUID showId, UUID userId) {
+
+        Show show = showRepository.findById(showId)
+            .orElseThrow(NotFoundShowException::new);
+
+        if (!show.getTicketingStartTime().isAfter(LocalDateTime.now())) {
+            throw new TicketingAlreadyStartedException();
+        }
+
+        show.delete(userId);
+    }
 }

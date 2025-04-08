@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +59,16 @@ public class ShowController {
 
         UpdateShowResponseDto responseDto = showService.update(showId, requestDto);
         return CommonResponse.success(responseDto);
+    }
+
+    @DeleteMapping("/{showId}")
+    public ResponseEntity<CommonResponse<String>> delete(
+        @PathVariable("showId") UUID showId,
+        @AuthenticationPrincipal UUID userId
+    ) {
+
+        showService.delete(showId, userId);
+        return CommonResponse.success("공연 삭제가 완료되었습니다.");
     }
 
 }

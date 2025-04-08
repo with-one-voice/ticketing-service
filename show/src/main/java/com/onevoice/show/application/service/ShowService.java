@@ -17,4 +17,6 @@ public interface ShowService {
     List<ShowResponseDto> getAll();
 
     UpdateShowResponseDto update(UUID showId, UpdateShowRequestDto requestDto);
+
+    void delete(UUID showId, UUID userId);
 }
