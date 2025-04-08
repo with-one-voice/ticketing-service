@@ -46,9 +46,17 @@ public enum ResponseCode {
     DUPLICATE_USER(4190, HttpStatus.CONFLICT, "이미 존재하는 사용자 입니다."),
     PASSWORD_NOT_MATCH(4100, HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 
+    // Payment
+    PAYMENT_NOT_FOUND(4740, HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보입니다."),
+
+    // Notification
+    NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다."),
+
     // Venue (8004)
     VENUE_NOT_FOUND(4440, HttpStatus.NOT_FOUND, "존재하지 않는 공연장 입니다."),
-    DUPLICATE_VENUE(4490, HttpStatus.CONFLICT, "이미 존재하는 공연장 입니다.");
+    DUPLICATE_VENUE(4490, HttpStatus.CONFLICT, "이미 존재하는 공연장 입니다.")
+
+    ;
 
     private final int code; // 커스텀 코드 (우리 마음대로 정하는 거)
     private final HttpStatus status;
