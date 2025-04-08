@@ -1,6 +1,5 @@
 package com.onevoice.payment.domain;
 
-import com.onevoice.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,5 +56,23 @@ public class Payment extends BaseEntity {
     // 결제 정보 생성
     public static Payment createPayment(UUID ticketId, UUID userId, MethodType methodType, Long amount) {
         return new Payment(ticketId, userId, methodType, amount);
+    }
+
+    // 취소 처리 메서드: 애그리거트 루트인 Payment 에서 Cancellation 을 조작한다.
+    public void cancel(String reason) {
+        // 취소 생성은 취소 애그리거트에
+        this.cancellation = Cancellation.create(reason);
+
+        // 연관관계 편의 메소드
+        cancellation.assignPayment(this);
+    }
+
+    // 환불 처리 메서드:
+    public void refund(String reason) {
+        // 환불 생성은 환불 애그리거트에
+        this.refund = Refund.create(reason);
+
+        // 연관관계 편의 메소드
+        refund.assignPayment(this);
     }
 }

@@ -1,6 +1,7 @@
 package com.onevoice.payment.domain;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "p_refund")
+@NoArgsConstructor
 public class Refund {
 
     @Id
@@ -34,4 +36,19 @@ public class Refund {
 
     // 환불 완료 시각
     private LocalDateTime completedAt;
+
+    private Refund(String reason) {
+        this.reason = reason;
+        this.status = RefundStatus.PENDING;
+        this.requestedAt = LocalDateTime.now();
+        // TODO: 환불 금액 계산하는 로직
+    }
+
+    public static Refund create(String reason) {
+        return new Refund(reason);
+    }
+
+    public void assignPayment(Payment payment) {
+        this.payment = payment;
+    }
 }
