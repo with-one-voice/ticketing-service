@@ -1,5 +1,6 @@
 package com.onevoice.payment.infrastructure.config;
 
+import com.onevoice.common.security.CustomAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
