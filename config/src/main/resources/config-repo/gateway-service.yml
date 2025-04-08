@@ -5,7 +5,6 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-
       routes:
         # admin
         - id: admin-service
@@ -105,3 +104,27 @@ management:
 
 jwt:
   secret: ${JWT_SECRET_KEY}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    with-credentials: true
+    urls:
+      - name: admin-service
+        url: /api/admin/v3/api-docs
+      - name: auth-service
+        url: /api/auth/v3/api-docs
+      - name: notification-service
+        url: /api/notifications/v3/api-docs
+      - name: payment-service
+        url: /api/payments/v3/api-docs
+      - name: seat-service
+        url: /api/seats/v3/api-docs
+      - name: show-service
+        url: /api/shows/v3/api-docs
+      - name: ticket-service
+        url: /api/tickets/v3/api-docs
+      - name: user-service
+        url: /api/users/v3/api-docs
+      - name: venue-service
+        url: /api/venues/v3/api-docs

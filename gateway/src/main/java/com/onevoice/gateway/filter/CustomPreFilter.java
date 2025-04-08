@@ -1,6 +1,7 @@
 package com.onevoice.gateway.filter;
 
 import com.onevoice.gateway.jwt.JwtUtils;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +24,19 @@ public class CustomPreFilter implements GlobalFilter, Ordered {
 
     private final JwtUtils jwtUtils;
 
+    private static final List<String> WHITELIST_PREFIXES = List.of(
+        "/signup", "/login",    // 로그인/회원가입 요청
+        "/v3/api-docs", "/swagger-ui", "/swagger-ui.html",
+        "/swagger-resources", "/webjars"
+    );
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         String uri = exchange.getRequest().getURI().getPath().toString();
         log.info("PreFilter request uri :{}",uri);
 
-        if (uri.startsWith("/api/auth/signup") || uri.startsWith("/api/auth/login")) {
+        if (isWhitelisted(uri)) {
             return chain.filter(exchange);
         }
 
@@ -60,6 +67,10 @@ public class CustomPreFilter implements GlobalFilter, Ordered {
             return bearer.substring(7);
         }
         return null;
+    }
+
+    private boolean isWhitelisted(String uri) {
+        return WHITELIST_PREFIXES.stream().anyMatch(uri::contains);
     }
 
     @Override
