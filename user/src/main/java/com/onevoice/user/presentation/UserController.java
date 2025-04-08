@@ -1,14 +1,11 @@
 package com.onevoice.user.presentation;
 
-import com.onevoice.common.dto.CommonResponse;
 import com.onevoice.user.application.dto.FindUserQuery;
 import com.onevoice.user.application.dto.LoginRequestDto;
 import com.onevoice.user.application.dto.SignupRequestDto;
 import com.onevoice.user.application.service.UserService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
