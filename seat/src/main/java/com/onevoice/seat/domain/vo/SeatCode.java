@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class SeatCode {
-    @Column(name = "seat_code", nullable = false)
+    @Column(nullable = false)
     private String value;
 
     public SeatCode(String value) {

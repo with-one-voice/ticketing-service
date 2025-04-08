@@ -22,7 +22,7 @@ public class Seat extends BaseEntity {
     private UUID seatId;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "seats_code"))
+    @AttributeOverride(name = "value", column = @Column(name = "seat_code"))
     private SeatCode seatCode;
 
     @Embedded
