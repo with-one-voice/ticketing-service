@@ -50,7 +50,12 @@ public enum ResponseCode {
     PAYMENT_NOT_FOUND(4740, HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보입니다."),
 
     // Notification
-    NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다.")
+    NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다."),
+
+    // Ticket
+    TICKET_OWNER_MISS__MATCH(4530, HttpStatus.FORBIDDEN, "티켓의 소유자가 일치하지 않습니다."),
+    TICKET_NOT_FOUND(4540, HttpStatus.NOT_FOUND, "티켓을 찾을 수 없습니다."),
+
 
     ;
 
