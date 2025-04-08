@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,7 +24,7 @@ public class BaseEntity {
 
     @CreatedBy
     @Column(name = "created_by", updatable = false)
-    protected String createdBy;
+    protected UUID createdBy;
 
     @LastModifiedDate
     @Column(name = "updated_at")
@@ -30,18 +32,18 @@ public class BaseEntity {
 
     @LastModifiedBy
     @Column(name = "updated_by")
-    protected String updatedBy;
+    protected UUID updatedBy;
 
     @Column(name ="deleted_at")
     protected LocalDateTime deletedAt;
 
     @Column(name ="deleted_by")
-    protected String deletedBy;
+    protected UUID deletedBy;
 
     /**
      * soft delete
      */
-    public void delete(String username){
+    public void delete(UUID username){
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = username;
     }
