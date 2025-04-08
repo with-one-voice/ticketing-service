@@ -32,7 +32,7 @@ public class SeatServiceImpl implements SeatService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public List<SeatResponseDto> createSeats(CreateSeatCommand command) {
+    public List<SeatResponseDto> createSeat(CreateSeatCommand command) {
         SessionId sessionId = new SessionId(command.sessionId());
         Money price = new Money(command.price());
 
@@ -69,14 +69,14 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    public List<SeatResponseDto> getSeatsBySession(UUID sessionId) {
+    public List<SeatResponseDto> getSeatBySession(UUID sessionId) {
         SessionId session = new SessionId(sessionId);
 
         List<Seat> seats = seatRepository.findAllBySessionId(session);
         return seats.stream().map(SeatResponseDto::of).toList();
     }
     //좌석 선점
-    public HoldSeatResponseDto holdSeats(HoldSeatCommand command) {
+    public HoldSeatResponseDto holdSeat(HoldSeatCommand command) {
         SessionId sessionId = new SessionId(command.sessionId());
         List<String> seatCodes = command.seatCodes();
         UUID userId = command.userId();
@@ -108,6 +108,13 @@ public class SeatServiceImpl implements SeatService {
         }
 
         return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(1), seatIds);
+    }
+
+    @Override
+    public void deleteSeat(UUID sessionId){
+        SessionId session = new SessionId(sessionId);
+        seatRepository.deleteAllBySessionId(session);
+        redisTemplate.delete("seat:" + sessionId.toString());
     }
 
 }

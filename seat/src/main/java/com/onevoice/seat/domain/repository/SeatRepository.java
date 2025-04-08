@@ -17,5 +17,5 @@ public interface SeatRepository {
     Optional<Seat> findBySessionIdAndSeatCode(SessionId sessionId, SeatCode seatCode);
 
     void saveAll(List<Seat> seats);
-
+    void deleteAllBySessionId(SessionId sessionId);
 }

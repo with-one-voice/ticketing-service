@@ -28,7 +28,7 @@ public class SeatController {
         CreateSeatCommand command = new CreateSeatCommand(
                 request.sessionId(), request.seatCount(), request.price()
         );
-        List<SeatResponseDto> responseList = seatService.createSeats(command);
+        List<SeatResponseDto> responseList = seatService.createSeat(command);
         return CommonResponse.success(responseList);
     }
     @GetMapping("/{sessionId}/{seatCode}")
@@ -43,7 +43,7 @@ public class SeatController {
     public ResponseEntity<CommonResponse<List<SeatResponseDto>>> getSeatsBySession(
             @PathVariable UUID sessionId
     ) {
-        return CommonResponse.success(seatService.getSeatsBySession(sessionId));
+        return CommonResponse.success(seatService.getSeatBySession(sessionId));
     }
 
     @PatchMapping("/{sessionId}/hold")
@@ -56,8 +56,14 @@ public class SeatController {
                 request.seatCodes(),
                 request.userId()
         );
-        HoldSeatResponseDto result = seatService.holdSeats(command);
+        HoldSeatResponseDto result = seatService.holdSeat(command);
         return CommonResponse.success(result);
     }
-
+    @DeleteMapping("/{sessionId}")
+    public ResponseEntity<CommonResponse<Void>> deleteBySessionId(
+            @PathVariable UUID sessionId
+    ) {
+        seatService.deleteSeat(sessionId);
+        return CommonResponse.success(null);
+    }
 }

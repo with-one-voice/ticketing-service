@@ -10,10 +10,11 @@ import java.util.UUID;
 
 
 public interface SeatService {
-    List<SeatResponseDto> createSeats(CreateSeatCommand command);
+    List<SeatResponseDto> createSeat(CreateSeatCommand command);
     SeatResponseDto getSeat(UUID sessionId, String seatCode);
 
-    List<SeatResponseDto> getSeatsBySession(UUID sessionId);
-    HoldSeatResponseDto holdSeats(HoldSeatCommand command);
+    List<SeatResponseDto> getSeatBySession(UUID sessionId);
+    HoldSeatResponseDto holdSeat(HoldSeatCommand command);
 
+    void deleteSeat(UUID sessionId);
 }
