@@ -15,41 +15,52 @@ public class Notification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID notification_id;
+    private UUID notificationId;
 
-    private UUID user_id;
+    private UUID userId;
 
     @Enumerated(EnumType.STRING)
-    private NotificationType type;
+    private NotificationType notificationType;
+
+    @Enumerated(EnumType.STRING)
+    private NotificationStatus notificationStatus;
+
+    private String title;
 
     private String message;
 
-    @Enumerated(EnumType.STRING)
-    private NotificationStatus status;
+    private String metadata;
 
     private Notification(
-        UUID user_id,
-        NotificationType type,
+        UUID userId,
+        NotificationType notificationType,
+        String title,
         String message,
-        NotificationStatus status
+        String metadata
     ) {
-        this.user_id = user_id;
-        this.type = type;
+        this.userId = userId;
+        this.notificationType = notificationType;
+        this.title = title;
         this.message = message;
-        this.status = status;
+        this.metadata = metadata;
+
+        // 알림 생성 시 status = PENDING
+        this.notificationStatus = NotificationStatus.PENDING;
     }
 
     public static Notification create(
-        UUID user_id,
-        NotificationType type,
+        UUID userId,
+        NotificationType notificationType,
+        String title,
         String message,
-        NotificationStatus status
+        String metadata
     ) {
         return new Notification(
-            user_id,
-            type,
+            userId,
+            notificationType,
+            title,
             message,
-            status
+            metadata
         );
     }
 }
