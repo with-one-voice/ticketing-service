@@ -2,6 +2,8 @@ package com.onevoice.seat.application.service;
 
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
+import com.onevoice.seat.exception.SeatAlreadyHeldException;
+import com.onevoice.seat.exception.SeatNotFoundException;
 import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
 import com.onevoice.seat.domain.Seat;
@@ -63,7 +65,7 @@ public class SeatServiceImpl implements SeatService {
         SeatCode code = new SeatCode(seatCode);
 
         Seat seat = seatRepository.findBySessionIdAndSeatCode(session, code)
-                .orElseThrow(() -> new RuntimeException("Seat not found"));
+                .orElseThrow(SeatNotFoundException::new);
 
         return SeatResponseDto.of(seat);
     }
@@ -84,7 +86,7 @@ public class SeatServiceImpl implements SeatService {
         //1. 좌석 조회
         List<Seat> seats = seatCodes.stream()
                 .map(code -> seatRepository.findBySessionIdAndSeatCode(sessionId, new SeatCode(code))
-                        .orElseThrow(() -> new RuntimeException("좌석을 찾을 수 없습니다: " + code)))
+                        .orElseThrow(SeatNotFoundException::new))
                 .toList();
 
         List<UUID> seatIds = seats.stream()
@@ -100,7 +102,7 @@ public class SeatServiceImpl implements SeatService {
                     .get(redisKey, seat.getSeatCode().getValue());
 
             if (!"AVAILABLE".equals(currentStatus)) {
-                throw new RuntimeException("이미 선점된 좌석입니다: " + seat.getSeatCode().getValue());
+                throw new SeatAlreadyHeldException();
             }
 
             redisTemplate.opsForHash().put(redisKey, seat.getSeatCode().getValue(), "HOLD");
