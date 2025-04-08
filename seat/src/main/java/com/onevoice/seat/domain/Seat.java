@@ -1,9 +1,9 @@
 package com.onevoice.seat.domain;
 
+import com.onevoice.common.entity.BaseEntity;
 import com.onevoice.seat.domain.vo.Money;
 import com.onevoice.seat.domain.vo.SeatCode;
 import com.onevoice.seat.domain.vo.SessionId;
-import com.onevoice.seat.infrastructure.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
