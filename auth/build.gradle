@@ -11,9 +11,6 @@ dependencies {
 	// 선택적으로 이 모듈에서만 쓰는 라이브러리 있을 경우 여기에 추가
 	// 예: security, kafka, redis 등
 
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	testImplementation 'org.springframework.security:spring-security-test'
-
 	// JWT 관련
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
