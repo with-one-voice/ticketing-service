@@ -23,7 +23,13 @@ public class SecurityConfig {
             .addFilterBefore(customAuthorizationFilter(),
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/swagger-resources/**",
+                    "/webjars/**"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(
