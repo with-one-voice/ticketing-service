@@ -4,8 +4,13 @@ import com.onevoice.common.dto.CommonResponse;
 import com.onevoice.show.application.service.ShowService;
 import com.onevoice.show.presentation.dto.request.CreateShowRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateShowResponseDto;
+import com.onevoice.show.presentation.dto.response.ShowResponseDto;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +28,22 @@ public class ShowController {
 
         CreateShowResponseDto responseDto = showService.create(requestDto);
         return CommonResponse.success(responseDto);
+    }
+
+    @GetMapping("/{showId}")
+    public ResponseEntity<CommonResponse<ShowResponseDto>> getOne(
+        @PathVariable("showId") UUID showId
+    ) {
+
+        ShowResponseDto responseDto = showService.getOne(showId);
+        return CommonResponse.success(responseDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponse<List<ShowResponseDto>>> getAll() {
+
+        List<ShowResponseDto> responseDtoList = showService.getAll();
+        return CommonResponse.success(responseDtoList);
     }
 
 }
