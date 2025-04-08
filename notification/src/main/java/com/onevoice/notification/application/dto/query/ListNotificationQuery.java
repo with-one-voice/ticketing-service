@@ -1,5 +1,9 @@
 package com.onevoice.notification.application.dto.query;
 
-public record ListNotificationQuery() {
+import java.util.List;
+
+public record ListNotificationQuery(
+    List<FindNotificationQuery> queryList
+) {
 
 }
