@@ -26,7 +26,7 @@ public class PaymentServiceImpl implements PaymentService {
                 command.ticketId(),
                 command.userId(),
                 command.paymentMethod(),
-                command.amount()
+                command.paymentAmount()
         );
         Payment saved = paymentRepository.save(payment);
         return saved.getPaymentId();
