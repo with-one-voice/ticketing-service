@@ -33,7 +33,7 @@ public class Show extends BaseEntity {
     @Id
     @Column(name = "show_id")
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     @Column(nullable = false, name = "venue_id")
     private UUID venueId;
