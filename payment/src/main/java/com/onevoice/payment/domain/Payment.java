@@ -36,27 +36,27 @@ public class Payment extends BaseEntity {
     private PaymentStatus paymentStatus;
 
     // 결제 금액
-    private Long amount;
+    private int paymentAmount;
 
     // 결제 취소
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Cancellation cancellation;
 
     // 환불
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Refund refund;
 
     public Payment(
             UUID ticketId,
             UUID userId,
             PaymentMethod paymentMethod,
-            Long amount
+            Integer paymentAmount
     ) {
         this.ticketId = ticketId;
         this.userId = userId;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = PaymentStatus.PENDING;
-        this.amount = amount;
+        this.paymentAmount = paymentAmount;
     }
 
     // 결제 정보 생성
@@ -64,9 +64,9 @@ public class Payment extends BaseEntity {
             UUID ticketId,
             UUID userId,
             PaymentMethod paymentMethod,
-            Long amount
+            Integer paymentAmount
     ) {
-        return new Payment(ticketId, userId, paymentMethod, amount);
+        return new Payment(ticketId, userId, paymentMethod, paymentAmount);
     }
 
     // 취소 처리 메서드: 애그리거트 루트인 Payment 에서 Cancellation 을 조작한다.

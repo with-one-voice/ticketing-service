@@ -22,14 +22,14 @@ public class Refund {
     private Payment payment;
 
     // 환불 금액
-    private int amount;
+    private int refundAmount;
 
     // 환불 사유
     private String reason;
 
     // 환불 상태
     @Enumerated(EnumType.STRING)
-    private RefundStatus status;
+    private RefundStatus refundStatus;
 
     // 환불 요청 시각
     private LocalDateTime requestedAt;
@@ -39,7 +39,7 @@ public class Refund {
 
     private Refund(String reason) {
         this.reason = reason;
-        this.status = RefundStatus.PENDING;
+        this.refundStatus = RefundStatus.PENDING;
         this.requestedAt = LocalDateTime.now();
         // TODO: 환불 금액 계산하는 로직
     }

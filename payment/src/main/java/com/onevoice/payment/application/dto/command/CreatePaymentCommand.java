@@ -1,15 +1,27 @@
 package com.onevoice.payment.application.dto.command;
 
 import com.onevoice.payment.domain.PaymentMethod;
-import lombok.Builder;
 
 import java.util.UUID;
 
-@Builder
 public record CreatePaymentCommand(
         UUID ticketId,
         UUID userId,
-        Long amount,
+        Integer paymentAmount,
         PaymentMethod paymentMethod
 ) {
+
+    public static CreatePaymentCommand of(
+            UUID ticketId,
+            UUID userId,
+            Integer paymentAmount,
+            PaymentMethod paymentMethod
+    ) {
+        return new CreatePaymentCommand(
+                ticketId,
+                userId,
+                paymentAmount,
+                paymentMethod
+        );
+    }
 }

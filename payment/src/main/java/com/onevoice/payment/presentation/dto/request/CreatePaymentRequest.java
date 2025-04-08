@@ -7,16 +7,16 @@ import java.util.UUID;
 
 public record CreatePaymentRequest(
         UUID ticketId,
-        Long amount,
+        Integer paymentAmount,
         PaymentMethod paymentMethod
 ) {
 
     public CreatePaymentCommand toCommand(UUID userId) {
-        return CreatePaymentCommand.builder()
-                .ticketId(ticketId)
-                .userId(userId)
-                .amount(amount)
-                .paymentMethod(paymentMethod)
-                .build();
+        return CreatePaymentCommand.of(
+                ticketId,
+                userId,
+                paymentAmount,
+                paymentMethod
+        );
     }
 }
