@@ -1,8 +1,11 @@
 package com.onevoice.ticket.application.service;
 
+import com.onevoice.ticket.application.client.UserClient;
+import com.onevoice.ticket.application.dto.FindUserQuery;
 import com.onevoice.ticket.domain.Ticket;
 import com.onevoice.ticket.domain.TicketStatus;
 import com.onevoice.ticket.domain.repository.TicketRepository;
+import com.onevoice.ticket.exception.RemoteUserNotFoundException;
 import com.onevoice.ticket.exception.TicketNotFoundException;
 import com.onevoice.ticket.exception.TicketOwnerMismatchException;
 import com.onevoice.ticket.presentation.dto.request.CreateTicketRequestDto;
@@ -26,13 +29,15 @@ import java.util.UUID;
 public class TicketServiceImpl implements TicketService{
 
     private final TicketRepository ticketRepository;
+    private final UserClient userClient;
 
     @Override
     public CreateTicketResponseDto createTicket(CreateTicketRequestDto requestDto) {
         /**
          * TODO user,show,seat 확인 로직
          */
-        String userName = "dummy user";
+        FindUserQuery userQuery = userClient.findUserById(requestDto.userId()).orElseThrow(RemoteUserNotFoundException::new);
+        String userName = userQuery.email();
         String showName = "dummy show";
 
         Ticket ticket = new Ticket(requestDto.userId(),userName, requestDto.showId(),showName,requestDto.seatId());

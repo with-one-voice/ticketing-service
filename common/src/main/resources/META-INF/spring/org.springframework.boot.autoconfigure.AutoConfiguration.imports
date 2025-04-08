@@ -1,1 +1,2 @@
 com.onevoice.common.config.SwaggerConfig
+com.onevoice.common.config.FeignSecurityHeaderConfig

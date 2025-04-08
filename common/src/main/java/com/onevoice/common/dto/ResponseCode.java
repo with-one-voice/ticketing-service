@@ -55,6 +55,7 @@ public enum ResponseCode {
     // Ticket
     TICKET_OWNER_MISS__MATCH(4530, HttpStatus.FORBIDDEN, "티켓의 소유자가 일치하지 않습니다."),
     TICKET_NOT_FOUND(4540, HttpStatus.NOT_FOUND, "티켓을 찾을 수 없습니다."),
+    TICKET_REMOTE_USER_NOT_FOUND(4544, HttpStatus.NOT_FOUND, "해탕 티켓을 소유한 유저가 없습니다."),
 
     // Venue (8004)
     VENUE_NOT_FOUND(4440, HttpStatus.NOT_FOUND, "존재하지 않는 공연장 입니다."),

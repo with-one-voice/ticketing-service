@@ -10,6 +10,8 @@ import com.onevoice.user.exception.DuplicateUserException;
 import com.onevoice.user.exception.PasswordNotMatchException;
 import com.onevoice.user.exception.UserNotFoundException;
 import java.util.Optional;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,13 @@ public class UserServiceImpl implements UserService{
             throw new PasswordNotMatchException();
         }
 
+        return Optional.of(FindUserQuery.of(user));
+    }
+
+    @Override
+    public Optional<FindUserQuery> findUserById(UUID userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return Optional.of(FindUserQuery.of(user));
     }
 }
