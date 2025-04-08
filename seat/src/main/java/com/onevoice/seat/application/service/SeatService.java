@@ -1,6 +1,8 @@
 package com.onevoice.seat.application.service;
 
 import com.onevoice.seat.application.dto.CreateSeatCommand;
+import com.onevoice.seat.application.dto.HoldSeatCommand;
+import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
 
 import java.util.List;
@@ -12,4 +14,6 @@ public interface SeatService {
     SeatResponseDto getSeat(UUID sessionId, String seatCode);
 
     List<SeatResponseDto> getSeatsBySession(UUID sessionId);
+    HoldSeatResponseDto holdSeats(HoldSeatCommand command);
+
 }
