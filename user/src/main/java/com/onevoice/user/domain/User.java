@@ -52,6 +52,7 @@ public class User extends BaseEntity {
         }
         if (this.createdBy == null){
             this.createdBy = this.id;
+            this.updatedBy = this.id;
         }
     }
 }
