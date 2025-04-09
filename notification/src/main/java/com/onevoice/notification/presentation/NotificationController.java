@@ -34,10 +34,13 @@ public class NotificationController {
      * 알림 생성 API
      */
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody CreateNotificationRequest request) {
+    public ResponseEntity<?> post(
+        @RequestBody CreateNotificationRequest request,
+        @AuthenticationPrincipal UUID userId
+    ) {
         log.info("Request Body:{}", request);
 
-        UUID notificationId = notificationService.create(request.toCommand(getUserId()));
+        UUID notificationId = notificationService.create(request.toCommand(userId));
         URI location = UriComponentsBuilder.newInstance()
             .path("/api/notifications/{notificationId}")
             .buildAndExpand(notificationId)
@@ -49,25 +52,24 @@ public class NotificationController {
      * 알림 목록 조회 API
      */
     @GetMapping
-    public ResponseEntity<?> getList(Pageable pageable) {
+    public ResponseEntity<?> getList(
+        @AuthenticationPrincipal UUID userId,
+        Pageable pageable
+    ) {
         log.info("Get list request: {}", pageable);
         // user 는 자신의 목록만 볼 수 있다.
-        return CommonResponse.success(notificationService.reads(getUserId(), pageable));
+        return CommonResponse.success(notificationService.reads(userId, pageable));
     }
 
     /**
      * 알림 조회 API
      */
     @GetMapping("/{notificationId}")
-    public ResponseEntity<?> get(@PathVariable UUID notificationId) {
+    public ResponseEntity<?> get(
+        @PathVariable UUID notificationId,
+        @AuthenticationPrincipal UUID userId
+    ) {
         log.info("Get request: {}", notificationId);
-        return CommonResponse.success(notificationService.read(getUserId(), notificationId));
+        return CommonResponse.success(notificationService.read(userId, notificationId));
     }
-
-    private UUID getUserId() {
-        // 사용자 정보 받아오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (UUID) authentication.getPrincipal();
-    }
-
 }
