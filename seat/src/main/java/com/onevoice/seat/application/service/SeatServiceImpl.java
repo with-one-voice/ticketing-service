@@ -5,6 +5,7 @@ import com.onevoice.seat.application.dto.HoldSeatCommand;
 import com.onevoice.seat.exception.SeatAlreadyHeldException;
 import com.onevoice.seat.exception.SeatNotFoundException;
 import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
+import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
 import com.onevoice.seat.domain.Seat;
 import com.onevoice.seat.domain.SeatStatus;
@@ -24,7 +25,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.onevoice.seat.domain.QSeat.seat;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class SeatServiceImpl implements SeatService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public List<SeatResponseDto> createSeat(CreateSeatCommand command) {
+    public List<SeatCreateResponseDto> createSeat(CreateSeatCommand command) {
         SessionId sessionId = new SessionId(command.sessionId());
         Money price = new Money(command.price());
 
@@ -53,7 +53,7 @@ public class SeatServiceImpl implements SeatService {
                 ))
         );
 
-        return seats.stream().map(SeatResponseDto::of).toList();
+        return seats.stream().map(SeatCreateResponseDto::of).toList();
     }
 
 

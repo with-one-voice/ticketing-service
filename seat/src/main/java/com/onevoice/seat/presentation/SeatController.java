@@ -6,6 +6,7 @@ import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
 import com.onevoice.seat.presentation.dto.request.HoldSeatRequestDto;
 import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
+import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
 import com.onevoice.seat.application.service.SeatService;
 import com.onevoice.seat.presentation.dto.request.CreateSeatRequestDto;
@@ -24,11 +25,11 @@ public class SeatController {
     private final SeatService seatService;
 
     @PostMapping("/create")
-    public ResponseEntity<CommonResponse<List<SeatResponseDto>>> create(@Valid @RequestBody CreateSeatRequestDto request) {
+    public ResponseEntity<CommonResponse<List<SeatCreateResponseDto>>> create(@Valid @RequestBody CreateSeatRequestDto request) {
         CreateSeatCommand command = new CreateSeatCommand(
                 request.sessionId(), request.seatCount(), request.price()
         );
-        List<SeatResponseDto> responseList = seatService.createSeat(command);
+        List<SeatCreateResponseDto> responseList = seatService.createSeat(command);
         return CommonResponse.success(responseList);
     }
     @GetMapping("/{sessionId}/{seatCode}")
