@@ -69,7 +69,9 @@ public enum ResponseCode {
     INVALID_SESSION_DATE(4394, HttpStatus.BAD_REQUEST,
         "유효하지 않은 공연 회차 날짜입니다. 공연 예매일 이후 날짜로 설정 가능합니다."),
     INVALID_SEAT_COUNT(4395, HttpStatus.BAD_REQUEST, "유효하지 않은 수용 인원입니다. 공연장 총 수용인원을 초과할 수 없습니다."),
-    INVALID_VENUE_ID(4396, HttpStatus.BAD_REQUEST, "유효하지 않은 공연장 ID 입니다. 해당하는 공연장을 찾을 수 없습니다.");
+    INVALID_VENUE_ID(4396, HttpStatus.BAD_REQUEST, "유효하지 않은 공연장 ID 입니다. 해당하는 공연장을 찾을 수 없습니다."),
+    SESSION_SEAT_CREATE_API_FAIL(4397, HttpStatus.BAD_REQUEST,
+        "Show Service에서 좌석 생성 API 호출을 실패하였습니다.");
 
 
     private final int code; // 커스텀 코드 (우리 마음대로 정하는 거)

@@ -1,6 +1,8 @@
 package com.onevoice.show.application.service;
 
+import com.onevoice.show.application.client.SeatClient;
 import com.onevoice.show.application.client.VenueClient;
+import com.onevoice.show.application.dto.CreateSeatRequestDto;
 import com.onevoice.show.application.dto.FindSessionQuery;
 import com.onevoice.show.application.dto.VenueResponseDto;
 import com.onevoice.show.domain.Session;
@@ -15,6 +17,7 @@ import com.onevoice.show.exception.InvalidSessionDateException;
 import com.onevoice.show.exception.InvalidVenueIdException;
 import com.onevoice.show.exception.NotFoundSessionException;
 import com.onevoice.show.exception.NotFoundShowException;
+import com.onevoice.show.exception.SeatCreateApiFailException;
 import com.onevoice.show.exception.TicketingAlreadyStartedException;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
@@ -36,6 +39,7 @@ public class SessionServiceImpl implements SessionService {
     private final ShowRepository showRepository;
     private final SessionRepository sessionRepository;
     private final VenueClient venueClient;
+    private final SeatClient seatClient;
 
     @Override
     @Transactional
@@ -79,6 +83,12 @@ public class SessionServiceImpl implements SessionService {
         FindSessionQuery query = FindSessionQuery.of(sessionRepository.save(session));
 
         //TODO: 좌석 생성 FeignClient 호출
+        try {
+            seatClient.create(new CreateSeatRequestDto(session.getId(), session.getSeatCount(),
+                session.getSeatPrice().intValue()));
+        } catch (SeatCreateApiFailException e) {
+            throw new SeatCreateApiFailException();
+        }
 
         return CreateSessionResponseDto.of(query);
     }
