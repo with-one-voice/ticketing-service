@@ -41,7 +41,9 @@ public enum ResponseCode {
     PASSWORD_NOT_MATCH(4100, HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 
     // Payment
+    PAYMENT_NO_CONTENT(2740, HttpStatus.NO_CONTENT, "요청 성공"),
     PAYMENT_NOT_FOUND(4740, HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보입니다."),
+    PAYMENT_NOT_STATUS(4700, HttpStatus.BAD_REQUEST, "존재하지 않는 결제 상태입니다."),
 
     // Notification
     NOTIFICATION_NO_CONTENT(2840, HttpStatus.NO_CONTENT, "요청 성공"),
