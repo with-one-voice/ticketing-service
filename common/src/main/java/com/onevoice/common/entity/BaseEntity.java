@@ -43,9 +43,9 @@ public class BaseEntity {
     /**
      * soft delete
      */
-    public void delete(UUID username){
+    public void delete(UUID userId){
         this.deletedAt = LocalDateTime.now();
-        this.deletedBy = username;
+        this.deletedBy = userId;
     }
 
     public void restore(){

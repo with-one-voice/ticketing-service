@@ -9,12 +9,16 @@ import com.onevoice.user.domain.repository.UserRepository;
 import com.onevoice.user.exception.DuplicateUserException;
 import com.onevoice.user.exception.PasswordNotMatchException;
 import com.onevoice.user.exception.UserNotFoundException;
+import com.onevoice.user.presentation.dto.request.DeleteUserRequestDto;
+import com.onevoice.user.presentation.dto.response.DeleteUserResponseDto;
+import com.onevoice.user.presentation.dto.response.GetUserInfoResponseDto;
 import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -57,5 +61,28 @@ public class UserServiceImpl implements UserService{
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return Optional.of(FindUserQuery.of(user));
+    }
+
+    @Override
+    public GetUserInfoResponseDto getMyInfo(UUID userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        return GetUserInfoResponseDto.of(user);
+    }
+
+    @Override
+    @Transactional
+    public DeleteUserResponseDto deleteUser(UUID userId, DeleteUserRequestDto requestDto) {
+
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        if (!user.getPassword().matches(requestDto.password(), passwordEncoder)) {
+            throw new PasswordNotMatchException();
+        }
+
+        user.delete(userId);
+
+        return DeleteUserResponseDto.of(user);
     }
 }
