@@ -2,7 +2,7 @@ package com.onevoice.payment.domain;
 
 public enum PaymentStatus {
     PENDING,
-    CANCELLED,
-    REFUNDED,
+    CANCEL_REQUEST,
+    REFUND_REQUEST,
     APPROVED,
 }

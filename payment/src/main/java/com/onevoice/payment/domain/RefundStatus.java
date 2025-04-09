@@ -4,4 +4,5 @@ public enum RefundStatus {
     PENDING,
     CANCELLED,
     FAILED,
+    COMPLETED,
 }

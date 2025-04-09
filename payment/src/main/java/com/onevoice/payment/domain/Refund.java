@@ -1,10 +1,17 @@
 package com.onevoice.payment.domain;
 
-import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Refund 애그리거트, 엔티티 클래스
@@ -12,11 +19,12 @@ import java.util.UUID;
 @Entity
 @Table(name = "p_refund")
 @NoArgsConstructor
+@Getter
 public class Refund {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID refund_id;
+    private UUID refundId;
 
     @OneToOne
     private Payment payment;
