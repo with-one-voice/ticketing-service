@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,7 +54,7 @@ public class NotificationController {
         @AuthenticationPrincipal UUID userId,
         Pageable pageable
     ) {
-        log.info("Get list request: {}", pageable);
+        log.info("Get list request: {} {}", userId, pageable);
         // user 는 자신의 목록만 볼 수 있다.
         return CommonResponse.success(notificationService.reads(userId, pageable));
     }
@@ -67,5 +69,17 @@ public class NotificationController {
     ) {
         log.info("Get request: {}", notificationId);
         return CommonResponse.success(notificationService.read(userId, notificationId));
+    }
+
+    /**
+     * 알림 삭제 API
+     */
+//    @Secured("ROLE_ADMIN")
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<?> delete(@PathVariable UUID notificationId) {
+        log.info("Delete request: {}", notificationId);
+        //  관리자만 삭제할 수 있다. 현재는 테스트를 위해 권한 주석 처리
+        notificationService.delete(notificationId);
+        return CommonResponse.of(ResponseCode.NOTIFICATION_NO_CONTENT, "삭제 완료");
     }
 }
