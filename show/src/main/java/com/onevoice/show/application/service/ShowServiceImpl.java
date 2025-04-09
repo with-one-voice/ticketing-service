@@ -36,6 +36,8 @@ public class ShowServiceImpl implements ShowService {
             throw new DuplicateShowException();
         }
 
+        //TODO: 공연장 정보 확인을 위한 FeignClient 호출
+
         Show show = Show.builder()
             .venueId(requestDto.venueId())
             .title(requestDto.title())

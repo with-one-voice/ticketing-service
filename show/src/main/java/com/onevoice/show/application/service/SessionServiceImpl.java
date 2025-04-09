@@ -47,6 +47,8 @@ public class SessionServiceImpl implements SessionService {
 
         FindSessionQuery query = FindSessionQuery.of(sessionRepository.save(session));
 
+        //TODO: 좌석 생성 FeignClient 호출
+
         return CreateSessionResponseDto.of(query);
     }
 
@@ -92,6 +94,8 @@ public class SessionServiceImpl implements SessionService {
         if (!session.getShow().getTicketingStartTime().isAfter(LocalDateTime.now())) {
             throw new TicketingAlreadyStartedException();
         }
+
+        //TODO: 회차 정보 수정 유효성 검사 보완
 
         // 해당 회차에 관한 정보가 이미 있는 경우 -> 공연 회차 정보 수정 불가
         if (sessionRepository.find(session.getShow().getId(), requestDto.sessionDate())
