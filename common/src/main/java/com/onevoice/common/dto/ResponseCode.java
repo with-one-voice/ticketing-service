@@ -62,10 +62,10 @@ public enum ResponseCode {
     // Show
     SHOW_NOT_FOUND(4340, HttpStatus.NOT_FOUND, "존재하지 않는 공연입니다."),
     SESSION_NOT_FOUND(4341, HttpStatus.NOT_FOUND, "존재하지 않는 공연 회차입니다."),
-    DUPLICATE_SHOW(4390, HttpStatus.CONFLICT, "이미 존재하는 공연 입니다. "),
-    DUPLICATE_SESSION(4391, HttpStatus.CONFLICT, "이미 존재하는 공연 회차입니다. "),
+    DUPLICATE_SHOW(4390, HttpStatus.CONFLICT, "이미 존재하는 공연 정보입니다. "),
+    DUPLICATE_SESSION(4391, HttpStatus.CONFLICT, "해당 날짜에 공연 회차가 이미 존재합니다. "),
     TICKETING_ALREADY_STARTED(4392, HttpStatus.BAD_REQUEST, "이미 티켓팅이 시작된 공연 정보는 수정할 수 없습니다."),
-    SHOW_CANCELLED(4393, HttpStatus.BAD_REQUEST, "취소된 공연입니다. 해당 공연에 대한 정보 변경 및 추가가 불가능합니다."),
+    SHOW_CANCELLED(4393, HttpStatus.BAD_REQUEST, "취소된 공연입니다. 해당 공연에 대한 정보 변경 및 회차 추가가 불가능합니다."),
     INVALID_SESSION_DATE(4394, HttpStatus.BAD_REQUEST,
         "유효하지 않은 공연 회차 날짜입니다. 공연 예매일 이후 날짜로 설정 가능합니다."),
     INVALID_SEAT_COUNT(4395, HttpStatus.BAD_REQUEST, "유효하지 않은 수용 인원입니다. 공연장 총 수용인원을 초과할 수 없습니다."),

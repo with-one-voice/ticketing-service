@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "venue-service")
 public interface VenueClient {
 
-//    @GetMapping("/{venueId}")
-//    ResponseEntity<CommonResponse<VenueResponseDto>> getOne(@PathVariable("venueId") UUID venueId);
-
     @GetMapping("/internal/{venueId}")
     Optional<FindVenueQuery> getOneInternal(@PathVariable("venueId") UUID venueId);
 

@@ -42,8 +42,6 @@ public class SessionServiceImpl implements SessionService {
 
         Show show = showRepository.findById(showId).orElseThrow(NotFoundShowException::new);
 
-        //TODO: 공연 회차 등록 유효성 검사 (공연 Status 확인, 공연 예매 날짜와 회차 날짜 비교, 공연장 수용 인원과 회차 수용 인원 비교)
-
         // 공연 상태 확인 (취소 상태인 공연의 경우 회차 등록 불가능)
         if (show.getStatus() != null) {
             if (show.getStatus().equals(Status.CANCELLED)) {
@@ -57,16 +55,11 @@ public class SessionServiceImpl implements SessionService {
         }
 
         // 해당 공연의 동일 날짜에 해당하는 회차 존재 여부 확인
-        // TODO : 예외 클래스 따로 생성
         if (sessionRepository.find(showId, requestDto.sessionDate()).isPresent()) {
             throw new DuplicateSessionException();
         }
 
         // 공연장 총 수용 인원과 회차 별 수용 인원 비교
-//        VenueResponseDto venueDto = venueClient.getOne(show.getVenueId()).getBody().getResult();
-//        if (venueDto.totalSeatCount() < requestDto.seatCount()) {
-//            throw new InvalidSeatCountException();
-//        }
         FindVenueQuery venue = venueClient.getOneInternal(show.getVenueId()).orElseThrow(
             InvalidVenueIdException::new);
         if (venue.totalSeatCount() < requestDto.seatCount()) {
@@ -132,7 +125,15 @@ public class SessionServiceImpl implements SessionService {
             throw new TicketingAlreadyStartedException();
         }
 
-        //TODO: 회차 정보 수정 유효성 검사 보완
+        // (같은 공연 내) 수정한 회차 날짜에 이미 다른 회차 정보가 존재하는 경우 -> 회차 정보 수정 불가
+        List<Session> sessions = sessionRepository.findByShowId(session.getShow().getId());
+        sessions.forEach(s -> {
+            if (!s.getId().equals(sessionId)) {
+                if (s.getSessionDate().equals(requestDto.sessionDate())) {
+                    throw new DuplicateSessionException();
+                }
+            }
+        });
 
         session.update(requestDto);
 
