@@ -60,7 +60,14 @@ public enum ResponseCode {
 
     //Seat (B = 6)
     SEAT_NOT_FOUND(4640, HttpStatus.NOT_FOUND, "존재하지 않는 좌석입니다."),
-    SEAT_ALREADY_HELD(4690, HttpStatus.CONFLICT, "이미 선점된 좌석입니다.");
+    SEAT_ALREADY_HELD(4690, HttpStatus.CONFLICT, "이미 선점된 좌석입니다."),
+
+    // Show
+    SHOW_NOT_FOUND(4340, HttpStatus.NOT_FOUND, "존재하지 않는 공연입니다."),
+    SESSION_NOT_FOUND(4341, HttpStatus.NOT_FOUND, "존재하지 않는 공연 회차입니다."),
+    DUPLICATE_SHOW(4390, HttpStatus.CONFLICT, "이미 존재하는 공연 입니다. "),
+    DUPLICATE_SESSION(4391, HttpStatus.CONFLICT, "이미 존재하는 공연 회차입니다. "),
+    TICKETING_ALREADY_STARTED(4391, HttpStatus.BAD_REQUEST, "이미 티켓팅이 시작된 공연 정보는 수정할 수 없습니다.");
 
 
     private final int code; // 커스텀 코드 (우리 마음대로 정하는 거)
