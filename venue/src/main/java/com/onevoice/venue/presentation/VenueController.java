@@ -1,7 +1,6 @@
 package com.onevoice.venue.presentation;
 
 import com.onevoice.common.dto.CommonResponse;
-import com.onevoice.venue.application.dto.FindVenueQuery;
 import com.onevoice.venue.application.service.VenueService;
 import com.onevoice.venue.presentation.dto.request.CreateVenueRequestDto;
 import com.onevoice.venue.presentation.dto.request.UpdateVenueRequestDto;
@@ -9,7 +8,6 @@ import com.onevoice.venue.presentation.dto.response.CreateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.UpdateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.VenueResponseDto;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,11 +84,4 @@ public class VenueController {
         return CommonResponse.success(responseDtoList);
     }
 
-    @GetMapping("/internal/{venueId}")
-    public Optional<FindVenueQuery> getOneInternal(
-        @PathVariable("venueId") UUID venueId
-    ) {
-
-        return venueService.getOneInternal(venueId);
-    }
 }

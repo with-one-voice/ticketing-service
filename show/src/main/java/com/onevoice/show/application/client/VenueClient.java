@@ -1,6 +1,6 @@
 package com.onevoice.show.application.client;
 
-import com.onevoice.show.application.dto.FindVenueQuery;
+import com.onevoice.show.application.dto.VenueResponseDto;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface VenueClient {
 
     @GetMapping("/internal/{venueId}")
-    Optional<FindVenueQuery> getOneInternal(@PathVariable("venueId") UUID venueId);
+    Optional<VenueResponseDto> getVenueOne(@PathVariable("venueId") UUID venueId);
 
 }

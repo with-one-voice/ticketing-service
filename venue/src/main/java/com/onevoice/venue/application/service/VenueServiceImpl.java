@@ -11,7 +11,6 @@ import com.onevoice.venue.presentation.dto.response.CreateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.UpdateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.VenueResponseDto;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -85,9 +84,7 @@ public class VenueServiceImpl implements VenueService {
 
         Venue venue = venueRepository.findById(venueId).orElseThrow(NotFoundVenueException::new);
 
-        //TODO : security 적용 후 현재 로그인한 사용자 userId 넣기 -> security 적용 후 확인
         venue.delete(userId);
-//        venue.delete(UUID.randomUUID());
     }
 
     @Override
@@ -105,10 +102,4 @@ public class VenueServiceImpl implements VenueService {
         return new PageImpl<>(dtoList, pageable, total);
     }
 
-    @Override
-    public Optional<FindVenueQuery> getOneInternal(UUID venueId) {
-        FindVenueQuery query = FindVenueQuery.of(
-            venueRepository.findById(venueId).orElseThrow(NotFoundVenueException::new));
-        return Optional.of(query);
-    }
 }
