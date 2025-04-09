@@ -2,7 +2,7 @@ package com.onevoice.show.application.service;
 
 import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.FindSessionQuery;
-import com.onevoice.show.application.dto.FindVenueQuery;
+import com.onevoice.show.application.dto.VenueResponseDto;
 import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Show;
 import com.onevoice.show.domain.Status;
@@ -19,6 +19,7 @@ import com.onevoice.show.exception.TicketingAlreadyStartedException;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateSessionResponseDto;
+import com.onevoice.show.presentation.dto.response.SessionDetailResponseDto;
 import com.onevoice.show.presentation.dto.response.SessionResponseDto;
 import com.onevoice.show.presentation.dto.response.UpdateSessionResponseDto;
 import java.time.LocalDateTime;
@@ -60,7 +61,7 @@ public class SessionServiceImpl implements SessionService {
         }
 
         // 공연장 총 수용 인원과 회차 별 수용 인원 비교
-        FindVenueQuery venue = venueClient.getOneInternal(show.getVenueId()).orElseThrow(
+        VenueResponseDto venue = venueClient.getVenueOne(show.getVenueId()).orElseThrow(
             InvalidVenueIdException::new);
         if (venue.totalSeatCount() < requestDto.seatCount()) {
             throw new InvalidSeatCountException();
@@ -168,5 +169,13 @@ public class SessionServiceImpl implements SessionService {
         }
 
         session.updateStatus();
+    }
+
+    @Override
+    public SessionDetailResponseDto getSessionDetail(UUID sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(NotFoundSessionException::new);
+
+        return SessionDetailResponseDto.of(session);
     }
 }
