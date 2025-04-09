@@ -11,6 +11,7 @@ import com.onevoice.venue.presentation.dto.response.CreateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.UpdateVenueResponseDto;
 import com.onevoice.venue.presentation.dto.response.VenueResponseDto;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -102,5 +103,12 @@ public class VenueServiceImpl implements VenueService {
             .toList();
 
         return new PageImpl<>(dtoList, pageable, total);
+    }
+
+    @Override
+    public Optional<FindVenueQuery> getOneInternal(UUID venueId) {
+        FindVenueQuery query = FindVenueQuery.of(
+            venueRepository.findById(venueId).orElseThrow(NotFoundVenueException::new));
+        return Optional.of(query);
     }
 }

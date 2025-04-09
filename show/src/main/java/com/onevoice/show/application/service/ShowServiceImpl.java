@@ -40,7 +40,10 @@ public class ShowServiceImpl implements ShowService {
         }
 
         //TODO: 공연장 정보 확인을 위한 FeignClient 호출
-        if (venueClient.getOne(requestDto.venueId()).getBody().getResult() == null) {
+//        if (venueClient.getOne(requestDto.venueId()).getBody().getResult() == null) {
+//            throw new InvalidVenueIdException();
+//        }
+        if (venueClient.getOneInternal(requestDto.venueId()).isEmpty()) {
             throw new InvalidVenueIdException();
         }
 
