@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NotificationJpaRepository extends JpaRepository<Notification, UUID> {
 
-    List<Notification> findAllByUserId(UUID userId, Pageable pageable);
+    List<Notification> findAllByUserIdAndDeletedAtIsNotNull(UUID userId, Pageable pageable);
 
-    Optional<Notification> findByUserIdAndNotificationId(UUID userId, UUID notificationId);
+    Optional<Notification> findByUserIdAndNotificationIdAndDeletedAtIsNotNull(UUID userId,
+        UUID notificationId);
 }
