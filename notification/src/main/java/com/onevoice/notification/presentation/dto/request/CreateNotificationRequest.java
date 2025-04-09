@@ -2,7 +2,7 @@ package com.onevoice.notification.presentation.dto.request;
 
 import com.onevoice.notification.application.dto.command.CreateNotificationCommand;
 import com.onevoice.notification.domain.NotificationType;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -12,7 +12,7 @@ public record CreateNotificationRequest(
 
     String title,
 
-    @NotEmpty(message = "메시지 내용을 입력해 주세요.")
+    @NotBlank(message = "메시지 내용을 입력해 주세요.")
     String message,
 
     String metadata

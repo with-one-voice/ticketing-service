@@ -11,8 +11,6 @@ public interface NotificationJpaRepository extends JpaRepository<Notification, U
 
     Page<Notification> findAllByUserIdAndDeletedAtIsNull(UUID userId, Pageable pageable);
 
-    Optional<Notification> findByUserIdAndNotificationIdAndDeletedAtIsNull(UUID userId,
-        UUID notificationId);
-
-    Optional<Notification> findById(UUID notificationId);
+    Optional<Notification> findByNotificationIdAndUserIdAndDeletedAtIsNull(UUID notificationId,
+        UUID userId);
 }

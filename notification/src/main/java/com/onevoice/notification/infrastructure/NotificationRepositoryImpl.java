@@ -1,7 +1,6 @@
 package com.onevoice.notification.infrastructure;
 
 import com.onevoice.notification.domain.Notification;
-import com.onevoice.notification.domain.NotificationStatus;
 import com.onevoice.notification.domain.repository.NotificationRepository;
 import com.onevoice.notification.infrastructure.jpa.NotificationJpaRepository;
 import java.util.Optional;
@@ -29,19 +28,14 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public Optional<Notification> findByUserIdAndNotificationId(UUID userId, UUID notificationId) {
-        return jpaRepository.findByUserIdAndNotificationIdAndDeletedAtIsNull(userId,
-            notificationId);
+    public Optional<Notification> findByIdAndUserId(UUID userId, UUID notificationId) {
+        return jpaRepository.findByNotificationIdAndUserIdAndDeletedAtIsNull(notificationId,
+            userId);
     }
 
     @Override
-    public Optional<Notification> findById(UUID notificationId) {
+    public Optional<Notification> findByNotificationId(UUID notificationId) {
         return jpaRepository.findById(notificationId);
-    }
-
-    @Override
-    public void updateStatus(UUID notificationId, NotificationStatus status) {
-
     }
 }
 

@@ -16,7 +16,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         // save 를 명시적으로 호출해야 해서 @Transactional 을 제외했다.
         Notification saved = repository.save(notification);
-        addEvent(command, saved.getNotificationId());
+        publishEvent(command, saved.getNotificationId());
         return saved.getNotificationId();
     }
 
@@ -60,8 +59,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public FindNotificationQuery read(UUID userId, UUID notificationId) {
-        return repository.findByUserIdAndNotificationId(userId, notificationId)
+    public FindNotificationQuery read(UUID notificationId, UUID userId) {
+        return repository.findByIdAndUserId(notificationId, userId)
             .map(FindNotificationQuery::from)
             .orElseThrow(NotificationNotFoundException::new);
     }
@@ -69,7 +68,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void updateStatus(UUID notificationId, NotificationStatus status) {
-        Notification notification = repository.findById(notificationId)
+        Notification notification = repository.findByNotificationId(notificationId)
             .orElseThrow(NotificationNotFoundException::new);
         notification.updateNotificationStatus(status);
     }
@@ -77,19 +76,19 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void delete(UUID notificationId) {
-        Notification notification = repository.findById(notificationId)
+        Notification notification = repository.findByNotificationId(notificationId)
             .orElseThrow(NotificationNotFoundException::new);
         notification.delete(notificationId);
     }
 
-    private void addEvent(CreateNotificationCommand command, UUID notificationId) {
-        // notificationType 발송 이벤트
+    private void publishEvent(CreateNotificationCommand command, UUID notificationId) {
+        // notificationType 발송 이벤트 발행
         switch (command.notificationType()) {
             case EMAIL: {
                 FindUserQuery query = userClient.findUserById(command.userId()).orElseThrow();
                 EmailMessage message = new EmailMessage(
                     notificationId,
-                    "username",
+                    "WOV", // username 이 없어서 임의로 넣음
                     query.email(),
                     command.title(),
                     command.message(),
@@ -108,6 +107,5 @@ public class NotificationServiceImpl implements NotificationService {
                 log.info("Unknown notification type");
                 break;
         }
-        // 이벤트 성공 여부를 받아 notification status update
     }
 }

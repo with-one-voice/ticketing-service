@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,7 +67,7 @@ public class NotificationController {
         @AuthenticationPrincipal UUID userId
     ) {
         log.info("Get request: {}", notificationId);
-        return CommonResponse.success(notificationService.read(userId, notificationId));
+        return CommonResponse.success(notificationService.read(notificationId, userId));
     }
 
     /**

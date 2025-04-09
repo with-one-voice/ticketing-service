@@ -13,7 +13,7 @@ public interface NotificationService {
 
     ListNotificationQuery reads(UUID userId, Pageable pageable);
 
-    FindNotificationQuery read(UUID userId, UUID notificationId);
+    FindNotificationQuery read(UUID notificationId, UUID userId);
 
     void updateStatus(UUID notificationId, NotificationStatus status);
 
