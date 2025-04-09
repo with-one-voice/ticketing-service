@@ -116,4 +116,18 @@ public class ShowServiceImpl implements ShowService {
 
         return new PageImpl<>(dtoList, pageable, total);
     }
+
+    @Override
+    @Transactional
+    public void updateStatus(UUID showId) {
+        Show show = showRepository.findById(showId)
+            .orElseThrow(NotFoundShowException::new);
+
+        // 티켓팅이 이미 진행되었다면, 공연 상태 변경 불가
+        if (!show.getTicketingStartTime().isAfter(LocalDateTime.now())) {
+            throw new TicketingAlreadyStartedException();
+        }
+
+        show.updateStatus();
+    }
 }

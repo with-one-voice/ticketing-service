@@ -84,4 +84,12 @@ public class ShowController {
         return CommonResponse.success(responseDtoList);
     }
 
+    @PatchMapping("/{showId}/status")
+    public ResponseEntity<CommonResponse<String>> updateStatus(
+        @PathVariable("showId") UUID showId
+    ) {
+        showService.updateStatus(showId);
+        return CommonResponse.success("공연 상태가 취소로 변경되었습니다.");
+    }
+
 }

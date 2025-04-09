@@ -34,6 +34,8 @@ public class SessionServiceImpl implements SessionService {
 
         Show show = showRepository.findById(showId).orElseThrow(NotFoundShowException::new);
 
+        //TODO: 공연 회차 등록 유효성 검사
+
         Session session = Session.builder()
             .show(show)
             .sessionDate(requestDto.sessionDate())
@@ -87,7 +89,7 @@ public class SessionServiceImpl implements SessionService {
             .orElseThrow(NotFoundSessionException::new);
 
         // 이미 예매가 진행된 경우 -> 공연 회차 정보 수정 불가
-        if (session.getShow().getTicketingStartTime().isBefore(LocalDateTime.now())) {
+        if (!session.getShow().getTicketingStartTime().isAfter(LocalDateTime.now())) {
             throw new TicketingAlreadyStartedException();
         }
 
@@ -110,10 +112,25 @@ public class SessionServiceImpl implements SessionService {
             .orElseThrow(NotFoundSessionException::new);
 
         // 이미 예매가 진행된 경우 -> 공연 회차 삭제 불가
-        if (session.getShow().getTicketingStartTime().isBefore(LocalDateTime.now())) {
+        if (!session.getShow().getTicketingStartTime().isAfter(LocalDateTime.now())) {
             throw new TicketingAlreadyStartedException();
         }
 
         session.delete(userId);
+    }
+
+    @Override
+    @Transactional
+    public void updateStatus(UUID sessionId) {
+
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(NotFoundSessionException::new);
+
+        // 이미 예매가 진행된 경우 -> 공연 회차 상태 변경 불가
+        if (!session.getShow().getTicketingStartTime().isAfter(LocalDateTime.now())) {
+            throw new TicketingAlreadyStartedException();
+        }
+
+        session.updateStatus();
     }
 }

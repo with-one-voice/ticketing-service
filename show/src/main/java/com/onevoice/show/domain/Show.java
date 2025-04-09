@@ -85,4 +85,8 @@ public class Show extends BaseEntity {
         this.ticketingStartTime = requestDto.ticketingStartTime();
         this.ticketingEndTime = requestDto.ticketingEndTime();
     }
+
+    public void updateStatus() {
+        this.status = Status.CANCELLED;
+    }
 }

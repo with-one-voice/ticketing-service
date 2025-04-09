@@ -66,4 +66,8 @@ public class Session extends BaseEntity {
         this.endTime = requestDto.endTime();
         this.seatPrice = requestDto.seatPrice();
     }
+
+    public void updateStatus() {
+        this.status = Status.CANCELLED;
+    }
 }

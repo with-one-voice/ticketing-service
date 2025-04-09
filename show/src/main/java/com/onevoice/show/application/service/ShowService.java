@@ -23,4 +23,6 @@ public interface ShowService {
     void delete(UUID showId, UUID userId);
 
     Page<ShowResponseDto> search(String keyword, Pageable pageable);
+
+    void updateStatus(UUID showId);
 }

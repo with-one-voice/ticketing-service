@@ -81,4 +81,12 @@ public class SessionController {
         return CommonResponse.success("공연 회차 삭제가 완료되었습니다.");
     }
 
+    @PatchMapping("/sessions/{sessionId}/status")
+    public ResponseEntity<CommonResponse<String>> updateStatus(
+        @PathVariable("sessionId") UUID sessionId
+    ) {
+        sessionService.updateStatus(sessionId);
+        return CommonResponse.success("공연 회차 상태가 취소로 변경되었습니다.");
+    }
+
 }

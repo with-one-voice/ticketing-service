@@ -21,4 +21,6 @@ public interface SessionService {
     UpdateSessionResponseDto update(UUID sessionId, UpdateSessionRequestDto requestDto);
 
     void delete(UUID sessionId, UUID userId);
+
+    void updateStatus(UUID sessionId);
 }
