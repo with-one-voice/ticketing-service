@@ -5,6 +5,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,26 +34,26 @@ public class BaseEntity {
     @Column(name = "updated_by")
     protected UUID updatedBy;
 
-    @Column(name = "deleted_at")
+    @Column(name ="deleted_at")
     protected LocalDateTime deletedAt;
 
-    @Column(name = "deleted_by")
+    @Column(name ="deleted_by")
     protected UUID deletedBy;
 
     /**
      * soft delete
      */
-    public void delete(UUID username) {
+    public void delete(UUID username){
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = username;
     }
 
-    public void restore() {
+    public void restore(){
         this.deletedAt = null;
         this.deletedBy = null;
     }
 
-    public boolean isDeleted() {
+    public boolean isDeleted(){
         return deletedAt != null;
     }
 }

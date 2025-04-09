@@ -8,19 +8,25 @@ public enum ResponseCode {
 
     /**
      * ────────────────────────────────────────────
-     *
-     * @Response Code Convention ───────────────────────────────────────
+     * @Response Code Convention
+     * ───────────────────────────────────────
      * @Format: @ABCD
-     * @- A : HTTP 상태 범주 (4 = 4xx Client Error, 5 = 5xx Server Error 등)
-     * @- B : 도메인 구분 (1 = User, 5 = Ticket, ...)
-     * @- CD: 세부 에러 코드 (40 = Not Found, 90 = Conflict 등) ───────────────────────────────────────
-     * @User Domain (B = 1) ───────────────────────────────────────
+     *  @- A : HTTP 상태 범주 (4 = 4xx Client Error, 5 = 5xx Server Error 등)
+     *  @- B : 도메인 구분 (1 = User, 5 = Ticket, ...)
+     *  @- CD: 세부 에러 코드 (40 = Not Found, 90 = Conflict 등)
+     * ───────────────────────────────────────
+     * @User Domain (B = 1)
+     * ───────────────────────────────────────
      * @4140 USER_NOT_FOUND        → 404 Not Found
-     * @4190 DUPLICATE_USER        → 409 Conflict ───────────────────────────────────────
-     * @Ticket Domain (B = 5) ───────────────────────────────────────
+     * @4190 DUPLICATE_USER        → 409 Conflict
+     * ───────────────────────────────────────
+     * @Ticket Domain (B = 5)
+     * ───────────────────────────────────────
      * @4590 TICKET_ALREADY_BOOKED → 409 Conflict
      * @※ 참고: 에러 메시지와 매핑된 HTTP 상태 코드도 함께 기재하면 더 명확합니다.
      */
+
+
 
     // 2xx: 성공
     SUCCESS(2000, HttpStatus.OK, "요청 성공"),
@@ -45,6 +51,14 @@ public enum ResponseCode {
 
     // Notification
     NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다."),
+
+    // Venue (8004)
+    VENUE_NOT_FOUND(4440, HttpStatus.NOT_FOUND, "존재하지 않는 공연장 입니다."),
+    DUPLICATE_VENUE(4490, HttpStatus.CONFLICT, "이미 존재하는 공연장 입니다."),
+
+    //Seat (B = 6)
+    SEAT_NOT_FOUND(4640, HttpStatus.NOT_FOUND, "존재하지 않는 좌석입니다."),
+    SEAT_ALREADY_HELD(4690, HttpStatus.CONFLICT, "이미 선점된 좌석입니다."),
 
     // Show
     SHOW_NOT_FOUND(4340, HttpStatus.NOT_FOUND, "존재하지 않는 공연입니다."),
