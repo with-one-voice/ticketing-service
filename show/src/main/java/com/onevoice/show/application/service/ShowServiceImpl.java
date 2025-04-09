@@ -40,7 +40,7 @@ public class ShowServiceImpl implements ShowService {
         }
 
         // 공연장 정보 확인
-        if (venueClient.getOneInternal(requestDto.venueId()).isEmpty()) {
+        if (venueClient.getVenueOne(requestDto.venueId()).isEmpty()) {
             throw new InvalidVenueIdException();
         }
 
