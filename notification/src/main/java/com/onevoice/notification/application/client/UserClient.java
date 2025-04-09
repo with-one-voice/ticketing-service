@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UserClient {
 
     @GetMapping("/{userId}")
-    Optional<FindUserQuery> findUser(@PathVariable UUID userId);
+    Optional<FindUserQuery> findUserById(@PathVariable UUID userId);
 }
