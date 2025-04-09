@@ -1,6 +1,7 @@
 package com.onevoice.show.domain;
 
 import com.onevoice.common.entity.BaseEntity;
+import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -59,4 +60,10 @@ public class Session extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    public void update(UpdateSessionRequestDto requestDto) {
+        this.sessionDate = requestDto.sessionDate();
+        this.startTime = requestDto.startTime();
+        this.endTime = requestDto.endTime();
+        this.seatPrice = requestDto.seatPrice();
+    }
 }

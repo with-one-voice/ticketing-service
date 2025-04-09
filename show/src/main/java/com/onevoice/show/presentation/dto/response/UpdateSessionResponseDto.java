@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
-public record CreateSessionResponseDto(
+public record UpdateSessionResponseDto(
     UUID sessionId,
     UUID showId,
     LocalDate sessionDate,
@@ -17,8 +17,8 @@ public record CreateSessionResponseDto(
     Status status
 ) {
 
-    public static CreateSessionResponseDto of(FindSessionQuery query) {
-        return new CreateSessionResponseDto(
+    public static UpdateSessionResponseDto of(FindSessionQuery query) {
+        return new UpdateSessionResponseDto(
             query.sessionId(),
             query.showId(),
             query.sessionDate(),
@@ -29,4 +29,5 @@ public record CreateSessionResponseDto(
             query.status()
         );
     }
+
 }

@@ -5,10 +5,16 @@ import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Show;
 import com.onevoice.show.domain.repository.SessionRepository;
 import com.onevoice.show.domain.repository.ShowRepository;
+import com.onevoice.show.exception.DuplicateSessionException;
+import com.onevoice.show.exception.NotFoundSessionException;
 import com.onevoice.show.exception.NotFoundShowException;
+import com.onevoice.show.exception.TicketingAlreadyStartedException;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
+import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateSessionResponseDto;
 import com.onevoice.show.presentation.dto.response.SessionResponseDto;
+import com.onevoice.show.presentation.dto.response.UpdateSessionResponseDto;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +60,10 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public List<SessionResponseDto> getShowSessions(UUID showId) {
 
+        if (showRepository.findById(showId).isEmpty()) {
+            throw new NotFoundShowException();
+        }
+
         List<FindSessionQuery> queries = sessionRepository.findByShowId(showId).stream()
             .map(FindSessionQuery::of).toList();
 
@@ -64,8 +74,46 @@ public class SessionServiceImpl implements SessionService {
     public SessionResponseDto getOneSession(UUID sessionId) {
 
         FindSessionQuery query = FindSessionQuery.of(
-            sessionRepository.findById(sessionId).orElseThrow(NotFoundShowException::new));
+            sessionRepository.findById(sessionId).orElseThrow(NotFoundSessionException::new));
 
         return SessionResponseDto.of(query);
+    }
+
+    @Override
+    @Transactional
+    public UpdateSessionResponseDto update(UUID sessionId, UpdateSessionRequestDto requestDto) {
+
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(NotFoundSessionException::new);
+
+        // 이미 예매가 진행된 경우 -> 공연 회차 정보 수정 불가
+        if (session.getShow().getTicketingStartTime().isBefore(LocalDateTime.now())) {
+            throw new TicketingAlreadyStartedException();
+        }
+
+        // 해당 회차에 관한 정보가 이미 있는 경우 -> 공연 회차 정보 수정 불가
+        if (sessionRepository.find(session.getShow().getId(), requestDto.sessionDate())
+            .isPresent()) {
+            throw new DuplicateSessionException();
+        }
+
+        session.update(requestDto);
+
+        return UpdateSessionResponseDto.of(FindSessionQuery.of(session));
+    }
+
+    @Override
+    @Transactional
+    public void delete(UUID sessionId, UUID userId) {
+
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(NotFoundSessionException::new);
+
+        // 이미 예매가 진행된 경우 -> 공연 회차 삭제 불가
+        if (session.getShow().getTicketingStartTime().isBefore(LocalDateTime.now())) {
+            throw new TicketingAlreadyStartedException();
+        }
+
+        session.delete(userId);
     }
 }

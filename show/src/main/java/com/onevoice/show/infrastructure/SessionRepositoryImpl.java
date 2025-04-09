@@ -5,6 +5,7 @@ import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.repository.SessionRepository;
 import com.onevoice.show.infrastructure.jpa.SessionJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,6 +50,19 @@ public class SessionRepositoryImpl implements SessionRepository {
         return Optional.ofNullable(queryFactory
             .selectFrom(session)
             .where(session.id.eq(sessionId)
+                .and(session.deletedAt.isNull())
+            )
+            .fetchFirst()
+        );
+    }
+
+    @Override
+    public Optional<Session> find(UUID showId, LocalDate sessionDate) {
+        QSession session = QSession.session;
+        return Optional.ofNullable(queryFactory
+            .selectFrom(session)
+            .where(session.show.id.eq(showId)
+                .and(session.sessionDate.eq(sessionDate))
                 .and(session.deletedAt.isNull())
             )
             .fetchFirst()
