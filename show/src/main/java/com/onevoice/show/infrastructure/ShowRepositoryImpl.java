@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -50,5 +51,38 @@ public class ShowRepositoryImpl implements ShowRepository {
             .selectFrom(show)
             .where(show.deletedAt.isNull())
             .fetch();
+    }
+
+    @Override
+    public List<Show> search(String keyword, Pageable pageable) {
+        QShow show = QShow.show;
+
+        return queryFactory
+            .selectFrom(show)
+            .where(
+                show.title.containsIgnoreCase(keyword)
+                    .or(show.artist.containsIgnoreCase(keyword)
+                        .or(show.description.containsIgnoreCase(keyword)))
+            )
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+    }
+
+    @Override
+    public Long getTotal(String keyword) {
+        QShow show = QShow.show;
+
+        Long result = queryFactory
+            .select(show.count())
+            .from(show)
+            .where(
+                show.title.containsIgnoreCase(keyword)
+                    .or(show.artist.containsIgnoreCase(keyword)
+                        .or(show.description.containsIgnoreCase(keyword)))
+            )
+            .fetchOne();
+
+        return result != null ? result : 0L;
     }
 }

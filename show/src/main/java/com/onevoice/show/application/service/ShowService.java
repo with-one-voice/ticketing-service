@@ -7,6 +7,8 @@ import com.onevoice.show.presentation.dto.response.ShowResponseDto;
 import com.onevoice.show.presentation.dto.response.UpdateShowResponseDto;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ShowService {
 
@@ -19,4 +21,6 @@ public interface ShowService {
     UpdateShowResponseDto update(UUID showId, UpdateShowRequestDto requestDto);
 
     void delete(UUID showId, UUID userId);
+
+    Page<ShowResponseDto> search(String keyword, Pageable pageable);
 }
