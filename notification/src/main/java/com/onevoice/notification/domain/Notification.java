@@ -63,4 +63,8 @@ public class Notification extends BaseEntity {
             metadata
         );
     }
+
+    public void updateNotificationStatus(NotificationStatus status) {
+        this.notificationStatus = status;
+    }
 }
