@@ -1,9 +1,13 @@
 package com.onevoice.show.infrastructure;
 
+import com.onevoice.show.domain.QSession;
 import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.repository.SessionRepository;
 import com.onevoice.show.infrastructure.jpa.SessionJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,5 +21,37 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public Session save(Session session) {
         return sessionJpaRepository.save(session);
+    }
+
+    @Override
+    public List<Session> findAll() {
+        QSession session = QSession.session;
+        return queryFactory
+            .selectFrom(session)
+            .where(session.deletedAt.isNull())
+            .fetch();
+    }
+
+    @Override
+    public List<Session> findByShowId(UUID showId) {
+        QSession session = QSession.session;
+        return queryFactory
+            .selectFrom(session)
+            .where(session.show.id.eq(showId)
+                .and(session.deletedAt.isNull())
+            )
+            .fetch();
+    }
+
+    @Override
+    public Optional<Session> findById(UUID sessionId) {
+        QSession session = QSession.session;
+        return Optional.ofNullable(queryFactory
+            .selectFrom(session)
+            .where(session.id.eq(sessionId)
+                .and(session.deletedAt.isNull())
+            )
+            .fetchFirst()
+        );
     }
 }
