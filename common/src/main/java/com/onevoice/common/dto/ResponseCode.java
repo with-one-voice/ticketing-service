@@ -52,6 +52,11 @@ public enum ResponseCode {
     // Notification
     NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다."),
 
+    // Ticket
+    TICKET_OWNER_MISS__MATCH(4530, HttpStatus.FORBIDDEN, "티켓의 소유자가 일치하지 않습니다."),
+    TICKET_NOT_FOUND(4540, HttpStatus.NOT_FOUND, "티켓을 찾을 수 없습니다."),
+    TICKET_REMOTE_USER_NOT_FOUND(4544, HttpStatus.NOT_FOUND, "해탕 티켓을 소유한 유저가 없습니다."),
+
     // Venue (8004)
     VENUE_NOT_FOUND(4440, HttpStatus.NOT_FOUND, "존재하지 않는 공연장 입니다."),
     DUPLICATE_VENUE(4490, HttpStatus.CONFLICT, "이미 존재하는 공연장 입니다."),
@@ -59,6 +64,7 @@ public enum ResponseCode {
     //Seat (B = 6)
     SEAT_NOT_FOUND(4640, HttpStatus.NOT_FOUND, "존재하지 않는 좌석입니다."),
     SEAT_ALREADY_HELD(4690, HttpStatus.CONFLICT, "이미 선점된 좌석입니다.");
+
 
     private final int code; // 커스텀 코드 (우리 마음대로 정하는 거)
     private final HttpStatus status;
