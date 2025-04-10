@@ -73,7 +73,9 @@ public enum ResponseCode {
         "유효하지 않은 공연 회차 날짜입니다. 공연 예매일 이후 날짜로 설정 가능합니다."),
     INVALID_SEAT_COUNT(4395, HttpStatus.BAD_REQUEST, "유효하지 않은 수용 인원입니다. 공연장 총 수용인원을 초과할 수 없습니다."),
     INVALID_VENUE_ID(4396, HttpStatus.BAD_REQUEST, "유효하지 않은 공연장 ID 입니다. 해당하는 공연장을 찾을 수 없습니다."),
-    SESSION_SEAT_CREATE_API_FAIL(4397, HttpStatus.BAD_REQUEST,
+    INVALID_TICKETING_DATE(4397, HttpStatus.BAD_REQUEST,
+        "유효하지 않은 티켓팅 날짜 입니다. 현재 날짜, 시간 이후만 가능합니다."),
+    SESSION_SEAT_CREATE_API_FAIL(4398, HttpStatus.BAD_REQUEST,
         "Show Service에서 좌석 생성 API 호출을 실패하였습니다.");
 
 

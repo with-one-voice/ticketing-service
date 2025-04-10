@@ -4,9 +4,11 @@ import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.FindShowQuery;
 import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Show;
+import com.onevoice.show.domain.Status;
 import com.onevoice.show.domain.repository.SessionRepository;
 import com.onevoice.show.domain.repository.ShowRepository;
 import com.onevoice.show.exception.DuplicateShowException;
+import com.onevoice.show.exception.InvalidTicketingDateException;
 import com.onevoice.show.exception.InvalidVenueIdException;
 import com.onevoice.show.exception.NotFoundShowException;
 import com.onevoice.show.exception.TicketingAlreadyStartedException;
@@ -48,6 +50,15 @@ public class ShowServiceImpl implements ShowService {
             throw new InvalidVenueIdException();
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = requestDto.ticketingStartTime();
+        LocalDateTime end = requestDto.ticketingEndTime();
+
+        // 티켓 예매 날짜 유효성 검사
+        if (start.isBefore(now) || !start.isBefore(end) || end.isBefore(now)) {
+            throw new InvalidTicketingDateException();
+        }
+
         Show show = Show.builder()
             .venueId(requestDto.venueId())
             .title(requestDto.title())
@@ -55,8 +66,9 @@ public class ShowServiceImpl implements ShowService {
             .category(requestDto.category())
             .posterUrl(requestDto.posterUrl())
             .description(requestDto.description())
-            .ticketingStartTime(requestDto.ticketingStartTime())
-            .ticketingEndTime(requestDto.ticketingEndTime())
+            .ticketingStartTime(start)
+            .ticketingEndTime(end)
+            .status(Status.BEFORE)
             .build();
 
         FindShowQuery query = FindShowQuery.of(showRepository.save(show));
