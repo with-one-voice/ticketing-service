@@ -34,26 +34,26 @@ public class BaseEntity {
     @Column(name = "updated_by")
     protected UUID updatedBy;
 
-    @Column(name ="deleted_at")
+    @Column(name = "deleted_at")
     protected LocalDateTime deletedAt;
 
-    @Column(name ="deleted_by")
+    @Column(name = "deleted_by")
     protected UUID deletedBy;
 
     /**
      * soft delete
      */
-    public void delete(UUID username){
+    public void delete(UUID userId) {
         this.deletedAt = LocalDateTime.now();
-        this.deletedBy = username;
+        this.deletedBy = userId;
     }
 
-    public void restore(){
+    public void restore() {
         this.deletedAt = null;
         this.deletedBy = null;
     }
 
-    public boolean isDeleted(){
+    public boolean isDeleted() {
         return deletedAt != null;
     }
 }

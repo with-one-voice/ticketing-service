@@ -1,11 +1,18 @@
 package com.onevoice.payment.domain;
 
 import com.onevoice.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 /**
  * Payment 애그리거트 루트, 엔티티 클래스
@@ -39,18 +46,18 @@ public class Payment extends BaseEntity {
     private int paymentAmount;
 
     // 결제 취소
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cancellation cancellation;
 
     // 환불
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Refund refund;
 
     public Payment(
-            UUID ticketId,
-            UUID userId,
-            PaymentMethod paymentMethod,
-            Integer paymentAmount
+        UUID ticketId,
+        UUID userId,
+        PaymentMethod paymentMethod,
+        Integer paymentAmount
     ) {
         this.ticketId = ticketId;
         this.userId = userId;
@@ -61,10 +68,10 @@ public class Payment extends BaseEntity {
 
     // 결제 정보 생성
     public static Payment createPayment(
-            UUID ticketId,
-            UUID userId,
-            PaymentMethod paymentMethod,
-            Integer paymentAmount
+        UUID ticketId,
+        UUID userId,
+        PaymentMethod paymentMethod,
+        Integer paymentAmount
     ) {
         return new Payment(ticketId, userId, paymentMethod, paymentAmount);
     }
@@ -76,6 +83,10 @@ public class Payment extends BaseEntity {
 
         // 연관관계 편의 메소드
         cancellation.assignPayment(this);
+
+        // TODO: 취소 가능 여부를 어디서 정할지...
+        // 상태값 변경
+        this.paymentStatus = PaymentStatus.CANCEL_REQUEST;
     }
 
     // 환불 처리 메서드
@@ -85,6 +96,9 @@ public class Payment extends BaseEntity {
 
         // 연관관계 편의 메소드
         refund.assignPayment(this);
+
+        // 상태값 변경
+        this.paymentStatus = PaymentStatus.REFUND_REQUEST;
     }
 }
 
