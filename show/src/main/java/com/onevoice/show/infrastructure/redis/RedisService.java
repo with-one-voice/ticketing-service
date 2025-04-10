@@ -15,9 +15,9 @@ public class RedisService {
 
     private static final String PREFIX = "show:view:";
 
-    public Long increaseShowViewCount(UUID showId) {
+    public void increaseShowViewCount(UUID showId) {
         String key = PREFIX + showId;
-        return redisTemplate.opsForValue().increment(key);
+        redisTemplate.opsForValue().increment(key);
     }
 
     public Long getShowViewCount(UUID showId) {
