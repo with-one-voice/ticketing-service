@@ -26,7 +26,8 @@ public class SecurityConfig {
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
-                    "/swagger-resources/**", "/webjars/**")
+                    "/swagger-resources/**", "/webjars/**",
+                    "/actuator/prometheus","/actuator/health","/metrics")
                 .permitAll()
                 .anyRequest().authenticated()
             )
