@@ -3,21 +3,25 @@ package com.onevoice.payment.application.service;
 import com.onevoice.payment.application.dto.command.CreatePaymentCommand;
 import com.onevoice.payment.application.dto.query.FindPaymentQuery;
 import com.onevoice.payment.application.dto.query.ListPaymentQuery;
+import com.onevoice.payment.application.event.PaymentCreateEvent;
 import com.onevoice.payment.domain.Payment;
 import com.onevoice.payment.domain.repository.PaymentRepository;
 import com.onevoice.payment.exception.PaymentNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository repository;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public UUID create(CreatePaymentCommand command) {
@@ -30,6 +34,10 @@ public class PaymentServiceImpl implements PaymentService {
             command.paymentAmount()
         );
         Payment saved = repository.save(payment);
+
+        // TODO: 결제 결과에 따라 paymentStatus 수정 후 관련 이벤트를 발행하는 방식으로 바꿔야 한다.
+        // 현재는 결제 정보 요청하면 즉시 완료 되었다고 가정하고 데이터 저장 후 이벤트 발행
+        publisher.publishEvent(new PaymentCreateEvent(this, saved.getTicketId()));
         return saved.getPaymentId();
     }
 
@@ -52,7 +60,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional
     public FindPaymentQuery cancel(
         UUID paymentId,
         UUID userId,
@@ -70,7 +77,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional
     public FindPaymentQuery refund(
         UUID paymentId,
         UUID userId,
@@ -87,7 +93,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional
     public void delete(UUID paymentId) {
         Payment payment = repository.findById(paymentId)
             .orElseThrow(PaymentNotFoundException::new);
