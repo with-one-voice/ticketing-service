@@ -158,7 +158,7 @@ public class ShowServiceImpl implements ShowService {
         }
 
         // session 상태
-        List<Session> sessions = sessionRepository.findAllWithShow(); // show -> fetch join
+        List<Session> sessions = sessionRepository.findAll(); // show -> fetch join
         for (Session session : sessions) {
             session.updateStatusByTime(now);
         }
