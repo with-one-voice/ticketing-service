@@ -19,5 +19,5 @@ public interface UserService {
 
     GetUserInfoResponseDto getMyInfo(UUID userId);
 
-    DeleteUserResponseDto deleteUser(UUID userId, DeleteUserRequestDto requestDto);
+    DeleteUserResponseDto deleteUser(java.util.UUID userId, DeleteUserRequestDto requestDto);
 }
