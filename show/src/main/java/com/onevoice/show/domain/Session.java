@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -58,7 +59,7 @@ public class Session extends BaseEntity {
     private Long seatPrice;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.BEFORE;
 
     public void update(UpdateSessionRequestDto requestDto) {
         this.sessionDate = requestDto.sessionDate();
@@ -69,5 +70,22 @@ public class Session extends BaseEntity {
 
     public void updateStatus() {
         this.status = Status.CANCELLED;
+    }
+
+    public void updateStatusByTime(LocalDateTime now) {
+        if (this.status == Status.CANCELLED || this.status == Status.SOLD_OUT) {
+            return;
+        }
+
+        LocalDateTime start = this.getShow().getTicketingStartTime();
+        LocalDateTime end = this.getShow().getTicketingEndTime();
+
+        if (now.isBefore(start)) {
+            this.status = Status.BEFORE;
+        } else if (now.isAfter(end)) {
+            this.status = Status.CLOSED;
+        } else {
+            this.status = Status.OPEN;
+        }
     }
 }

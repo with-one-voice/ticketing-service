@@ -2,7 +2,9 @@ package com.onevoice.show.application.service;
 
 import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.FindShowQuery;
+import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Show;
+import com.onevoice.show.domain.repository.SessionRepository;
 import com.onevoice.show.domain.repository.ShowRepository;
 import com.onevoice.show.exception.DuplicateShowException;
 import com.onevoice.show.exception.InvalidVenueIdException;
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShowServiceImpl implements ShowService {
 
     private final ShowRepository showRepository;
+    private final SessionRepository sessionRepository;
     private final VenueClient venueClient;
 
     @Override
@@ -100,6 +104,8 @@ public class ShowServiceImpl implements ShowService {
     @Transactional
     public void delete(UUID showId, UUID userId) {
 
+        // TODO: 회차 정보 확인 후, 존재하는 경우 삭제 불가 OR 티켓팅 전이라면 좌석, 회차, 공연 순으로 삭제
+
         Show show = showRepository.findById(showId)
             .orElseThrow(NotFoundShowException::new);
 
@@ -108,6 +114,7 @@ public class ShowServiceImpl implements ShowService {
         }
 
         show.delete(userId);
+
     }
 
     @Override
@@ -137,5 +144,23 @@ public class ShowServiceImpl implements ShowService {
         }
 
         show.updateStatus();
+    }
+
+    @Scheduled(fixedRate = 60000) // 1분마다
+    @Transactional
+    public void updateShowSessionStatus() {
+        LocalDateTime now = LocalDateTime.now();
+
+        // show 상태
+        List<Show> shows = showRepository.findAll();
+        for (Show show : shows) {
+            show.updateStatusByTime(now);
+        }
+
+        // session 상태
+        List<Session> sessions = sessionRepository.findAllWithShow(); // show -> fetch join
+        for (Session session : sessions) {
+            session.updateStatusByTime(now);
+        }
     }
 }

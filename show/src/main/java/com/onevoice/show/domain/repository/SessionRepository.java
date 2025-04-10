@@ -17,4 +17,6 @@ public interface SessionRepository {
     Optional<Session> findById(UUID sessionId);
 
     Optional<Session> find(UUID showId, LocalDate sessionDate);
+
+    List<Session> findAllWithShow();
 }

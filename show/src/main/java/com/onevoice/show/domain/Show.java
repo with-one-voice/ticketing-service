@@ -62,20 +62,10 @@ public class Show extends BaseEntity {
     private LocalDateTime ticketingEndTime;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.BEFORE;
 
     @OneToMany(mappedBy = "show", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Session> sessions = new ArrayList<>();
-
-    public void addSession(Session session) {
-        sessions.add(session);
-        session.setShow(this);
-    }
-
-    public void removeSession(Session session) {
-        sessions.remove(session);
-        session.setShow(null);
-    }
 
     public void update(UpdateShowRequestDto requestDto) {
         this.artist = requestDto.artist();
@@ -88,5 +78,20 @@ public class Show extends BaseEntity {
 
     public void updateStatus() {
         this.status = Status.CANCELLED;
+    }
+
+    public void updateStatusByTime(LocalDateTime now) {
+        if (this.status == Status.CANCELLED || this.status == Status.SOLD_OUT) {
+            return; // 수동 상태는 자동으로 변경 X
+        }
+
+        if (now.isBefore(this.ticketingStartTime)) {
+            this.status = Status.BEFORE;
+        } else if (now.isAfter(this.ticketingEndTime)) {
+            this.status = Status.CLOSED;
+        } else {
+            this.status = Status.OPEN;
+        }
+
     }
 }

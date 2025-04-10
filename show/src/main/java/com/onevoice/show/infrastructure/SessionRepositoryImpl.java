@@ -68,4 +68,9 @@ public class SessionRepositoryImpl implements SessionRepository {
             .fetchFirst()
         );
     }
+
+    @Override
+    public List<Session> findAllWithShow() {
+        return sessionJpaRepository.findAllWithShow();
+    }
 }
