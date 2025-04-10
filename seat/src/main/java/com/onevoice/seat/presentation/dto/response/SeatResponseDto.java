@@ -8,7 +8,8 @@ public record SeatResponseDto(UUID seatId,
                               UUID sessionId,
                               String seatCode,
                               String status,
-                              int price) {
+                              int price
+) {
     public static SeatResponseDto of(Seat seat) {
         return new SeatResponseDto(
                 seat.getSeatId(),

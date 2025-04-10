@@ -23,9 +23,8 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(customAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v3/api-docs/", "/swagger-ui/", "/swagger-ui.html",
-                                "/swagger-resources/", "/webjars/",
-                            "/actuator/prometheus","/actuator/health","/metrics").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                                "/swagger-resources/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

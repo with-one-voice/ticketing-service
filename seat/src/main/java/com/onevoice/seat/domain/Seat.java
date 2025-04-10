@@ -21,6 +21,8 @@ public class Seat extends BaseEntity {
     @Column(name = "seat_id")
     private UUID seatId;
 
+    private UUID userId;
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "seat_code"))
     private SeatCode seatCode;
@@ -36,10 +38,19 @@ public class Seat extends BaseEntity {
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private Money price;
 
+
     public Seat(SeatCode seatCode, SessionId sessionId, SeatStatus status, Money price) {
         this.seatCode = seatCode;
         this.sessionId = sessionId;
         this.status = status;
         this.price = price;
+    }
+
+    public void holdBy(UUID userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("선점자 ID는 null일 수 없습니다.");
+        }
+        this.userId = userId;
+        this.status = SeatStatus.HOLD;
     }
 }
