@@ -101,6 +101,10 @@ management:
     web:
       exposure:
         include: "*"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
 jwt:
   secret: ${JWT_SECRET_KEY}
