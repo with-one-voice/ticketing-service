@@ -85,4 +85,14 @@ public class ShowRepositoryImpl implements ShowRepository {
 
         return result != null ? result : 0L;
     }
+
+    @Override
+    public void updateViewCount(UUID showId, Long increment) {
+        QShow show = QShow.show;
+
+        queryFactory.update(show)
+            .set(show.viewCount, show.viewCount.add(increment))
+            .where(show.id.eq(showId))
+            .execute();
+    }
 }

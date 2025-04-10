@@ -2,16 +2,15 @@ package com.onevoice.show.application.service;
 
 import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.FindShowQuery;
-import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Show;
 import com.onevoice.show.domain.Status;
-import com.onevoice.show.domain.repository.SessionRepository;
 import com.onevoice.show.domain.repository.ShowRepository;
 import com.onevoice.show.exception.DuplicateShowException;
 import com.onevoice.show.exception.InvalidTicketingDateException;
 import com.onevoice.show.exception.InvalidVenueIdException;
 import com.onevoice.show.exception.NotFoundShowException;
 import com.onevoice.show.exception.TicketingAlreadyStartedException;
+import com.onevoice.show.infrastructure.redis.RedisService;
 import com.onevoice.show.presentation.dto.request.CreateShowRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateShowRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateShowResponseDto;
@@ -25,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShowServiceImpl implements ShowService {
 
     private final ShowRepository showRepository;
-    private final SessionRepository sessionRepository;
     private final VenueClient venueClient;
+    private final RedisService redisService;
 
     @Override
     @Transactional
@@ -81,6 +79,9 @@ public class ShowServiceImpl implements ShowService {
 
         FindShowQuery query = FindShowQuery.of(showRepository.findById(showId)
             .orElseThrow(NotFoundShowException::new));
+
+        // 조회수 증가
+        redisService.increaseShowViewCount(showId);
 
         return ShowResponseDto.of(query);
     }
@@ -156,23 +157,5 @@ public class ShowServiceImpl implements ShowService {
         }
 
         show.updateStatus();
-    }
-
-    @Scheduled(fixedRate = 60000) // 1분마다
-    @Transactional
-    public void updateShowSessionStatus() {
-        LocalDateTime now = LocalDateTime.now();
-
-        // show 상태
-        List<Show> shows = showRepository.findAll();
-        for (Show show : shows) {
-            show.updateStatusByTime(now);
-        }
-
-        // session 상태
-        List<Session> sessions = sessionRepository.findAll(); // show -> fetch join
-        for (Session session : sessions) {
-            session.updateStatusByTime(now);
-        }
     }
 }

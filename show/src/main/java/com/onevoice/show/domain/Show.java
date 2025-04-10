@@ -61,6 +61,9 @@ public class Show extends BaseEntity {
     @Column(nullable = false, name = "ticketing_end_time")
     private LocalDateTime ticketingEndTime;
 
+    @Column(name = "view_count")
+    private Long viewCount = 0L;
+
     @Enumerated(EnumType.STRING)
     private Status status = Status.BEFORE;
 
