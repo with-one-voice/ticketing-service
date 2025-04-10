@@ -3,6 +3,7 @@ package com.onevoice.show.application.service;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateSessionResponseDto;
+import com.onevoice.show.presentation.dto.response.SessionDetailResponseDto;
 import com.onevoice.show.presentation.dto.response.SessionResponseDto;
 import com.onevoice.show.presentation.dto.response.UpdateSessionResponseDto;
 import java.util.List;
@@ -23,4 +24,6 @@ public interface SessionService {
     void delete(UUID sessionId, UUID userId);
 
     void updateStatus(UUID sessionId);
+
+    SessionDetailResponseDto getSessionDetail(UUID sessionId);
 }

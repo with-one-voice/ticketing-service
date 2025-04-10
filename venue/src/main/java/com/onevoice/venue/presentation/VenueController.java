@@ -83,4 +83,5 @@ public class VenueController {
         Page<VenueResponseDto> responseDtoList = venueService.search(keyword, pageable);
         return CommonResponse.success(responseDtoList);
     }
+
 }
