@@ -2,7 +2,7 @@ package com.onevoice.show.application.dto;
 
 import java.util.UUID;
 
-public record CreateSeatRequestDto(
+public record SeatCreateResponseDto(
     UUID sessionId,
     int seatCount,
     int price
