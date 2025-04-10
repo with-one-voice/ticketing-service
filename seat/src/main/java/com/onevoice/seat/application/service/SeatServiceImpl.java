@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -33,6 +34,10 @@ public class SeatServiceImpl implements SeatService {
     private final SeatRepository seatRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
+
+    /*
+    * 좌석 생성
+    * */
     @Override
     public List<SeatCreateResponseDto> createSeat(CreateSeatCommand command) {
         SessionId sessionId = new SessionId(command.sessionId());
@@ -57,6 +62,9 @@ public class SeatServiceImpl implements SeatService {
     }
 
 
+    /*
+    * 좌석 단건 조회
+    * */
     @Override
     public SeatResponseDto getSeat(UUID sessionId, String seatCode) {
 
@@ -66,16 +74,41 @@ public class SeatServiceImpl implements SeatService {
 
         Seat seat = seatRepository.findBySessionIdAndSeatCode(session, code)
                 .orElseThrow(SeatNotFoundException::new);
+        //  Redis에서 상태 조회
+        String redisKey = "seat:" + sessionId;
+        String redisStatus = (String) redisTemplate.opsForHash()
+                .get(redisKey, seatCode);
 
+        //  Redis에 상태가 있으면 그걸로 덮어쓰기
+        if (redisStatus != null) {
+            SeatStatus redisSeatStatus = SeatStatus.valueOf(redisStatus);
+            seat = seat.withStatus(redisSeatStatus);  // 새로운 상태 적용
+        }
         return SeatResponseDto.of(seat);
     }
 
+    //해당 회차별 좌석 목록 조회
     @Override
     public List<SeatResponseDto> getSeatBySession(UUID sessionId) {
         SessionId session = new SessionId(sessionId);
-
         List<Seat> seats = seatRepository.findAllBySessionId(session);
-        return seats.stream().map(SeatResponseDto::of).toList();
+        //  Redis에서 전체 좌석 상태 가져오기
+        String redisKey = "seat:" + sessionId;
+        Map<Object, Object> redisStatuses = redisTemplate.opsForHash().entries(redisKey);
+
+        //  Redis 상태를 반영해서 Seat 객체 상태 수정
+        List<SeatResponseDto> response = seats.stream()
+                .map(seat -> {
+                    String seatCode = seat.getSeatCode().getValue();
+                    if (redisStatuses.containsKey(seatCode)) {
+                        SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatCode));
+                        return SeatResponseDto.of(seat.withStatus(redisStatus));
+                    }
+                    return SeatResponseDto.of(seat);
+                })
+                .toList();
+
+        return response;
     }
     //좌석 선점
     public HoldSeatResponseDto holdSeat(HoldSeatCommand command) {
@@ -83,7 +116,7 @@ public class SeatServiceImpl implements SeatService {
         List<String> seatCodes = command.seatCodes();
         UUID userId = command.userId();
 
-        //1. 좌석 조회
+        //좌석 조회
         List<Seat> seats = seatCodes.stream()
                 .map(code -> seatRepository.findBySessionIdAndSeatCode(sessionId, new SeatCode(code))
                         .orElseThrow(SeatNotFoundException::new))
@@ -106,10 +139,10 @@ public class SeatServiceImpl implements SeatService {
             }
 
             redisTemplate.opsForHash().put(redisKey, seat.getSeatCode().getValue(), "HOLD");
-            redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(1));
+            redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
         }
 
-        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(1), seatIds);
+        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), seatIds);
     }
 
     @Override
