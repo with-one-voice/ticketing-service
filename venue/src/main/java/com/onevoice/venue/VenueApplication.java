@@ -5,11 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.onevoice.common", "com.onevoice.venue"})
 public class VenueApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(VenueApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(VenueApplication.class, args);
+    }
 
 }

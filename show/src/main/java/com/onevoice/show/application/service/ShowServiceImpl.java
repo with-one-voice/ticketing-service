@@ -1,9 +1,11 @@
 package com.onevoice.show.application.service;
 
+import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.FindShowQuery;
 import com.onevoice.show.domain.Show;
 import com.onevoice.show.domain.repository.ShowRepository;
 import com.onevoice.show.exception.DuplicateShowException;
+import com.onevoice.show.exception.InvalidVenueIdException;
 import com.onevoice.show.exception.NotFoundShowException;
 import com.onevoice.show.exception.TicketingAlreadyStartedException;
 import com.onevoice.show.presentation.dto.request.CreateShowRequestDto;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShowServiceImpl implements ShowService {
 
     private final ShowRepository showRepository;
+    private final VenueClient venueClient;
 
     @Override
     @Transactional
@@ -36,7 +39,10 @@ public class ShowServiceImpl implements ShowService {
             throw new DuplicateShowException();
         }
 
-        //TODO: 공연장 정보 확인을 위한 FeignClient 호출
+        // 공연장 정보 확인
+        if (venueClient.getVenueOne(requestDto.venueId()).isEmpty()) {
+            throw new InvalidVenueIdException();
+        }
 
         Show show = Show.builder()
             .venueId(requestDto.venueId())
