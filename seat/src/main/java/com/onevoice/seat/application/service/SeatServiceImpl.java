@@ -145,6 +145,30 @@ public class SeatServiceImpl implements SeatService {
         return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), seatIds);
     }
 
+    /*
+    * 좌석 상태 변경
+    * */
+    @Override
+    public List<SeatResponseDto> updateSeatStatuses(List<UUID> seatIds, SeatStatus newStatus) {
+        List<Seat> seats = seatRepository.findBySeatIdIn(seatIds);
+
+        for (Seat seat : seats) {
+            seat.changeStatus(newStatus);
+        }
+
+        seatRepository.saveAll(seats);
+
+        if (!seats.isEmpty()) {
+            String redisKey = "seat:" + seats.get(0).getSessionId().getValue();
+            for (Seat seat : seats) {
+                redisTemplate.opsForHash().put(redisKey, seat.getSeatCode().getValue(), newStatus.name());
+            }
+        }
+
+        return seats.stream().map(SeatResponseDto::of).toList();
+    }
+
+
     @Override
     public void deleteSeat(UUID sessionId){
         SessionId session = new SessionId(sessionId);

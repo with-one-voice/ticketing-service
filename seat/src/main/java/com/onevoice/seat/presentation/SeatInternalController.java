@@ -6,6 +6,7 @@ import com.onevoice.seat.application.dto.HoldSeatCommand;
 import com.onevoice.seat.application.service.SeatService;
 import com.onevoice.seat.presentation.dto.request.CreateSeatRequestDto;
 import com.onevoice.seat.presentation.dto.request.HoldSeatRequestDto;
+import com.onevoice.seat.presentation.dto.request.SeatStatusChangeRequestDto;
 import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
@@ -66,5 +67,18 @@ public class SeatInternalController {
         );
         HoldSeatResponseDto result = seatService.holdSeat(command);
         return Optional.ofNullable(result);
+    }
+
+    /*
+    * 좌석 상태 변경
+    * */
+    @PatchMapping("/status")
+    public Optional<List<SeatResponseDto>> updateStatusInternal(
+            @RequestBody SeatStatusChangeRequestDto request
+    ) {
+        List<SeatResponseDto> updatedSeats = seatService.updateSeatStatuses(
+                request.seatIds(), request.newStatus()
+        );
+        return Optional.ofNullable(updatedSeats);
     }
 }
