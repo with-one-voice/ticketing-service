@@ -100,11 +100,12 @@ public class TicketRepositoryImpl implements TicketRepository {
                 case "createdat" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.createdAt));
                 case "createdby" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.createdBy));
                 case "userid" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.userId));
-                case "showid" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.showId));
+                case "sessionid" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.sessionId));
+                case "showname" ->orderSpecifiers.add(new OrderSpecifier<>(direction,ticket.showName));
                 case "seatid" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.seatId));
                 case "status" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.status));
                 default -> throw new IllegalArgumentException("정렬 불가능한 필드: "+property+ "\n"
-                        + "정렬 가능한 필드들 리스트 : createdAt,createdBy,userId,showId,seatId,status");
+                        + "정렬 가능한 필드들 리스트 : createdAt,createdBy,userId,sessionId,showName,seatId,status");
             }
         }
         return null;

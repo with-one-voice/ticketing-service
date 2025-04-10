@@ -76,7 +76,7 @@ public class SeatController {
     ) {
         HoldSeatCommand command = new HoldSeatCommand(
                 sessionId,
-                request.seatCodes(),
+                request.seatIds(),
                 userId
         );
         HoldSeatResponseDto result = seatService.holdSeat(command);

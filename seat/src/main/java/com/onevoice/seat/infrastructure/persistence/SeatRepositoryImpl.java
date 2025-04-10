@@ -58,4 +58,14 @@ public class SeatRepositoryImpl implements SeatRepository {
                 .where(qSeat.seatId.in(seatIds))
                 .fetch();
     }
+
+    @Override
+    public Optional<Seat> findById(UUID code) {
+        return Optional.ofNullable(queryFactory
+            .selectFrom(qSeat)
+            .where(qSeat.seatId.eq(code),
+                qSeat.deletedAt.isNull())
+            .fetchFirst()
+        );
+    }
 }

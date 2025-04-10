@@ -113,18 +113,13 @@ public class SeatServiceImpl implements SeatService {
     //좌석 선점
     public HoldSeatResponseDto holdSeat(HoldSeatCommand command) {
         SessionId sessionId = new SessionId(command.sessionId());
-        List<String> seatCodes = command.seatCodes();
+        List<UUID> seatIdList = command.seatIds();
         UUID userId = command.userId();
 
         //좌석 조회
-        List<Seat> seats = seatCodes.stream()
-                .map(code -> seatRepository.findBySessionIdAndSeatCode(sessionId, new SeatCode(code))
-                        .orElseThrow(SeatNotFoundException::new))
-                .toList();
-
-        List<UUID> seatIds = seats.stream()
-                .map(Seat::getSeatId)
-                .toList();
+        List<Seat> seats = seatIdList.stream()
+            .map(code -> seatRepository.findById(code).orElseThrow(SeatNotFoundException::new))
+            .toList();
 
         //상태 확인 및 Redis TTL (1분) 설정
         for (Seat seat : seats) {
@@ -142,7 +137,7 @@ public class SeatServiceImpl implements SeatService {
             redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
         }
 
-        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), seatIds);
+        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), command.seatIds());
     }
 
     /*

@@ -181,6 +181,7 @@ public class SessionServiceImpl implements SessionService {
         session.updateStatus();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public SessionDetailResponseDto getSessionDetail(UUID sessionId) {
         Session session = sessionRepository.findById(sessionId)

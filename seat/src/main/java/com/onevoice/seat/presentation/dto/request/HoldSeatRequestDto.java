@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public record HoldSeatRequestDto(
         @NotEmpty(message = "좌석 코드는 하나 이상 선택되어야 합니다.")
-        List<String> seatCodes
+        List<UUID> seatIds
 ) {
 }

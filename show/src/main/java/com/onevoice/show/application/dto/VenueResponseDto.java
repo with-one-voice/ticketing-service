@@ -8,13 +8,7 @@ public record VenueResponseDto(
     String name,
     String location,
     String description,
-    Integer totalSeatCount,
-    LocalDateTime createAt,
-    UUID createdBy,
-    LocalDateTime updateAt,
-    UUID updatedBy,
-    LocalDateTime deleteAt,
-    UUID deletedBy
+    Integer totalSeatCount
 ) {
 
 }
