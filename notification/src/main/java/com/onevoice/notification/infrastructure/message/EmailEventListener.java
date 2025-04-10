@@ -1,4 +1,4 @@
-package com.onevoice.notification.infrastructure.email;
+package com.onevoice.notification.infrastructure.message;
 
 import com.onevoice.notification.application.event.EmailSendEvent;
 import com.onevoice.notification.application.service.NotificationService;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j(topic = "EventListener")
 @Component
 @RequiredArgsConstructor
-public class EventListener implements ApplicationListener<EmailSendEvent> {
+public class EmailEventListener implements ApplicationListener<EmailSendEvent> {
 
     private final JavaMailSender javaMailSender;
     private final NotificationService notificationService;
@@ -23,16 +23,16 @@ public class EventListener implements ApplicationListener<EmailSendEvent> {
     public void onApplicationEvent(EmailSendEvent event) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setSubject(event.getEmail().title());
-            message.setText(getText(event.getEmail().username(), event.getEmail().message()));
-            message.setTo(event.getEmail().email());
+            message.setSubject(event.getMessage().title());
+            message.setText(getText(event.getMessage().username(), event.getMessage().message()));
+            message.setTo(event.getMessage().email());
             javaMailSender.send(message);
 
-            log.info("Email sent successfully to {}", event.getEmail().email());
-            updateEmailStatus(event.getEmail().notificationId(), NotificationStatus.SENT);
+            log.info("Email sent successfully to {}", event.getMessage().email());
+            updateEmailStatus(event.getMessage().notificationId(), NotificationStatus.SENT);
         } catch (Exception e) {
-            log.error("Failed to send email to {}: {}", event.getEmail().email(), e.getMessage());
-            updateEmailStatus(event.getEmail().notificationId(), NotificationStatus.FAILED);
+            log.error("Failed to send email to {}: {}", event.getMessage().email(), e.getMessage());
+            updateEmailStatus(event.getMessage().notificationId(), NotificationStatus.FAILED);
         }
     }
 

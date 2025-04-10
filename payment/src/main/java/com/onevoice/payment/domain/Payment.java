@@ -53,16 +53,17 @@ public class Payment extends BaseEntity {
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Refund refund;
 
-    public Payment(
+    private Payment(
         UUID ticketId,
         UUID userId,
         PaymentMethod paymentMethod,
+        PaymentStatus paymentStatus,
         Integer paymentAmount
     ) {
         this.ticketId = ticketId;
         this.userId = userId;
         this.paymentMethod = paymentMethod;
-        this.paymentStatus = PaymentStatus.PENDING;
+        this.paymentStatus = paymentStatus;
         this.paymentAmount = paymentAmount;
     }
 
@@ -73,7 +74,15 @@ public class Payment extends BaseEntity {
         PaymentMethod paymentMethod,
         Integer paymentAmount
     ) {
-        return new Payment(ticketId, userId, paymentMethod, paymentAmount);
+        // TODO: method 에 따라 status 를 다르게 해야 한다. 일단은 바로 완료처리
+        // card: 즉시 완료(pg 연동 후에 변경)
+        // account: 대기 (이건 스케쥴러로 일정시간 마다 업데이트 되도록 처리)
+        PaymentStatus paymentStatus = PaymentStatus.COMPLETE;
+//        if (PaymentMethod.CARD == paymentMethod) {
+//            paymentStatus = PaymentStatus.COMPLETE;
+//        }
+
+        return new Payment(ticketId, userId, paymentMethod, paymentStatus, paymentAmount);
     }
 
     // 취소 처리 메서드: 애그리거트 루트인 Payment 에서 Cancellation 을 조작한다.
