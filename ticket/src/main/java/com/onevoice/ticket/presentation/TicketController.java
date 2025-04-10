@@ -22,6 +22,9 @@ public class TicketController {
 
     private final TicketService ticketService;
 
+    /**
+     * 티켓 생성
+     */
     @PostMapping
     public ResponseEntity<CommonResponse<CreateTicketResponseDto>> createTicket(@RequestBody CreateTicketRequestDto requestDto) {
 
@@ -29,6 +32,9 @@ public class TicketController {
         return CommonResponse.success(responseDto);
     }
 
+    /**
+     * 유저가 예약한 티켓 리스트
+     */
     @GetMapping
     public ResponseEntity<CommonResponse<Page<ListReservedTicketResponseDto>>> getReservedTickets(
             @AuthenticationPrincipal UUID userID,
@@ -42,12 +48,18 @@ public class TicketController {
         return CommonResponse.success(responseDto);
     }
 
+    /**
+     * 티켓 정보 확인
+     */
     @GetMapping("/{ticketId}")
     public ResponseEntity<CommonResponse<FindTicketResponseDto>> getTicket(@PathVariable UUID ticketId, @AuthenticationPrincipal UUID userId) {
         FindTicketResponseDto responseDto = ticketService.getTicket(ticketId, userId);
         return CommonResponse.success(responseDto);
     }
 
+    /**
+     * 티켓 상태 변경
+     */
     @PatchMapping("/{ticketId}")
     public ResponseEntity<CommonResponse<FindTicketResponseDto>> updateTicketStatus(@PathVariable UUID ticketId, @AuthenticationPrincipal UUID userId,
                                                                                     @RequestBody UpdateTicketStatusRequestDto requestDto) {
@@ -55,18 +67,29 @@ public class TicketController {
         return CommonResponse.success(responseDto);
     }
 
+    /**
+     * 티켓 만료 처리
+     */
     @PatchMapping("/{ticketId}/expiration")
     public ResponseEntity<CommonResponse<FindTicketResponseDto>> expireTicket(@PathVariable UUID ticketId) {
         FindTicketResponseDto responseDto = ticketService.expireTicket(ticketId);
         return CommonResponse.success(responseDto);
     }
 
+    /**
+     * 티켓 취소 처리
+     */
     @DeleteMapping("/{ticketId}")
     public ResponseEntity<CommonResponse<DeleteTicketResponseDto>> deleteTicket(@PathVariable UUID ticketId) {
         DeleteTicketResponseDto responseDto = ticketService.deleteTicket(ticketId);
         return CommonResponse.success(responseDto);
     }
 
+
+    /**
+     * 티켓 검색
+     * keyword : 공연 이름
+     */
     @GetMapping("/search")
     public ResponseEntity<CommonResponse<Page<ListReservedTicketResponseDto>>> searchTickets(
             @AuthenticationPrincipal UUID userId,
