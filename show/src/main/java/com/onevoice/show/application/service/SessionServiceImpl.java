@@ -82,11 +82,11 @@ public class SessionServiceImpl implements SessionService {
 
         FindSessionQuery query = FindSessionQuery.of(sessionRepository.save(session));
 
-        //TODO: 좌석 생성 FeignClient 호출
+        //TODO: 좌석 생성 FeignClient 호출 -> seat와 api 맞추면 해결 될 듯 ??
         try {
             seatClient.create(new CreateSeatRequestDto(session.getId(), session.getSeatCount(),
                 session.getSeatPrice().intValue()));
-        } catch (SeatCreateApiFailException e) {
+        } catch (Exception e) {
             throw new SeatCreateApiFailException();
         }
 
