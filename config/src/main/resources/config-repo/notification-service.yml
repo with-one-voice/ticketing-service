@@ -39,3 +39,13 @@ springdoc:
 
 swagger:
   server-url: http://localhost:8080/api/notifications
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
