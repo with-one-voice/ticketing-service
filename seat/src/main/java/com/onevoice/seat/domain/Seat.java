@@ -45,12 +45,19 @@ public class Seat extends BaseEntity {
         this.status = status;
         this.price = price;
     }
-
-    public void holdBy(UUID userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("선점자 ID는 null일 수 없습니다.");
-        }
-        this.userId = userId;
-        this.status = SeatStatus.HOLD;
+    /*
+    * 상태만 바꾼 복제본 만들어줌
+    * */
+    public Seat withStatus(SeatStatus newStatus) {
+        Seat clone = new Seat(this.seatCode, this.sessionId, newStatus, this.price);
+        clone.seatId = this.seatId;
+        clone.userId = this.userId;
+        return clone;
+    }
+    /*
+    * 좌석 상태 변경
+    * */
+    public void changeStatus(SeatStatus status) {
+        this.status = status;
     }
 }

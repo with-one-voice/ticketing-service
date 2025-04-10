@@ -2,6 +2,7 @@ package com.onevoice.seat.application.service;
 
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
+import com.onevoice.seat.domain.SeatStatus;
 import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
@@ -18,4 +19,7 @@ public interface SeatService {
     HoldSeatResponseDto holdSeat(HoldSeatCommand command);
 
     void deleteSeat(UUID sessionId);
+    List<SeatResponseDto> updateSeatStatuses(List<UUID> seatIds, SeatStatus newStatus);
+
+
 }
