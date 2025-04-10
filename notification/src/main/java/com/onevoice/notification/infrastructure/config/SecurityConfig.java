@@ -3,6 +3,7 @@ package com.onevoice.notification.infrastructure.config;
 import com.onevoice.common.security.CustomAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -10,6 +11,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity(
+    securedEnabled = true,
+    prePostEnabled = true,
+    jsr250Enabled = true
+)
 public class SecurityConfig {
 
     @Bean
@@ -28,7 +34,10 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/swagger-resources/**",
-                    "/webjars/**"
+                    "/webjars/**",
+                    "/actuator/prometheus",
+                    "/actuator/health",
+                    "/metrics"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

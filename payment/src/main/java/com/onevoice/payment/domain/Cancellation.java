@@ -1,10 +1,16 @@
 package com.onevoice.payment.domain;
 
-import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Cancellation 애그리거트, 엔티티 클래스
@@ -12,11 +18,12 @@ import java.util.UUID;
 @Entity
 @Table(name = "p_cancellation")
 @NoArgsConstructor
+@Getter
 public class Cancellation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID cancellation_id;
+    private UUID cancellationId;
 
     @OneToOne
     @JoinColumn(name = "payment_id")
