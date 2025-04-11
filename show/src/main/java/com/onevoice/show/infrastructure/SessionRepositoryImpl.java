@@ -1,6 +1,7 @@
 package com.onevoice.show.infrastructure;
 
 import com.onevoice.show.domain.QSession;
+import com.onevoice.show.domain.QShow;
 import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.repository.SessionRepository;
 import com.onevoice.show.infrastructure.jpa.SessionJpaRepository;
@@ -27,8 +28,11 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public List<Session> findAll() {
         QSession session = QSession.session;
+        QShow show = QShow.show;
+
         return queryFactory
             .selectFrom(session)
+            .join(session.show, show).fetchJoin()
             .where(session.deletedAt.isNull())
             .fetch();
     }
@@ -36,10 +40,14 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public List<Session> findByShowId(UUID showId) {
         QSession session = QSession.session;
+        QShow show = QShow.show;
+
         return queryFactory
             .selectFrom(session)
-            .where(session.show.id.eq(showId)
-                .and(session.deletedAt.isNull())
+            .join(session.show, show).fetchJoin()
+            .where(
+                session.show.id.eq(showId),
+                session.deletedAt.isNull()
             )
             .fetch();
     }
@@ -59,11 +67,15 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public Optional<Session> find(UUID showId, LocalDate sessionDate) {
         QSession session = QSession.session;
+        QShow show = QShow.show;
+
         return Optional.ofNullable(queryFactory
             .selectFrom(session)
-            .where(session.show.id.eq(showId)
-                .and(session.sessionDate.eq(sessionDate))
-                .and(session.deletedAt.isNull())
+            .join(session.show, show).fetchJoin()
+            .where(
+                session.show.id.eq(showId),
+                session.sessionDate.eq(sessionDate),
+                session.deletedAt.isNull()
             )
             .fetchFirst()
         );

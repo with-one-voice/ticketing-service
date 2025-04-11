@@ -3,11 +3,14 @@ package com.onevoice.show.application.service;
 import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.FindShowQuery;
 import com.onevoice.show.domain.Show;
+import com.onevoice.show.domain.Status;
 import com.onevoice.show.domain.repository.ShowRepository;
 import com.onevoice.show.exception.DuplicateShowException;
+import com.onevoice.show.exception.InvalidTicketingDateException;
 import com.onevoice.show.exception.InvalidVenueIdException;
 import com.onevoice.show.exception.NotFoundShowException;
 import com.onevoice.show.exception.TicketingAlreadyStartedException;
+import com.onevoice.show.infrastructure.redis.RedisService;
 import com.onevoice.show.presentation.dto.request.CreateShowRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateShowRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateShowResponseDto;
@@ -30,6 +33,7 @@ public class ShowServiceImpl implements ShowService {
 
     private final ShowRepository showRepository;
     private final VenueClient venueClient;
+    private final RedisService redisService;
 
     @Override
     @Transactional
@@ -44,6 +48,15 @@ public class ShowServiceImpl implements ShowService {
             throw new InvalidVenueIdException();
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = requestDto.ticketingStartTime();
+        LocalDateTime end = requestDto.ticketingEndTime();
+
+        // 티켓 예매 날짜 유효성 검사
+        if (start.isBefore(now) || !start.isBefore(end) || end.isBefore(now)) {
+            throw new InvalidTicketingDateException();
+        }
+
         Show show = Show.builder()
             .venueId(requestDto.venueId())
             .title(requestDto.title())
@@ -51,8 +64,9 @@ public class ShowServiceImpl implements ShowService {
             .category(requestDto.category())
             .posterUrl(requestDto.posterUrl())
             .description(requestDto.description())
-            .ticketingStartTime(requestDto.ticketingStartTime())
-            .ticketingEndTime(requestDto.ticketingEndTime())
+            .ticketingStartTime(start)
+            .ticketingEndTime(end)
+            .status(Status.BEFORE)
             .build();
 
         FindShowQuery query = FindShowQuery.of(showRepository.save(show));
@@ -65,6 +79,9 @@ public class ShowServiceImpl implements ShowService {
 
         FindShowQuery query = FindShowQuery.of(showRepository.findById(showId)
             .orElseThrow(NotFoundShowException::new));
+
+        // 조회수 증가
+        redisService.increaseShowViewCount(showId);
 
         return ShowResponseDto.of(query);
     }
@@ -100,6 +117,8 @@ public class ShowServiceImpl implements ShowService {
     @Transactional
     public void delete(UUID showId, UUID userId) {
 
+        // TODO: 회차 정보 확인 후, 존재하는 경우 삭제 불가 OR 티켓팅 전이라면 좌석, 회차, 공연 순으로 삭제
+
         Show show = showRepository.findById(showId)
             .orElseThrow(NotFoundShowException::new);
 
@@ -108,6 +127,7 @@ public class ShowServiceImpl implements ShowService {
         }
 
         show.delete(userId);
+
     }
 
     @Override
@@ -137,5 +157,12 @@ public class ShowServiceImpl implements ShowService {
         }
 
         show.updateStatus();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ShowResponseDto> getTop5ViewedShows() {
+        //TODO:조회수 상위권 5개 공연 조회 로직
+        return List.of();
     }
 }

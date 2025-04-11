@@ -2,8 +2,8 @@ package com.onevoice.show.application.service;
 
 import com.onevoice.show.application.client.SeatClient;
 import com.onevoice.show.application.client.VenueClient;
-import com.onevoice.show.application.dto.CreateSeatRequestDto;
 import com.onevoice.show.application.dto.FindSessionQuery;
+import com.onevoice.show.application.dto.SeatCreateResponseDto;
 import com.onevoice.show.application.dto.VenueResponseDto;
 import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Show;
@@ -27,11 +27,14 @@ import com.onevoice.show.presentation.dto.response.SessionResponseDto;
 import com.onevoice.show.presentation.dto.response.UpdateSessionResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SessionServiceImpl implements SessionService {
@@ -84,8 +87,13 @@ public class SessionServiceImpl implements SessionService {
 
         //TODO: 좌석 생성 FeignClient 호출 -> seat와 api 맞추면 해결 될 듯 ??
         try {
-            seatClient.create(new CreateSeatRequestDto(session.getId(), session.getSeatCount(),
-                session.getSeatPrice().intValue()));
+            Optional<List<SeatCreateResponseDto>> result = seatClient.createInternal(
+                new SeatCreateResponseDto(session.getId(), session.getSeatCount(),
+                    session.getSeatPrice().intValue()));
+            
+            result.ifPresent(seatCreateResponseDtos -> log.info("공연 회차 수용인원({})- 생성된 좌석 개수 : {}",
+                requestDto.seatCount(),
+                seatCreateResponseDtos.size()));
         } catch (Exception e) {
             throw new SeatCreateApiFailException();
         }

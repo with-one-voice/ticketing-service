@@ -1,5 +1,5 @@
 package com.onevoice.show.domain;
 
 public enum Status {
-    CANCELLED, SOLD_OUT
+    CANCELLED, SOLD_OUT, BEFORE, OPEN, CLOSED
 }

@@ -19,4 +19,6 @@ public interface ShowRepository {
     List<Show> search(String keyword, Pageable pageable);
 
     Long getTotal(String keyword);
+
+    void updateViewCount(UUID showId, Long increment);
 }
