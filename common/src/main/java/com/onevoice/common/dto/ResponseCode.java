@@ -40,30 +40,6 @@ public enum ResponseCode {
     DUPLICATE_USER(4190, HttpStatus.CONFLICT, "이미 존재하는 사용자 입니다."),
     PASSWORD_NOT_MATCH(4100, HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 
-    // Payment
-    PAYMENT_NO_CONTENT(2740, HttpStatus.NO_CONTENT, "요청 성공"),
-    PAYMENT_NOT_FOUND(4740, HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보입니다."),
-    PAYMENT_NOT_STATUS(4700, HttpStatus.BAD_REQUEST, "존재하지 않는 결제 상태입니다."),
-
-    // Notification
-    NOTIFICATION_NO_CONTENT(2840, HttpStatus.NO_CONTENT, "요청 성공"),
-    NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다."),
-
-    // Ticket
-    TICKET_OWNER_MISS__MATCH(4530, HttpStatus.FORBIDDEN, "티켓의 소유자가 일치하지 않습니다."),
-    TICKET_NOT_FOUND(4540, HttpStatus.NOT_FOUND, "티켓을 찾을 수 없습니다."),
-    TICKET_REMOTE_USER_NOT_FOUND(4541, HttpStatus.NOT_FOUND, "해탕 티켓을 소유한 유저가 없습니다."),
-    Ticket_SESSION_NOT_FOUND(4543, HttpStatus.NOT_FOUND, "해당 공연 회차가 없습니다."),
-
-
-    // Venue (8004)
-    VENUE_NOT_FOUND(4440, HttpStatus.NOT_FOUND, "존재하지 않는 공연장 입니다."),
-    DUPLICATE_VENUE(4490, HttpStatus.CONFLICT, "이미 존재하는 공연장 입니다."),
-
-    //Seat (B = 6)
-    SEAT_NOT_FOUND(4640, HttpStatus.NOT_FOUND, "존재하지 않는 좌석입니다."),
-    SEAT_ALREADY_HELD(4690, HttpStatus.CONFLICT, "이미 선점된 좌석입니다."),
-
     // Show
     SHOW_NOT_FOUND(4340, HttpStatus.NOT_FOUND, "존재하지 않는 공연입니다."),
     SESSION_NOT_FOUND(4341, HttpStatus.NOT_FOUND, "존재하지 않는 공연 회차입니다."),
@@ -78,8 +54,32 @@ public enum ResponseCode {
     INVALID_TICKETING_DATE(4397, HttpStatus.BAD_REQUEST,
         "유효하지 않은 티켓팅 날짜 입니다. 현재 날짜, 시간 이후만 가능합니다."),
     SESSION_SEAT_CREATE_API_FAIL(4398, HttpStatus.BAD_REQUEST,
-        "Show Service에서 좌석 생성 API 호출을 실패하였습니다.");
+        "Show Service 에서 좌석 생성 API 호출을 실패하였습니다."),
 
+    // Venue (8004)
+    VENUE_NOT_FOUND(4440, HttpStatus.NOT_FOUND, "존재하지 않는 공연장 입니다."),
+    DUPLICATE_VENUE(4490, HttpStatus.CONFLICT, "이미 존재하는 공연장 입니다."),
+
+    // Ticket
+    TICKET_OWNER_MISS__MATCH(4530, HttpStatus.FORBIDDEN, "티켓의 소유자가 일치하지 않습니다."),
+    TICKET_NOT_FOUND(4540, HttpStatus.NOT_FOUND, "티켓을 찾을 수 없습니다."),
+    TICKET_REMOTE_USER_NOT_FOUND(4541, HttpStatus.NOT_FOUND, "해탕 티켓을 소유한 유저가 없습니다."),
+    Ticket_SESSION_NOT_FOUND(4543, HttpStatus.NOT_FOUND, "해당 공연 회차가 없습니다."),
+
+    //Seat (B = 6)
+    SEAT_NOT_FOUND(4640, HttpStatus.NOT_FOUND, "존재하지 않는 좌석입니다."),
+    SEAT_ALREADY_HELD(4690, HttpStatus.CONFLICT, "이미 선점된 좌석입니다."),
+
+    // Payment
+    PAYMENT_NO_CONTENT(2740, HttpStatus.NO_CONTENT, "요청 성공"),
+    PAYMENT_NOT_FOUND(4740, HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보입니다."),
+    PAYMENT_NOT_STATUS(4700, HttpStatus.BAD_REQUEST, "존재하지 않는 결제 상태입니다."),
+
+    // Notification
+    NOTIFICATION_NO_CONTENT(2840, HttpStatus.NO_CONTENT, "요청 성공"),
+    NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다."),
+
+    ;
 
     private final int code; // 커스텀 코드 (우리 마음대로 정하는 거)
     private final HttpStatus status;
