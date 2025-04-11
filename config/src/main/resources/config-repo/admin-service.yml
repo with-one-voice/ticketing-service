@@ -16,6 +16,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     open-in-view: false
+  zipkin:
+    base-url: http://zipkin:9411  # 도커 내부 서비스명 사용
+    enabled: true
+    sleuth:
+      sampler:
+        probability: 1.0  # 전체 요청 추적 (운영은 0.1~0.3 추천)
 
 springdoc:
   swagger-ui:
