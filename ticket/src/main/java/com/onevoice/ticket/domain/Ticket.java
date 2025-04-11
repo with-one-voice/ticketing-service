@@ -25,8 +25,8 @@ public class Ticket extends BaseEntity {
     @Column(name ="user_name",nullable = false)
     private String userName;
 
-    @Column(name = "show_id", nullable = false)
-    private UUID showId;
+    @Column(name = "session_id", nullable = false)
+    private UUID sessionId;
 
     @Column(name = "show_name",nullable = false)
     private String showName;
@@ -41,10 +41,10 @@ public class Ticket extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
 
-    public Ticket(UUID userId,String userName, UUID showId,String showName, UUID seatId) {
+    public Ticket(UUID userId,String userName, UUID sessionId,String showName, UUID seatId) {
         this.userId = userId;
         this.userName = userName;
-        this.showId = showId;
+        this.sessionId = sessionId;
         this.showName = showName;
         this.seatId = seatId;
         this.reservedAt = LocalDateTime.now();

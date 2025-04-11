@@ -5,6 +5,6 @@ import java.util.UUID;
 
 public record HoldSeatCommand(
         UUID sessionId,
-        List<String> seatCodes,
+        List<UUID> seatIds,
         UUID userId
 ) { }

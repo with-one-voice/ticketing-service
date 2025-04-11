@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/internal/seat")
+@RequestMapping("/internal")
 public class SeatInternalController {
     private final SeatService seatService;
 
@@ -54,7 +54,7 @@ public class SeatInternalController {
     /*
      * 좌석 선점
      * */
-    @PatchMapping("/{sessionId}/hold")
+    @PutMapping("/{sessionId}/hold")
     public Optional<HoldSeatResponseDto> holdSeatsInternal(
             @RequestHeader("X-User-Id") UUID userId,
             @PathVariable UUID sessionId,
@@ -62,7 +62,7 @@ public class SeatInternalController {
     ) {
         HoldSeatCommand command = new HoldSeatCommand(
                 sessionId,
-                request.seatCodes(),
+                request.seatIds(),
                 userId
         );
         HoldSeatResponseDto result = seatService.holdSeat(command);

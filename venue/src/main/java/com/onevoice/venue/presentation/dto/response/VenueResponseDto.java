@@ -9,9 +9,7 @@ public record VenueResponseDto(
     String name,
     String location,
     String description,
-    Integer totalSeatCount,
-    LocalDateTime createdAt,
-    UUID createdBy
+    Integer totalSeatCount
 ) {
 
     public static VenueResponseDto of(FindVenueQuery query) {
@@ -20,9 +18,7 @@ public record VenueResponseDto(
             query.name(),
             query.location(),
             query.description(),
-            query.totalSeatCount(),
-            query.createAt(),
-            query.createdBy()
+            query.totalSeatCount()
         );
     }
 }

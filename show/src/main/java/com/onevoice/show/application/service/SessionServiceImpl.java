@@ -3,6 +3,7 @@ package com.onevoice.show.application.service;
 import com.onevoice.show.application.client.SeatClient;
 import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.FindSessionQuery;
+import com.onevoice.show.application.dto.SeatCreateRequestDto;
 import com.onevoice.show.application.dto.SeatCreateResponseDto;
 import com.onevoice.show.application.dto.VenueResponseDto;
 import com.onevoice.show.domain.Session;
@@ -88,7 +89,7 @@ public class SessionServiceImpl implements SessionService {
         //TODO: 좌석 생성 FeignClient 호출 -> seat와 api 맞추면 해결 될 듯 ??
         try {
             Optional<List<SeatCreateResponseDto>> result = seatClient.createInternal(
-                new SeatCreateResponseDto(session.getId(), session.getSeatCount(),
+                new SeatCreateRequestDto(session.getId(), session.getSeatCount(),
                     session.getSeatPrice().intValue()));
             
             result.ifPresent(seatCreateResponseDtos -> log.info("공연 회차 수용인원({})- 생성된 좌석 개수 : {}",
@@ -189,6 +190,7 @@ public class SessionServiceImpl implements SessionService {
         session.updateStatus();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public SessionDetailResponseDto getSessionDetail(UUID sessionId) {
         Session session = sessionRepository.findById(sessionId)

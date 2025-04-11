@@ -21,9 +21,9 @@ public class TicketInternalController {
     private final TicketService ticketService;
 
     @PatchMapping("/{ticketId}")
-    public Optional<FindTicketResponseDto> updateTicketStatus(@PathVariable UUID ticketId, @AuthenticationPrincipal UUID userId,
+    public Optional<FindTicketResponseDto> updateTicketStatus(@PathVariable UUID ticketId,
         @RequestBody UpdateTicketStatusRequestDto requestDto) {
-        FindTicketResponseDto responseDto = ticketService.updateTicketStatus(ticketId, userId,requestDto);
+        FindTicketResponseDto responseDto = ticketService.updateTicketStatus(ticketId,requestDto);
         return Optional.ofNullable(responseDto);
     }
 

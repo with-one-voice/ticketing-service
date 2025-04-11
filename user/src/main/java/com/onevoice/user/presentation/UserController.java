@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,5 +35,11 @@ public class UserController {
    @GetMapping("/{userId}")
     public Optional<FindUserQuery> findUserById(@PathVariable UUID userId) {
         return userService.findUserById(userId);
+   }
+
+   @GetMapping("/test")
+    public Optional<FindUserQuery> testMethod(@AuthenticationPrincipal UUID userId){
+
+       return userService.findUserById(userId);
    }
 }

@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public record CreateTicketRequestDto(
         UUID userId,
-        UUID showId,
+        UUID sessionId,
         UUID seatId
 ) {
 }

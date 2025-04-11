@@ -26,7 +26,7 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET_KEY}
-  expiration: 360000
+  expiration: 36000000
 
 springdoc:
   swagger-ui:

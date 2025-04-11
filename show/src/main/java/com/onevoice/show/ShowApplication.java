@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @EnableFeignClients
-@SpringBootApplication(scanBasePackages = {"com.onevoice.common", "com.onevoice.show"})
+@SpringBootApplication
 public class ShowApplication {
 
     public static void main(String[] args) {

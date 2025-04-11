@@ -13,6 +13,6 @@ public record CreateTicketResponseDto(
         UUID seatId
 ) {
     public static CreateTicketResponseDto of(Ticket ticket) {
-        return new CreateTicketResponseDto(ticket.getId(), ticket.getUserId(), ticket.getUserName() , ticket.getShowId(), ticket.getShowName(), ticket.getSeatId());
+        return new CreateTicketResponseDto(ticket.getId(), ticket.getUserId(), ticket.getUserName() , ticket.getSessionId(), ticket.getShowName(), ticket.getSeatId());
     }
 }

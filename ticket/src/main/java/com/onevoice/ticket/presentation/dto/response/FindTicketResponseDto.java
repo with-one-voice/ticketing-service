@@ -17,6 +17,6 @@ public record FindTicketResponseDto(
         LocalDateTime reservedAt
 ) {
     public static FindTicketResponseDto of(Ticket ticket) {
-        return new FindTicketResponseDto(ticket.getId(), ticket.getUserId(), ticket.getUserName() ,ticket.getShowId(),ticket.getShowName() ,ticket.getSeatId(), ticket.getStatus(), ticket.getReservedAt());
+        return new FindTicketResponseDto(ticket.getId(), ticket.getUserId(), ticket.getUserName() ,ticket.getSessionId(),ticket.getShowName() ,ticket.getSeatId(), ticket.getStatus(), ticket.getReservedAt());
     }
 }

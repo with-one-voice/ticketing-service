@@ -1,5 +1,6 @@
 package com.onevoice.show.application.client;
 
+import com.onevoice.show.application.dto.SeatCreateRequestDto;
 import com.onevoice.show.application.dto.SeatCreateResponseDto;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "seat-service")
 public interface SeatClient {
 
-    @PostMapping("/internal/seat/create")
+    @PostMapping("/internal/create")
     Optional<List<SeatCreateResponseDto>> createInternal(
-        @RequestBody @Valid SeatCreateResponseDto request);
+        @RequestBody @Valid SeatCreateRequestDto request);
 }
