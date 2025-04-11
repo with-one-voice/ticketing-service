@@ -11,7 +11,10 @@ public class EventConfig {
 
     //  org.springframework.context.ApplicationEvent;
     //  ApplicationEventMulticaster 빈을 등록하면 이벤트 리스너는 이벤트 퍼블리셔와 다른 스레드에서 비동기로 실행된다.
-    //  더 세밀한 작업은 @Async 설정을 따로..
+    //  기본적으로 SimpleAsyncTaskExecutor 는 스레드를 무한정 생성하며,
+    //  이는 리소스 관리에 부담을 줄 수 있다.
+    //  따라서 실제 애플리케이션에서는 ThreadPoolTaskExecutor 등으로
+    //  스레드 풀 크기를 제한해야 한다. -> payment 도메인 참조
     @Bean(name = "applicationEventMulticaster")
     public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
         SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
