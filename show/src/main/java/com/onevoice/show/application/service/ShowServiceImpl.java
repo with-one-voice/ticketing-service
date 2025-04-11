@@ -158,4 +158,11 @@ public class ShowServiceImpl implements ShowService {
 
         show.updateStatus();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ShowResponseDto> getTop5ViewedShows() {
+        //TODO:조회수 상위권 5개 공연 조회 로직
+        return List.of();
+    }
 }

@@ -25,4 +25,6 @@ public interface ShowService {
     Page<ShowResponseDto> search(String keyword, Pageable pageable);
 
     void updateStatus(UUID showId);
+
+    List<ShowResponseDto> getTop5ViewedShows();
 }
