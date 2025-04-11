@@ -19,7 +19,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.logs/
+logs/
 .env
 .idea/
 *.iws
