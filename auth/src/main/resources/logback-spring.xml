@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+  <!-- 도메인(애플리케이션) 이름 기반 -->
+  <springProperty scope="context" name="APP_NAME" source="spring.application.name" />
+  <property name="LOG_PATH" value="./logs" />
+  <property name="LOG_FILE" value="${LOG_PATH}/${APP_NAME}.log" />
+
+  <!-- FILE: 로그 파일 저장 (Rolling) -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_FILE}</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>10MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- CONSOLE: 컬러 콘솔 출력 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>
+        %d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- 로그 레벨별 출력 (원하면 여기서 세분화 가능) -->
+  <logger name="org.springframework" level="WARN" />
+  <logger name="com.zaxxer.hikari" level="INFO" />
+  <logger name="org.hibernate.SQL" level="DEBUG" />
+
+  <!-- 루트 로그 설정 -->
+  <root level="INFO">
+    <appender-ref ref="FILE" />
+    <appender-ref ref="CONSOLE" />
+  </root>
+</configuration>
