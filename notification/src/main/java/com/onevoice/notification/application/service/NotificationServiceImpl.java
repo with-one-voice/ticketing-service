@@ -2,7 +2,7 @@ package com.onevoice.notification.application.service;
 
 import com.onevoice.notification.application.client.UserClient;
 import com.onevoice.notification.application.dto.command.CreateNotificationCommand;
-import com.onevoice.notification.application.dto.message.EmailMessage;
+import com.onevoice.notification.application.dto.message.EmailContext;
 import com.onevoice.notification.application.dto.query.FindNotificationQuery;
 import com.onevoice.notification.application.dto.query.FindUserQuery;
 import com.onevoice.notification.application.dto.query.ListNotificationQuery;
@@ -86,7 +86,7 @@ public class NotificationServiceImpl implements NotificationService {
         switch (command.notificationType()) {
             case EMAIL: {
                 FindUserQuery query = userClient.findUserById(command.userId()).orElseThrow();
-                EmailMessage message = new EmailMessage(
+                EmailContext message = new EmailContext(
                     notificationId,
                     "WOV", // username 이 없어서 임의로 넣음
                     query.email(),
