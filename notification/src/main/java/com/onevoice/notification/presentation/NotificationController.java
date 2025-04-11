@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,11 +74,11 @@ public class NotificationController {
     /**
      * 알림 삭제 API
      */
-//    @Secured("ROLE_ADMIN")
+    @Secured("ROLE_ADMIN")
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<?> delete(@PathVariable UUID notificationId) {
         log.info("Delete request: {}", notificationId);
-        //  관리자만 삭제할 수 있다. 현재는 테스트를 위해 권한 주석 처리
+        //  관리자만 삭제할 수 있다.
         notificationService.delete(notificationId);
         return CommonResponse.of(ResponseCode.NOTIFICATION_NO_CONTENT, "삭제 완료");
     }

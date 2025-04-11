@@ -27,7 +27,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final UserClient userClient;
     private final NotificationRepository repository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public UUID create(CreateNotificationCommand command) {
@@ -94,7 +94,8 @@ public class NotificationServiceImpl implements NotificationService {
                     command.message(),
                     command.metadata()
                 );
-                eventPublisher.publishEvent(new EmailSendEvent(this, message));
+                // TODO: 트랜잭션과 상관 없으니 @Async 로 변경하자.
+                publisher.publishEvent(new EmailSendEvent(this, message));
                 break;
             }
             case SMS:

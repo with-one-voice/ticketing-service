@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,15 +20,7 @@ public class SeatRepositoryImpl implements SeatRepository {
     private final JPAQueryFactory queryFactory;
     private final QSeat qSeat = QSeat.seat;
 
-    @Override
-    public Seat save(Seat seat) {
-        return seatJpaRepository.save(seat);
-    }
 
-    @Override
-    public List<Seat> findBySessionId(SessionId sessionId) {
-        return List.of();
-    }
 
     @Override
     public List<Seat> findAllBySessionId(SessionId sessionId) {
@@ -56,5 +49,13 @@ public class SeatRepositoryImpl implements SeatRepository {
     public void deleteAllBySessionId(SessionId sessionId) {
         List<Seat> seats = seatJpaRepository.findBySessionId(sessionId);
         seatJpaRepository.deleteAll(seats);
+    }
+
+    @Override
+    public List<Seat> findBySeatIdIn(List<UUID> seatIds) {
+        return queryFactory
+                .selectFrom(qSeat)
+                .where(qSeat.seatId.in(seatIds))
+                .fetch();
     }
 }

@@ -5,6 +5,7 @@ import com.onevoice.common.dto.CommonResponse;
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
 import com.onevoice.seat.presentation.dto.request.HoldSeatRequestDto;
+import com.onevoice.seat.presentation.dto.request.SeatStatusChangeRequestDto;
 import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
@@ -26,6 +27,9 @@ import java.util.UUID;
 public class SeatController {
     private final SeatService seatService;
 
+    /*
+    * 좌석 생성
+    * */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<CommonResponse<List<SeatCreateResponseDto>>> create(
@@ -38,6 +42,9 @@ public class SeatController {
         return CommonResponse.success(responseList);
     }
 
+    /*
+    * 좌석 단건 조회
+    * */
     @GetMapping("/{sessionId}/{seatCode}")
     public ResponseEntity<CommonResponse<SeatResponseDto>> getSeat(
             @PathVariable UUID sessionId,
@@ -47,6 +54,9 @@ public class SeatController {
         return CommonResponse.success(seatService.getSeat(sessionId, seatCode));
     }
 
+    /*
+    * 회차별 좌석 목록 조회
+    * */
     @GetMapping("/{sessionId}")
     public ResponseEntity<CommonResponse<List<SeatResponseDto>>> getSeatsBySession(
             @PathVariable UUID sessionId,
@@ -55,6 +65,9 @@ public class SeatController {
         return CommonResponse.success(seatService.getSeatBySession(sessionId));
     }
 
+    /*
+    * 좌석 선점 요청
+    * */
     @PatchMapping("/{sessionId}/hold")
     public ResponseEntity<CommonResponse<HoldSeatResponseDto>> holdSeats(
             @AuthenticationPrincipal UUID userId,
@@ -70,6 +83,23 @@ public class SeatController {
         return CommonResponse.success(result);
 
     }
+
+    /*
+    * 좌석 상태 변경
+    * */
+    @PatchMapping("/status")
+    public ResponseEntity<CommonResponse<List<SeatResponseDto>>> updateStatusExternal(
+            @RequestBody SeatStatusChangeRequestDto request
+    ) {
+        List<SeatResponseDto> updatedSeats = seatService.updateSeatStatuses(
+                request.seatIds(), request.newStatus()
+        );
+        return CommonResponse.success(updatedSeats);
+    }
+
+    /*
+    * 좌석 삭제
+    * */
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{sessionId}")
     public ResponseEntity<CommonResponse<Void>> deleteBySessionId(

@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class Refund {
     private UUID refundId;
 
     @OneToOne
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
     // 환불 금액
