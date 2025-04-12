@@ -60,10 +60,10 @@ public class SeatRepositoryImpl implements SeatRepository {
     }
 
     @Override
-    public Optional<Seat> findById(UUID code) {
+    public Optional<Seat> findById(UUID seatId) {
         return Optional.ofNullable(queryFactory
             .selectFrom(qSeat)
-            .where(qSeat.seatId.eq(code),
+            .where(qSeat.seatId.eq(seatId),
                 qSeat.deletedAt.isNull())
             .fetchFirst()
         );

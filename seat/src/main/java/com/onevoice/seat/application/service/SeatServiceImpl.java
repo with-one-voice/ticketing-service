@@ -53,7 +53,7 @@ public class SeatServiceImpl implements SeatService {
 
         redisTemplate.opsForHash().putAll("seat:" + sessionId.getValue(),
                 seats.stream().collect(Collectors.toMap(
-                        s -> s.getSeatCode().getValue(),
+                        s -> s.getSeatId().toString(),
                         s -> s.getStatus().name()
                 ))
         );
@@ -66,24 +66,20 @@ public class SeatServiceImpl implements SeatService {
     * 좌석 단건 조회
     * */
     @Override
-    public SeatResponseDto getSeat(UUID sessionId, String seatCode) {
+    public SeatResponseDto getSeat(UUID sessionId, UUID seatId) {
 
-
-        SessionId session = new SessionId(sessionId);
-        SeatCode code = new SeatCode(seatCode);
-
-        Seat seat = seatRepository.findBySessionIdAndSeatCode(session, code)
+        Seat seat = seatRepository.findById(seatId)
                 .orElseThrow(SeatNotFoundException::new);
-        //  Redis에서 상태 조회
+
         String redisKey = "seat:" + sessionId;
         String redisStatus = (String) redisTemplate.opsForHash()
-                .get(redisKey, seatCode);
+                .get(redisKey, seatId.toString());
 
-        //  Redis에 상태가 있으면 그걸로 덮어쓰기
         if (redisStatus != null) {
             SeatStatus redisSeatStatus = SeatStatus.valueOf(redisStatus);
-            seat = seat.withStatus(redisSeatStatus);  // 새로운 상태 적용
+            seat = seat.withStatus(redisSeatStatus); //새로운 상태 적용
         }
+
         return SeatResponseDto.of(seat);
     }
 
@@ -99,9 +95,9 @@ public class SeatServiceImpl implements SeatService {
         //  Redis 상태를 반영해서 Seat 객체 상태 수정
         List<SeatResponseDto> response = seats.stream()
                 .map(seat -> {
-                    String seatCode = seat.getSeatCode().getValue();
-                    if (redisStatuses.containsKey(seatCode)) {
-                        SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatCode));
+                    String seatId = seat.getSeatId().toString();
+                    if (redisStatuses.containsKey(seatId)) {
+                        SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatId));
                         return SeatResponseDto.of(seat.withStatus(redisStatus));
                     }
                     return SeatResponseDto.of(seat);
@@ -118,26 +114,27 @@ public class SeatServiceImpl implements SeatService {
 
         //좌석 조회
         List<Seat> seats = seatIdList.stream()
-            .map(code -> seatRepository.findById(code).orElseThrow(SeatNotFoundException::new))
-            .toList();
+                .map(id -> seatRepository.findById(id).orElseThrow(SeatNotFoundException::new))
+                .toList();
+
+        String redisKey = "seat:" + sessionId.getValue();
 
         //상태 확인 및 Redis TTL (1분) 설정
         for (Seat seat : seats) {
-            String redisKey = "seat:" + sessionId.getValue();
-            String holdKey = "seat-hold:" + sessionId.getValue() + ":" + seat.getSeatCode().getValue();
+            String seatIdStr = seat.getSeatId().toString();
+            String holdKey = "seat-hold:" + sessionId.getValue() + ":" + seatIdStr;
 
-            String currentStatus = (String) redisTemplate.opsForHash()
-                    .get(redisKey, seat.getSeatCode().getValue());
+            String currentStatus = (String) redisTemplate.opsForHash().get(redisKey, seatIdStr);
 
             if (!"AVAILABLE".equals(currentStatus)) {
                 throw new SeatAlreadyHeldException();
             }
 
-            redisTemplate.opsForHash().put(redisKey, seat.getSeatCode().getValue(), "HOLD");
+            redisTemplate.opsForHash().put(redisKey, seatIdStr, "HOLD");
             redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
         }
 
-        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), command.seatIds());
+        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), seatIdList);
     }
 
     /*
@@ -156,7 +153,13 @@ public class SeatServiceImpl implements SeatService {
         if (!seats.isEmpty()) {
             String redisKey = "seat:" + seats.get(0).getSessionId().getValue();
             for (Seat seat : seats) {
-                redisTemplate.opsForHash().put(redisKey, seat.getSeatCode().getValue(), newStatus.name());
+                redisTemplate.opsForHash().put(redisKey, seat.getSeatId().toString(), newStatus.name());
+                //상태 AVALIABLE면 holdKey도 삭제
+                if (newStatus == SeatStatus.AVAILABLE) {  //
+                    String holdKey = "seat-hold:" + seat.getSessionId().getValue() + ":" + seat.getSeatId();
+                    redisTemplate.delete(holdKey);
+                }
+
             }
         }
 
