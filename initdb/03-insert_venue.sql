@@ -1,25 +1,5 @@
 -- venue_db에 생성되는 p_venues 테이블에 값 넣는 쿼리문
-
--- auto-generated definition
-create table p_venues
-(
-    venue_id         uuid         not null
-        primary key,
-    created_at       timestamp(6),
-    created_by       uuid,
-    deleted_at       timestamp(6),
-    deleted_by       uuid,
-    updated_at       timestamp(6),
-    updated_by       uuid,
-    description      varchar(300) not null,
-    location         varchar(300) not null,
-    name             varchar(300) not null,
-    total_seat_count integer      not null
-);
-
-alter table p_venues
-    owner to sa;
-
+\c venue_db;
 
 INSERT INTO p_venues (venue_id, name, location, description, total_seat_count,
                       created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
