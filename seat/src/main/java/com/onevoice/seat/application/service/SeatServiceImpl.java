@@ -128,15 +128,15 @@ public class SeatServiceImpl implements SeatService {
         for (Seat seat : seats) {
             String seatIdStr = seat.getSeatId().toString();
             String holdKey = "seat-hold:" + sessionId.getValue() + ":" + seatIdStr;
-
+            String lockKey = "lock:seat:" + seatIdStr;
 
             //Redisson 락 생성
-            RLock lock = redissonClient.getLock("lock:seat:" + seatIdStr);
+            RLock lock = redissonClient.getLock(lockKey);
 
             try {
                 //  락 시도 (2초 대기, 5초 유지)
-                log.info("[{}] 락 획득 시도 중...", seatIdStr);
-                boolean locked = lock.tryLock(2, 5, TimeUnit.SECONDS);
+                log.info("[{}] 락 획득 시도 중... (락 키: {})", seatIdStr, lockKey);
+                boolean locked = lock.tryLock(2, 60, TimeUnit.SECONDS);
                 if (!locked) {
                     log.warn("[{}] 락 획득 실패 - 이미 다른 사용자가 점유 중", seatIdStr);
                     throw new SeatAlreadyHeldException(); // 락 획득 실패
