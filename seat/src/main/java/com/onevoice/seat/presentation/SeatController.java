@@ -69,7 +69,7 @@ public class SeatController {
     /*
     * 좌석 선점 요청
     * */
-    @PatchMapping("/{sessionId}/hold")
+    @PutMapping("/{sessionId}/hold")
     public ResponseEntity<CommonResponse<HoldSeatResponseDto>> holdSeats(
             @AuthenticationPrincipal UUID userId,
             @PathVariable UUID sessionId,

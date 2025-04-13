@@ -15,6 +15,9 @@ import com.onevoice.seat.domain.vo.SeatCode;
 import com.onevoice.seat.domain.vo.SessionId;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -30,10 +34,11 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class SeatServiceImpl implements SeatService {
     private final SeatRepository seatRepository;
     private final RedisTemplate<String, String> redisTemplate;
-
+    private final RedissonClient redissonClient;
 
     /*
     * 좌석 생성
@@ -124,15 +129,52 @@ public class SeatServiceImpl implements SeatService {
             String seatIdStr = seat.getSeatId().toString();
             String holdKey = "seat-hold:" + sessionId.getValue() + ":" + seatIdStr;
 
-            String currentStatus = (String) redisTemplate.opsForHash().get(redisKey, seatIdStr);
 
-            if (!"AVAILABLE".equals(currentStatus)) {
-                throw new SeatAlreadyHeldException();
+            //Redisson 락 생성
+            RLock lock = redissonClient.getLock("lock:seat:" + seatIdStr);
+
+            try {
+                //  락 시도 (2초 대기, 5초 유지)
+                log.info("[{}] 락 획득 시도 중...", seatIdStr);
+                boolean locked = lock.tryLock(2, 5, TimeUnit.SECONDS);
+                if (!locked) {
+                    log.warn("[{}] 락 획득 실패 - 이미 다른 사용자가 점유 중", seatIdStr);
+                    throw new SeatAlreadyHeldException(); // 락 획득 실패
+                }
+                log.info("[{}] 락 획득 성공!", seatIdStr);
+                String currentStatus = (String) redisTemplate.opsForHash().get(redisKey, seatIdStr);
+                log.info("[{}] 현재 Redis 상태: {}", seatIdStr, currentStatus);
+
+                if (!"AVAILABLE".equals(currentStatus)) {
+                    log.warn("[{}] 현재 상태가 AVAILABLE이 아니므로 선점 불가", seatIdStr);
+                    throw new SeatAlreadyHeldException();
+                }
+
+                redisTemplate.opsForHash().put(redisKey, seatIdStr, "HOLD");
+                redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
+                log.info("[{}] 선점 성공 → 상태: HOLD, TTL 5분 설정 완료", seatIdStr);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("[{}] 락 대기 중 인터럽트 발생", seatIdStr, e);
+                throw new RuntimeException("Seat lock interrupted", e);
+            } finally {
+                //  현재 쓰레드가 락 소유 중일 때만 해제
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                    log.info("[{}] 락 해제 완료", seatIdStr);
+                }
+                }
             }
 
-            redisTemplate.opsForHash().put(redisKey, seatIdStr, "HOLD");
-            redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
-        }
+//            String currentStatus = (String) redisTemplate.opsForHash().get(redisKey, seatIdStr);
+//
+//            if (!"AVAILABLE".equals(currentStatus)) {
+//                throw new SeatAlreadyHeldException();
+//            }
+//
+//            redisTemplate.opsForHash().put(redisKey, seatIdStr, "HOLD");
+//            redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
+//        }
 
         return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), seatIdList);
     }

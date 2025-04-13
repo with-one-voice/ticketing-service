@@ -28,6 +28,7 @@ public class SeatInternalController {
     private final SeatService seatService;
 
 
+
     /*
      * 회차별 좌석 조회
      * */
@@ -86,7 +87,7 @@ public class SeatInternalController {
     /*
     * 좌석 선점 복구(예매 실패시)
     * */
-    @PutMapping("/internal/recover")
+    @PutMapping("/recover")
     public Optional<List<SeatResponseDto>> recoverSeats(
             @RequestBody List<UUID> seatIds
     ) {
