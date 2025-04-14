@@ -22,7 +22,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         String uri = request.getRequestURI();
-        log.info("Request URI :{}", uri);
+        if (!uri.startsWith("/actuator")) {
+            log.info("Request URI :{}", uri);
+        }
 
         String userIdHeader = request.getHeader("X-User-Id");
         String roleHeader = request.getHeader("X-User-Role");
