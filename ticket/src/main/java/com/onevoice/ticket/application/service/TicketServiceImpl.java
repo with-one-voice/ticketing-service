@@ -2,6 +2,7 @@ package com.onevoice.ticket.application.service;
 
 import com.onevoice.common.enumtype.SeatStatus;
 import com.onevoice.common.enumtype.TicketStatus;
+import com.onevoice.common.security.UserRole;
 import com.onevoice.ticket.application.client.SeatClient;
 import com.onevoice.ticket.application.client.ShowClient;
 import com.onevoice.ticket.application.client.UserClient;
@@ -46,7 +47,6 @@ public class TicketServiceImpl implements TicketService{
     private final UserClient userClient;
     private final ShowClient showClient;
     private final SeatClient seatClient;
-    private final RedissonClient redissonClient;
 
     @Override
     public CreateTicketResponseDto createTicket(CreateTicketRequestDto requestDto) {
@@ -160,14 +160,15 @@ public class TicketServiceImpl implements TicketService{
 
                 UpdateSeatStatusCommand command = new UpdateSeatStatusCommand(seatIds,
                     SeatStatus.RESERVED);
-                seatClient.updateStatusInternal(command);
+                seatClient.updateStatusInternal(ticket.getUserId(), UserRole.USER,command);
             }else{
                 List<UUID> seatIds = new ArrayList<>();
                 seatIds.add(ticket.getSeatId());
 
                 UpdateSeatStatusCommand command = new UpdateSeatStatusCommand(seatIds,
                     SeatStatus.AVAILABLE);
-                seatClient.updateStatusInternal(command);
+                seatClient.updateStatusInternal(ticket.getUserId(), UserRole.USER,
+                    command);
 
             }
             ticket.updateTicketStatus(newStatus);

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record TicketMessage(
     UUID ticketId,
+    UUID userId,
     TicketStatus ticketStatus
 ) {
 }

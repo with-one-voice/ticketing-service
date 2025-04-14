@@ -1,6 +1,7 @@
 package com.onevoice.seat.presentation;
 
 import com.onevoice.common.enumtype.SeatStatus;
+import com.onevoice.common.security.UserRole;
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
 import com.onevoice.seat.application.service.SeatService;
@@ -74,6 +75,7 @@ public class SeatInternalController {
     @PutMapping("/status")
     public Optional<List<SeatResponseDto>> updateStatusInternal(
             @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
             @RequestBody SeatStatusChangeRequestDto request
 
     ) {

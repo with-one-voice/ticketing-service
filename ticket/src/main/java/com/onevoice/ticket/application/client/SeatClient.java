@@ -1,5 +1,6 @@
 package com.onevoice.ticket.application.client;
 
+import com.onevoice.common.security.UserRole;
 import com.onevoice.ticket.application.dto.FindHoldSeatQuery;
 import com.onevoice.ticket.application.dto.FindSeatQuery;
 import com.onevoice.ticket.application.dto.HoldSeatCommand;
@@ -11,6 +12,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "seat-service")
 public interface SeatClient {
@@ -23,6 +25,8 @@ public interface SeatClient {
 
     @PutMapping("/internal/status")
     Optional<List<FindSeatQuery>> updateStatusInternal(
+        @RequestHeader("X-User-Id") UUID userId,
+        @RequestHeader("X-User-Role") UserRole userRole,
         @RequestBody UpdateSeatStatusCommand command
     );
 }
