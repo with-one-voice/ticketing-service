@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+  <!-- Spring application name 기반 -->
+  <springProperty scope="context" name="APP_NAME" source="spring.application.name" />
+  <property name="LOG_PATH" value="./logs" />
+  <property name="LOG_FILE" value="${LOG_PATH}/${APP_NAME}.log" />
+
+  <!-- FILE: 로그 파일 저장 -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_FILE}</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>10MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - [traceId:%X{traceId}, spanId:%X{spanId}] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- CONSOLE: 컬러 출력 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - [traceId:%X{traceId}, spanId:%X{spanId}] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 주요 라이브러리 로그 수준 -->
+  <logger name="org.springframework" level="WARN" />
+  <logger name="com.zaxxer.hikari" level="INFO" />
+  <logger name="org.hibernate.SQL" level="INFO" />
+
+  <!-- 전체 로그 레벨: INFO -->
+  <root level="INFO">
+    <appender-ref ref="FILE" />
+    <appender-ref ref="CONSOLE" />
+  </root>
+
+</configuration>

@@ -1,0 +1,9 @@
+CREATE DATABASE user_db;
+CREATE DATABASE show_db;
+CREATE DATABASE venue_db;
+CREATE DATABASE ticket_db;
+CREATE DATABASE seat_db;
+CREATE DATABASE payment_db;
+CREATE DATABASE notification_db;
+CREATE DATABASE admin_db;
+CREATE DATABASE auth_db;

@@ -1,0 +1,45 @@
+server:
+  port: 8002
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/user_db
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:sa}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    open-in-view: false
+
+  zipkin:
+    base-url: http://zipkin:9411  # 도커 내부 서비스명 사용
+    enabled: true
+    sleuth:
+      sampler:
+        probability: 1.0  # 전체 요청 추적 (운영은 0.1~0.3 추천)
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    path: /v3/api-docs
+
+swagger:
+  server-url: http://localhost:8080/api/users
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+

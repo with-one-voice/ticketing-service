@@ -1,0 +1,112 @@
+buildscript {
+	ext {
+		springBootVersion = '3.4.4'
+	}
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+		classpath "io.spring.gradle:dependency-management-plugin:1.1.7"
+	}
+}
+
+allprojects {
+	group = 'com.onevoice'
+	version = '1.0.0'
+
+	repositories {
+		mavenCentral()
+	}
+}
+
+// 공통 설정이 적용될 모듈만 지정
+// 인프라 모듈은 해당 모듈에서 직접 build.gradle설정 (eureka,config,gateway)
+def sharedModules = [
+		project(':user'),
+		project(':auth'),
+		project(':show'),
+		project(':venue'),
+		project(':ticket'),
+		project(':seat'),
+		project(':payment'),
+		project(':notification'),
+		project(':admin')
+]
+
+configure(sharedModules) {
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
+
+
+	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(17)
+		}
+	}
+
+	dependencies {
+		// 공통 의존성
+		if (!project.hasProperty('excludeCloud')) {
+			println("[INFO][${project.name}] ✅ Cloud config & eureka dependencies included")
+			// CI 시에는 config,eureka 없어도 실행되도록 설정
+			// 추후에는 변경하여 config,eureka와 함께 CI가 되도록 수정
+			implementation 'org.springframework.cloud:spring-cloud-starter-config'
+			implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+		} else {
+			println("[INFO][${project.name}] 🚫 Cloud config & eureka dependencies excluded")
+
+		}
+
+		implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+		implementation 'org.springframework.boot:spring-boot-starter-web'
+		implementation 'org.springframework.boot:spring-boot-starter-validation'
+		implementation 'org.springframework.boot:spring-boot-starter-actuator'
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+		implementation 'org.apache.commons:commons-lang3'
+
+		// monitoring
+		implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+		implementation 'io.micrometer:micrometer-registry-prometheus'
+
+		// swagger
+		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+
+		// common
+		implementation project(':common')
+
+		// lombok
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+
+		// postgresql
+		implementation 'org.springframework.boot:spring-boot-starter'
+		runtimeOnly 'org.postgresql:postgresql'
+
+		// security
+		implementation 'org.springframework.boot:spring-boot-starter-security'
+		testImplementation 'org.springframework.security:spring-security-test'
+
+		// 테스트
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+		testRuntimeOnly 'com.h2database:h2'
+	}
+
+	ext {
+		set('springCloudVersion', "2024.0.1")
+	}
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		}
+	}
+
+	test {
+		useJUnitPlatform()
+	}
+}

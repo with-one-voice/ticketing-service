@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: venue-service
+
+  config:
+    import: configserver:${CONFIG_SERVER_URL:http://localhost:19000}
+
+  profiles:
+    include: shared

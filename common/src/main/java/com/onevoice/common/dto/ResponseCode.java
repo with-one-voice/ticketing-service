@@ -1,0 +1,93 @@
+package com.onevoice.common.dto;
+
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+public enum ResponseCode {
+
+    /**
+     * ────────────────────────────────────────────
+     *
+     * @Response Code Convention ───────────────────────────────────────
+     * @Format: @ABCD
+     * @- A : HTTP 상태 범주 (4 = 4xx Client Error, 5 = 5xx Server Error 등)
+     * @- B : 도메인 구분 (1 = User, 5 = Ticket, ...)
+     * @- CD: 세부 에러 코드 (40 = Not Found, 90 = Conflict 등) ───────────────────────────────────────
+     * @User Domain (B = 1) ───────────────────────────────────────
+     * @4140 USER_NOT_FOUND        → 404 Not Found
+     * @4190 DUPLICATE_USER        → 409 Conflict ───────────────────────────────────────
+     * @Ticket Domain (B = 5) ───────────────────────────────────────
+     * @4590 TICKET_ALREADY_BOOKED → 409 Conflict
+     * @※ 참고: 에러 메시지와 매핑된 HTTP 상태 코드도 함께 기재하면 더 명확합니다.
+     */
+
+    // 2xx: 성공
+    SUCCESS(2000, HttpStatus.OK, "요청 성공"),
+    CREATED(2010, HttpStatus.CREATED, "생성 성공"),
+
+    // 4xx: 클라이언트 오류
+    BAD_REQUEST(4000, HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    UNAUTHORIZED(4010, HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
+    FORBIDDEN(4030, HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+    NOT_FOUND(4040, HttpStatus.NOT_FOUND, "대상을 찾을 수 없습니다."),
+
+    // 5xx: 서버 오류
+    INTERNAL_ERROR(5000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+
+    // User
+    USER_NOT_FOUND(4140, HttpStatus.NOT_FOUND, "존재하지 않는 사용자 입니다."),
+    DUPLICATE_USER(4190, HttpStatus.CONFLICT, "이미 존재하는 사용자 입니다."),
+    PASSWORD_NOT_MATCH(4100, HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+
+    // Payment
+    PAYMENT_NO_CONTENT(2740, HttpStatus.NO_CONTENT, "요청 성공"),
+    PAYMENT_NOT_FOUND(4740, HttpStatus.NOT_FOUND, "존재하지 않는 결제 정보입니다."),
+    PAYMENT_NOT_STATUS(4700, HttpStatus.BAD_REQUEST, "존재하지 않는 결제 상태입니다."),
+
+    // Notification
+    NOTIFICATION_NO_CONTENT(2840, HttpStatus.NO_CONTENT, "요청 성공"),
+    NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다."),
+
+    // Ticket
+    TICKET_OWNER_MISS__MATCH(4530, HttpStatus.FORBIDDEN, "티켓의 소유자가 일치하지 않습니다."),
+    TICKET_NOT_FOUND(4540, HttpStatus.NOT_FOUND, "티켓을 찾을 수 없습니다."),
+    TICKET_REMOTE_USER_NOT_FOUND(4541, HttpStatus.NOT_FOUND, "해탕 티켓을 소유한 유저가 없습니다."),
+    Ticket_SESSION_NOT_FOUND(4543, HttpStatus.NOT_FOUND, "해당 공연 회차가 없습니다."),
+
+
+    // Venue (8004)
+    VENUE_NOT_FOUND(4440, HttpStatus.NOT_FOUND, "존재하지 않는 공연장 입니다."),
+    DUPLICATE_VENUE(4490, HttpStatus.CONFLICT, "이미 존재하는 공연장 입니다."),
+
+    //Seat (B = 6)
+    SEAT_NOT_FOUND(4640, HttpStatus.NOT_FOUND, "존재하지 않는 좌석입니다."),
+    SEAT_ALREADY_HELD(4690, HttpStatus.CONFLICT, "이미 선점된 좌석입니다."),
+
+    // Show
+    SHOW_NOT_FOUND(4340, HttpStatus.NOT_FOUND, "존재하지 않는 공연입니다."),
+    SESSION_NOT_FOUND(4341, HttpStatus.NOT_FOUND, "존재하지 않는 공연 회차입니다."),
+    DUPLICATE_SHOW(4390, HttpStatus.CONFLICT, "이미 존재하는 공연 정보입니다. "),
+    DUPLICATE_SESSION(4391, HttpStatus.CONFLICT, "해당 날짜에 공연 회차가 이미 존재합니다. "),
+    TICKETING_ALREADY_STARTED(4392, HttpStatus.BAD_REQUEST, "이미 티켓팅이 시작된 공연 정보는 수정할 수 없습니다."),
+    SHOW_CANCELLED(4393, HttpStatus.BAD_REQUEST, "취소된 공연입니다. 해당 공연에 대한 정보 변경 및 회차 추가가 불가능합니다."),
+    INVALID_SESSION_DATE(4394, HttpStatus.BAD_REQUEST,
+        "유효하지 않은 공연 회차 날짜입니다. 공연 예매일 이후 날짜로 설정 가능합니다."),
+    INVALID_SEAT_COUNT(4395, HttpStatus.BAD_REQUEST, "유효하지 않은 수용 인원입니다. 공연장 총 수용인원을 초과할 수 없습니다."),
+    INVALID_VENUE_ID(4396, HttpStatus.BAD_REQUEST, "유효하지 않은 공연장 ID 입니다. 해당하는 공연장을 찾을 수 없습니다."),
+    INVALID_TICKETING_DATE(4397, HttpStatus.BAD_REQUEST,
+        "유효하지 않은 티켓팅 날짜 입니다. 현재 날짜, 시간 이후만 가능합니다."),
+    SESSION_SEAT_CREATE_API_FAIL(4398, HttpStatus.BAD_REQUEST,
+        "Show Service에서 좌석 생성 API 호출을 실패하였습니다.");
+
+
+    private final int code; // 커스텀 코드 (우리 마음대로 정하는 거)
+    private final HttpStatus status;
+    private final String message;
+
+    ResponseCode(int code, HttpStatus status, String message) {
+        this.code = code;
+        this.status = status;
+        this.message = message;
+    }
+}

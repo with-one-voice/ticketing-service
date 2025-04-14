@@ -1,0 +1,141 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # admin
+        - id: admin-service
+          uri: lb://admin-service
+          predicates:
+            - Path=/api/admin/**
+          filters:
+            - StripPrefix=2
+
+        # auth
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=2
+
+        # notification
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=2
+
+        # payment
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - StripPrefix=2
+
+        # seat
+        - id: seat-service
+          uri: lb://seat-service
+          predicates:
+            - Path=/api/seats/**
+          filters:
+            - StripPrefix=2
+
+        # show
+        - id: show-service
+          uri: lb://show-service
+          predicates:
+            - Path=/api/shows/**
+          filters:
+            - StripPrefix=2
+
+        # ticket
+        - id: ticket-service
+          uri: lb://ticket-service
+          predicates:
+            - Path=/api/tickets/**
+          filters:
+            - StripPrefix=2
+
+        # user
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=2
+
+        # venue
+        - id: venue-service
+          uri: lb://venue-service
+          predicates:
+            - Path=/api/venues/**
+          filters:
+            - StripPrefix=2
+
+  config:
+    import: configserver:${CONFIG_SERVER_URL:http://localhost:19000}
+
+  zipkin:
+    base-url: http://zipkin:9411  # 도커 내부 서비스명 사용
+    enabled: true
+    sleuth:
+      sampler:
+        probability: 1.0  # 전체 요청 추적 (운영은 0.1~0.3 추천)
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    with-credentials: true
+    urls:
+      - name: admin-service
+        url: /api/admin/v3/api-docs
+      - name: auth-service
+        url: /api/auth/v3/api-docs
+      - name: notification-service
+        url: /api/notifications/v3/api-docs
+      - name: payment-service
+        url: /api/payments/v3/api-docs
+      - name: seat-service
+        url: /api/seats/v3/api-docs
+      - name: show-service
+        url: /api/shows/v3/api-docs
+      - name: ticket-service
+        url: /api/tickets/v3/api-docs
+      - name: user-service
+        url: /api/users/v3/api-docs
+      - name: venue-service
+        url: /api/venues/v3/api-docs
