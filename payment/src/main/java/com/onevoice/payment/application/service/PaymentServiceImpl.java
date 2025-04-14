@@ -1,6 +1,7 @@
 package com.onevoice.payment.application.service;
 
 import com.onevoice.payment.application.dto.command.CreatePaymentCommand;
+import com.onevoice.payment.application.dto.message.PaymentMessage;
 import com.onevoice.payment.application.dto.query.FindPaymentQuery;
 import com.onevoice.payment.application.dto.query.ListPaymentQuery;
 import com.onevoice.payment.application.event.PaymentCreateEvent;
@@ -37,7 +38,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         // TODO: 결제 결과에 따라 paymentStatus 수정 후 관련 이벤트를 발행하는 방식으로 바꿔야 한다.
         // 현재는 결제 정보 요청하면 즉시 완료 되었다고 가정하고 데이터 저장 후 이벤트 발행
-        publisher.publishEvent(new PaymentCreateEvent(this, saved.getTicketId()));
+        publisher.publishEvent(
+            new PaymentCreateEvent(this, PaymentMessage.from(payment)));
         return saved.getPaymentId();
     }
 

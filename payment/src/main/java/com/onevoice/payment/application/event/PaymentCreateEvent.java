@@ -1,7 +1,7 @@
 package com.onevoice.payment.application.event;
 
+import com.onevoice.payment.application.dto.message.PaymentMessage;
 import java.io.Serial;
-import java.util.UUID;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
@@ -11,10 +11,10 @@ public class PaymentCreateEvent extends ApplicationEvent {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final UUID ticketId;
+    private final PaymentMessage message;
 
-    public PaymentCreateEvent(Object source, UUID ticketId) {
+    public PaymentCreateEvent(Object source, PaymentMessage message) {
         super(source);
-        this.ticketId = ticketId;
+        this.message = message;
     }
 }

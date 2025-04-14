@@ -1,4 +1,5 @@
 -- venue_db에 생성되는 p_venues 테이블에 값 넣는 쿼리문
+\c venue_db;
 
 INSERT INTO p_venues (venue_id, name, location, description, total_seat_count,
                       created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)

@@ -9,6 +9,6 @@ public record UpdateTicketStatusRequestDto(
         WAITING_PAYMENT,
         CONFIRM_PAYMENT,
         CANCELLED,
-        FAILED;
+        EXPIRED;
     }
 }

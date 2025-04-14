@@ -1,6 +1,6 @@
 package com.onevoice.notification.application.event;
 
-import com.onevoice.notification.application.dto.message.EmailMessage;
+import com.onevoice.notification.application.dto.message.EmailContext;
 import java.io.Serial;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
@@ -11,9 +11,9 @@ public class EmailSendEvent extends ApplicationEvent {
     @Serial
     private static final long serialVersionUID = -2685172945219633123L;
 
-    private final EmailMessage message;
+    private final EmailContext message;
 
-    public EmailSendEvent(Object source, EmailMessage message) {
+    public EmailSendEvent(Object source, EmailContext message) {
         super(source);
         this.message = message;
     }
