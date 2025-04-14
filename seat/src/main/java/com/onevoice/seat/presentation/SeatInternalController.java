@@ -73,7 +73,9 @@ public class SeatInternalController {
     * */
     @PutMapping("/status")
     public Optional<List<SeatResponseDto>> updateStatusInternal(
+            @RequestHeader("X-User-Id") UUID userId,
             @RequestBody SeatStatusChangeRequestDto request
+
     ) {
         List<SeatResponseDto> updatedSeats = seatService.updateSeatStatuses(
                 request.seatIds(), request.newStatus()
@@ -86,6 +88,7 @@ public class SeatInternalController {
     * */
     @PutMapping("/recover")
     public Optional<List<SeatResponseDto>> recoverSeats(
+            @RequestHeader("X-User-Id") UUID userId,
             @RequestBody List<UUID> seatIds
     ) {
         List<SeatResponseDto> recovered = seatService.updateSeatStatuses(seatIds, SeatStatus.AVAILABLE);
