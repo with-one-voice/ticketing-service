@@ -2,9 +2,9 @@ package com.onevoice.payment.infrastructure.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onevoice.common.enumtype.TicketStatus;
 import com.onevoice.payment.application.client.TicketClient;
 import com.onevoice.payment.application.dto.message.TicketMessage;
-import com.onevoice.payment.application.dto.message.TicketMessage.TicketStatus;
 import com.onevoice.payment.application.event.PaymentCreateEvent;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

@@ -1,10 +1,9 @@
 package com.onevoice.seat.presentation;
 
-import com.onevoice.common.dto.CommonResponse;
+import com.onevoice.common.enumtype.SeatStatus;
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
 import com.onevoice.seat.application.service.SeatService;
-import com.onevoice.seat.domain.SeatStatus;
 import com.onevoice.seat.presentation.dto.request.CreateSeatRequestDto;
 import com.onevoice.seat.presentation.dto.request.HoldSeatRequestDto;
 import com.onevoice.seat.presentation.dto.request.SeatStatusChangeRequestDto;
@@ -13,8 +12,6 @@ import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

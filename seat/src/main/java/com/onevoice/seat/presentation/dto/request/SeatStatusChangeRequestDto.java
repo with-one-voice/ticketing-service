@@ -1,7 +1,6 @@
 package com.onevoice.seat.presentation.dto.request;
 
-import com.onevoice.seat.domain.SeatStatus;
-
+import com.onevoice.common.enumtype.SeatStatus;
 import java.util.List;
 import java.util.UUID;
 

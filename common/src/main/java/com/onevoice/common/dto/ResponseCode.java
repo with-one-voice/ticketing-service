@@ -64,7 +64,9 @@ public enum ResponseCode {
     TICKET_OWNER_MISS__MATCH(4530, HttpStatus.FORBIDDEN, "티켓의 소유자가 일치하지 않습니다."),
     TICKET_NOT_FOUND(4540, HttpStatus.NOT_FOUND, "티켓을 찾을 수 없습니다."),
     TICKET_REMOTE_USER_NOT_FOUND(4541, HttpStatus.NOT_FOUND, "해탕 티켓을 소유한 유저가 없습니다."),
-    Ticket_SESSION_NOT_FOUND(4543, HttpStatus.NOT_FOUND, "해당 공연 회차가 없습니다."),
+    TICKET_SESSION_NOT_FOUND(4543, HttpStatus.NOT_FOUND, "해당 공연 회차가 없습니다."),
+    DUPLICATE_TICKET_EXCEPTION(4590, HttpStatus.CONFLICT, "이미 예매된 티켓입니다."),
+
 
     //Seat (B = 6)
     SEAT_NOT_FOUND(4640, HttpStatus.NOT_FOUND, "존재하지 않는 좌석입니다."),

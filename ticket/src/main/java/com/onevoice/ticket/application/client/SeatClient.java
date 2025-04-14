@@ -1,7 +1,10 @@
 package com.onevoice.ticket.application.client;
 
 import com.onevoice.ticket.application.dto.FindHoldSeatQuery;
+import com.onevoice.ticket.application.dto.FindSeatQuery;
 import com.onevoice.ticket.application.dto.HoldSeatCommand;
+import com.onevoice.ticket.application.dto.UpdateSeatStatusCommand;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,5 +19,10 @@ public interface SeatClient {
     Optional<FindHoldSeatQuery> holdSeatsInternal(
         @PathVariable UUID sessionId,
         @RequestBody HoldSeatCommand command
+    );
+
+    @PutMapping("/internal/status")
+    Optional<List<FindSeatQuery>> updateStatusInternal(
+        @RequestBody UpdateSeatStatusCommand command
     );
 }

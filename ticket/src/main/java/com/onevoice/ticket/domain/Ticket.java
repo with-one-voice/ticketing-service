@@ -1,6 +1,7 @@
 package com.onevoice.ticket.domain;
 
 import com.onevoice.common.entity.BaseEntity;
+import com.onevoice.common.enumtype.TicketStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,11 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name ="p_tickets")
+@Table(
+    name ="p_tickets",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_session_seat", columnNames = {"session_id", "seat_id"})
+    })
 public class Ticket extends BaseEntity {
 
     @Id
@@ -41,6 +46,10 @@ public class Ticket extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     public Ticket(UUID userId,String userName, UUID sessionId,String showName, UUID seatId) {
         this.userId = userId;
         this.userName = userName;
@@ -48,6 +57,7 @@ public class Ticket extends BaseEntity {
         this.showName = showName;
         this.seatId = seatId;
         this.reservedAt = LocalDateTime.now();
+        this.status = TicketStatus.WAITING_PAYMENT;
     }
 
     public void updateTicketStatus(TicketStatus status) {

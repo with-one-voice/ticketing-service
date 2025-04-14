@@ -1,5 +1,6 @@
 package com.onevoice.payment.application.dto.client;
 
+import com.onevoice.common.enumtype.TicketStatus;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,12 +14,4 @@ public record FindTicketResponseDto(
     TicketStatus status,
     LocalDateTime reservedAt
 ) {
-
-    public enum TicketStatus {
-
-        WAITING_PAYMENT,
-        CONFIRM_PAYMENT,
-        CANCELLED,
-        FAILED;
-    }
 }
