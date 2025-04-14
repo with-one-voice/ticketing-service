@@ -27,14 +27,15 @@ public class CustomPreFilter implements GlobalFilter, Ordered {
     private static final List<String> WHITELIST_PREFIXES = List.of(
         "/signup", "/login",    // 로그인/회원가입 요청
         "/v3/api-docs", "/swagger-ui", "/swagger-ui.html",
-        "/swagger-resources", "/webjars"
+        "/swagger-resources", "/webjars",
+        "/actuator/prometheus"
     );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         String uri = exchange.getRequest().getURI().getPath().toString();
-        log.info("PreFilter request uri :{}",uri);
+        log.info("PreFilter request uri :{}", uri);
 
         if (isWhitelisted(uri)) {
             return chain.filter(exchange);
