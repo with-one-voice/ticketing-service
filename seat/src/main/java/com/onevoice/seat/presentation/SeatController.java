@@ -25,6 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping
 public class SeatController {
+
     private final SeatService seatService;
 
     /*
@@ -45,13 +46,13 @@ public class SeatController {
     /*
     * 좌석 단건 조회
     * */
-    @GetMapping("/{sessionId}/{seatCode}")
+    @GetMapping("/{sessionId}/{seatId}")
     public ResponseEntity<CommonResponse<SeatResponseDto>> getSeat(
             @PathVariable UUID sessionId,
-            @PathVariable String seatCode,
+            @PathVariable UUID seatId,
             @AuthenticationPrincipal UUID userId
     ) {
-        return CommonResponse.success(seatService.getSeat(sessionId, seatCode));
+        return CommonResponse.success(seatService.getSeat(sessionId, seatId));
     }
 
     /*
@@ -68,7 +69,7 @@ public class SeatController {
     /*
     * 좌석 선점 요청
     * */
-    @PatchMapping("/{sessionId}/hold")
+    @PutMapping("/{sessionId}/hold")
     public ResponseEntity<CommonResponse<HoldSeatResponseDto>> holdSeats(
             @AuthenticationPrincipal UUID userId,
             @PathVariable UUID sessionId,
@@ -109,4 +110,7 @@ public class SeatController {
         seatService.deleteSeat(sessionId);
         return CommonResponse.success(null);
     }
+
+
+
 }

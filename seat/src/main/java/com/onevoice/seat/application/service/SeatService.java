@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public interface SeatService {
     List<SeatCreateResponseDto> createSeat(CreateSeatCommand command);
-    SeatResponseDto getSeat(UUID sessionId, String seatCode);
+    SeatResponseDto getSeat(UUID sessionId, UUID seatId);
 
     List<SeatResponseDto> getSeatBySession(UUID sessionId);
     HoldSeatResponseDto holdSeat(HoldSeatCommand command);

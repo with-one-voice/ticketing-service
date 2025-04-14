@@ -18,5 +18,5 @@ public interface SeatRepository {
     void deleteAllBySessionId(SessionId sessionId);
     List<Seat> findBySeatIdIn(List<UUID> seatIds);
 
-    Optional<Seat> findById(UUID code);
+    Optional<Seat> findById(UUID seatId);
 }

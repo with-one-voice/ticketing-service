@@ -4,6 +4,7 @@ import com.onevoice.common.dto.CommonResponse;
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
 import com.onevoice.seat.application.service.SeatService;
+import com.onevoice.seat.domain.SeatStatus;
 import com.onevoice.seat.presentation.dto.request.CreateSeatRequestDto;
 import com.onevoice.seat.presentation.dto.request.HoldSeatRequestDto;
 import com.onevoice.seat.presentation.dto.request.SeatStatusChangeRequestDto;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @RequestMapping("/internal")
 public class SeatInternalController {
     private final SeatService seatService;
+
 
 
     /*
@@ -72,7 +74,7 @@ public class SeatInternalController {
     /*
     * 좌석 상태 변경
     * */
-    @PatchMapping("/status")
+    @PutMapping("/status")
     public Optional<List<SeatResponseDto>> updateStatusInternal(
             @RequestBody SeatStatusChangeRequestDto request
     ) {
@@ -80,5 +82,16 @@ public class SeatInternalController {
                 request.seatIds(), request.newStatus()
         );
         return Optional.ofNullable(updatedSeats);
+    }
+
+    /*
+    * 좌석 선점 복구(예매 실패시)
+    * */
+    @PutMapping("/recover")
+    public Optional<List<SeatResponseDto>> recoverSeats(
+            @RequestBody List<UUID> seatIds
+    ) {
+        List<SeatResponseDto> recovered = seatService.updateSeatStatuses(seatIds, SeatStatus.AVAILABLE);
+        return Optional.ofNullable(recovered);
     }
 }
