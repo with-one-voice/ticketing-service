@@ -1,0 +1,44 @@
+package com.onevoice.seat.infrastructure.message;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onevoice.common.enumtype.KafkaTopicType;
+import com.onevoice.seat.application.dto.message.SeatCreateFailMessage;
+import com.onevoice.seat.application.dto.message.SeatCreateSuccessMessage;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Component;
+
+@Slf4j(topic = "SeatEventProducer")
+@Component
+@RequiredArgsConstructor
+public class SeatEventProducer {
+
+    private final ObjectMapper objectMapper;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    public void sendCreateSuccess(UUID sessionId) {
+        try {
+            SeatCreateSuccessMessage message = new SeatCreateSuccessMessage(sessionId);
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            kafkaTemplate.send(KafkaTopicType.SEAT_CREATE_SUCCESS.getTopic(), sessionId.toString(),
+                jsonMessage);
+            log.info("seat_create_success 전송 완료: {}", jsonMessage);
+        } catch (Exception e) {
+            log.error("seat_create_success 전송 실패", e);
+        }
+    }
+
+    public void sendCreateFail(UUID sessionId) {
+        try {
+            SeatCreateFailMessage message = new SeatCreateFailMessage(sessionId);
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            kafkaTemplate.send(KafkaTopicType.SEAT_CREATE_FAIL.getTopic(), sessionId.toString(),
+                jsonMessage);
+            log.info("seat_create_fail 전송 완료: {}", jsonMessage);
+        } catch (Exception e) {
+            log.error("seat_create_fail 전송 실패", e);
+        }
+    }
+}
