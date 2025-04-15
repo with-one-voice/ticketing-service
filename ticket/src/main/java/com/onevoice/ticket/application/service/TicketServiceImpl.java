@@ -1,5 +1,6 @@
 package com.onevoice.ticket.application.service;
 
+import com.onevoice.common.enumtype.KafkaTopicType;
 import com.onevoice.common.enumtype.SeatStatus;
 import com.onevoice.common.enumtype.TicketStatus;
 import com.onevoice.common.security.UserRole;
@@ -9,7 +10,10 @@ import com.onevoice.ticket.application.client.UserClient;
 import com.onevoice.ticket.application.dto.FindUserQuery;
 import com.onevoice.ticket.application.dto.HoldSeatCommand;
 import com.onevoice.ticket.application.dto.SessionDetailsQuery;
+import com.onevoice.ticket.application.dto.TicketConfirmedMessage;
+import com.onevoice.ticket.application.dto.TicketFailedMessage;
 import com.onevoice.ticket.application.dto.UpdateSeatStatusCommand;
+import com.onevoice.ticket.application.event.GenericKafkaEvent;
 import com.onevoice.ticket.domain.Ticket;
 import com.onevoice.ticket.domain.repository.TicketRepository;
 import com.onevoice.ticket.exception.DuplicateTicketException;
@@ -29,6 +33,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TicketServiceImpl implements TicketService{
 
     private final TicketRepository ticketRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final UserClient userClient;
     private final ShowClient showClient;
     private final SeatClient seatClient;
@@ -222,5 +228,54 @@ public class TicketServiceImpl implements TicketService{
         Page<Ticket> ticketList = ticketRepository.searchTicketByKeyword(userId, pageable,keyword);
 
         return ticketList.map(ListReservedTicketResponseDto::of);
+    }
+
+
+    @Override
+    @Transactional
+    public void confirmTicketAfterPayment(UUID ticketId) {
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+            .orElseThrow(TicketNotFoundException::new);
+
+        TicketStatus newStatus = TicketStatus.CONFIRM_PAYMENT;
+        if (newStatus == ticket.getStatus()) {
+            log.info("이미 처리된 메시지입니다. ticketId={}, status={}", ticket.getId(), ticket.getStatus());
+        }
+
+        // 티켓 상태 변경
+        ticket.updateTicketStatus(newStatus);
+        List<UUID> seatIdList = new ArrayList<>();
+        seatIdList.add(ticket.getSeatId());
+
+        // 좌석 확정 메시지 발행
+        TicketConfirmedMessage payload = new TicketConfirmedMessage(seatIdList, ticket.getUserId());
+        GenericKafkaEvent<TicketConfirmedMessage> event = new GenericKafkaEvent<>(KafkaTopicType.TICKET_CONFIRM.getTopic(),
+            payload);
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    @Transactional
+    public void failTicketAfterPayment(UUID ticketId) {
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+            .orElseThrow(TicketNotFoundException::new);
+
+        TicketStatus newStatus = TicketStatus.CANCELLED;
+        if (newStatus == ticket.getStatus()) {
+            log.info("이미 처리된 메시지입니다. ticketId={}, status={}", ticket.getId(), ticket.getStatus());
+        }
+
+        // 티켓 상태 변경
+        ticket.updateTicketStatus(newStatus);
+        List<UUID> seatIdList = new ArrayList<>();
+        seatIdList.add(ticket.getSeatId());
+
+        // 티켓 확정 실패 메시지 발행
+        TicketFailedMessage payload = new TicketFailedMessage(seatIdList, ticket.getUserId());
+        GenericKafkaEvent<TicketFailedMessage> event = new GenericKafkaEvent<>(
+            KafkaTopicType.TICKET_CONFIRM_FAIL.getTopic(), payload);
+        applicationEventPublisher.publishEvent(event);
     }
 }
