@@ -33,7 +33,8 @@ public class SecurityConfig {
                     "/webjars/**",
                     "/actuator/prometheus",
                     "/actuator/health",
-                    "/metrics"
+                    "/metrics",
+                    "/kakao/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

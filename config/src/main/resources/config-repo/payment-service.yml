@@ -50,3 +50,10 @@ management:
     export:
       prometheus:
         enabled: true
+
+kakaopay:
+  api:
+    secret:
+      key: ${KAKAO_PAY_SECRET_KEY}
+  cid: ${KAKAO_PAY_CID}
+  host: ${KAKAO_PAY_HOST}
