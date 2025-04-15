@@ -22,13 +22,11 @@ public class KakaoPaymentController {
 
     @GetMapping
     public String index() {
-        log.info("Kakao payment index");
         return "index";
     }
 
     @GetMapping("/ready/{paymentId}")
     public String ready(@PathVariable UUID paymentId, Model model) {
-        log.info("Kakao payment ready");
         KakaoPayReadyQuery ready = kakaoPayService.ready(paymentId);
         model.addAttribute("response", ready);
         model.addAttribute("paymentId", paymentId);
@@ -41,9 +39,7 @@ public class KakaoPaymentController {
         @RequestParam("pg_token") String pgToken,
         Model model
     ) {
-        log.info("Kakao payment approve");
         String approveResponse = kakaoPayService.approve(paymentId, pgToken);
-        log.info("Approve response: {}", approveResponse);
         model.addAttribute("response", approveResponse);
         model.addAttribute("paymentId", paymentId);
         return "approve";
