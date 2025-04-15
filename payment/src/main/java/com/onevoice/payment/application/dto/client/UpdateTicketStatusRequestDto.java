@@ -1,14 +1,8 @@
 package com.onevoice.payment.application.dto.client;
 
+import com.onevoice.common.enumtype.TicketStatus;
+
 public record UpdateTicketStatusRequestDto(
     TicketStatus status
 ) {
-
-    public enum TicketStatus {
-
-        WAITING_PAYMENT,
-        CONFIRM_PAYMENT,
-        CANCELLED,
-        EXPIRED;
-    }
 }

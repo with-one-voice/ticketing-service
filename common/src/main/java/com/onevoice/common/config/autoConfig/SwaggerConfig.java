@@ -1,4 +1,4 @@
-package com.onevoice.common.config;
+package com.onevoice.common.config.autoConfig;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

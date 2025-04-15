@@ -1,7 +1,7 @@
 package com.onevoice.ticket.presentation.dto.response;
 
+import com.onevoice.common.enumtype.TicketStatus;
 import com.onevoice.ticket.domain.Ticket;
-import com.onevoice.ticket.domain.TicketStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

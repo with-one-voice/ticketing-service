@@ -2,9 +2,9 @@ package com.onevoice.payment.infrastructure.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onevoice.common.enumtype.TicketStatus;
 import com.onevoice.payment.application.client.TicketClient;
 import com.onevoice.payment.application.dto.message.TicketMessage;
-import com.onevoice.payment.application.dto.message.TicketMessage.TicketStatus;
 import com.onevoice.payment.application.event.PaymentCreateEvent;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class PaymentEventListener {
 //            new UpdateTicketStatusRequestDto(TicketStatus.CONFIRM_PAYMENT));
         String message = objectMapper.writeValueAsString(event.getMessage());
         String ticketStatus = getTicketStatus(
-            event.getMessage().ticketId(),
+            event.getMessage().ticketId(),event.getMessage().userId(),
             TicketStatus.CONFIRM_PAYMENT
         );
         // key 는 지정하지 않아도 된다.
@@ -52,16 +52,16 @@ public class PaymentEventListener {
 //            event.getMessage().ticketId(),
 //            new UpdateTicketStatusRequestDto(TicketStatus.CANCELLED));
         String ticketStatus = getTicketStatus(
-            event.getMessage().ticketId(),
+            event.getMessage().ticketId(),event.getMessage().userId(),
             TicketStatus.CANCELLED
         );
         kafkaTemplate.send("ticket_status", ticketStatus);
     }
 
-    private String getTicketStatus(UUID ticketId, TicketStatus cancelled)
+    private String getTicketStatus(UUID ticketId,UUID userId ,TicketStatus cancelled)
         throws JsonProcessingException {
         return objectMapper.writeValueAsString(
-            new TicketMessage(ticketId,
+            new TicketMessage(ticketId,userId,
                 cancelled)
         );
     }
