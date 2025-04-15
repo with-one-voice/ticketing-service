@@ -1,7 +1,7 @@
 package com.onevoice.show.presentation;
 
-import com.onevoice.show.application.service.SessionService;
-import com.onevoice.show.application.service.ShowService;
+import com.onevoice.show.application.service.session.SessionService;
+import com.onevoice.show.application.service.show.ShowService;
 import com.onevoice.show.presentation.dto.response.SessionDetailResponseDto;
 import com.onevoice.show.presentation.dto.response.ShowResponseDto;
 import java.util.List;

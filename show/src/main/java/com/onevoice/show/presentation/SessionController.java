@@ -1,7 +1,7 @@
 package com.onevoice.show.presentation;
 
 import com.onevoice.common.dto.CommonResponse;
-import com.onevoice.show.application.service.SessionService;
+import com.onevoice.show.application.service.session.SessionService;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateSessionResponseDto;
