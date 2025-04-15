@@ -1,4 +1,4 @@
-package com.onevoice.show.application.service;
+package com.onevoice.show.application.service.show;
 
 import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.query.FindShowQuery;

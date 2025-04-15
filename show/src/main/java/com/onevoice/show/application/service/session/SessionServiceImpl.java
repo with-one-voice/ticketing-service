@@ -1,4 +1,4 @@
-package com.onevoice.show.application.service;
+package com.onevoice.show.application.service.session;
 
 import com.onevoice.show.application.client.SeatClient;
 import com.onevoice.show.application.client.VenueClient;

@@ -1,4 +1,4 @@
-package com.onevoice.show.application.service;
+package com.onevoice.show.application.service.session;
 
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;

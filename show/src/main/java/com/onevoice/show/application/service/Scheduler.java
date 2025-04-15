@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ShowScheduler {
+public class Scheduler {
 
     private final ShowRepository showRepository;
     private final SessionRepository sessionRepository;
