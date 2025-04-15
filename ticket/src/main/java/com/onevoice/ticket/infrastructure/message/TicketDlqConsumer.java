@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TicketDlqConsumer {
 
-    @KafkaListener(topics = "ticket_status.DLQ", groupId = "ticket-dlq-group")
+    @KafkaListener(topics = "payment_success.DLQ", groupId = "ticket-dlq-group")
     public void consumeDlq(ConsumerRecord<String, String> record) {
         log.error("[DLQ] Failed message received: topic={}, partition={}, offset={}, key={}, value={}",
             record.topic(), record.partition(), record.offset(), record.key(), record.value());
