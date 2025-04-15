@@ -25,4 +25,7 @@ public interface TicketService {
     DeleteTicketResponseDto deleteTicket(UUID ticketId);
 
     Page<ListReservedTicketResponseDto> searchTickets(UUID userId, int page, int size, String sortBy, boolean isAsc, String keyword);
+
+    void confirmTicketAfterPayment(UUID ticketId);
+    void failTicketAfterPayment(UUID ticketId);
 }
