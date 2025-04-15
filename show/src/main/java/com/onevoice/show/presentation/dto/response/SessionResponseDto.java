@@ -1,6 +1,6 @@
 package com.onevoice.show.presentation.dto.response;
 
-import com.onevoice.show.application.dto.FindSessionQuery;
+import com.onevoice.show.application.dto.query.FindSessionQuery;
 import com.onevoice.show.domain.Status;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -1,6 +1,5 @@
-package com.onevoice.show.application.dto;
+package com.onevoice.show.application.dto.client;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record VenueResponseDto(

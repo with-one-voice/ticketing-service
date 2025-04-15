@@ -2,10 +2,10 @@ package com.onevoice.show.application.service;
 
 import com.onevoice.show.application.client.SeatClient;
 import com.onevoice.show.application.client.VenueClient;
-import com.onevoice.show.application.dto.FindSessionQuery;
-import com.onevoice.show.application.dto.SeatCreateRequestDto;
-import com.onevoice.show.application.dto.SeatCreateResponseDto;
-import com.onevoice.show.application.dto.VenueResponseDto;
+import com.onevoice.show.application.dto.client.SeatCreateRequestDto;
+import com.onevoice.show.application.dto.client.SeatCreateResponseDto;
+import com.onevoice.show.application.dto.client.VenueResponseDto;
+import com.onevoice.show.application.dto.query.FindSessionQuery;
 import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Show;
 import com.onevoice.show.domain.Status;
@@ -86,12 +86,12 @@ public class SessionServiceImpl implements SessionService {
 
         FindSessionQuery query = FindSessionQuery.of(sessionRepository.save(session));
 
-        //TODO: 좌석 생성 FeignClient 호출 -> seat와 api 맞추면 해결 될 듯 ??
+        //TODO: 좌석 생성 FeignClient 호출 -> Kafka 이벤트 적용
         try {
             Optional<List<SeatCreateResponseDto>> result = seatClient.createInternal(
                 new SeatCreateRequestDto(session.getId(), session.getSeatCount(),
                     session.getSeatPrice().intValue()));
-            
+
             result.ifPresent(seatCreateResponseDtos -> log.info("공연 회차 수용인원({})- 생성된 좌석 개수 : {}",
                 requestDto.seatCount(),
                 seatCreateResponseDtos.size()));

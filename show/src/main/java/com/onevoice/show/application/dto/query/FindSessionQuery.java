@@ -1,4 +1,4 @@
-package com.onevoice.show.application.dto;
+package com.onevoice.show.application.dto.query;
 
 import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Status;
