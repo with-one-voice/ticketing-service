@@ -23,7 +23,11 @@ public interface SessionService {
 
     void delete(UUID sessionId, UUID userId);
 
-    void updateStatus(UUID sessionId);
+    void updateStatusCancel(UUID sessionId);
 
     SessionDetailResponseDto getSessionDetail(UUID sessionId);
+
+    void successToCreateSeat(UUID sessionId);
+
+    void failToCreateSeat(UUID sessionId);
 }

@@ -59,7 +59,7 @@ public class Session extends BaseEntity {
     private Long seatPrice;
 
     @Enumerated(EnumType.STRING)
-    private Status status = Status.BEFORE;
+    private Status status;
 
     public void update(UpdateSessionRequestDto requestDto) {
         this.sessionDate = requestDto.sessionDate();
@@ -68,7 +68,11 @@ public class Session extends BaseEntity {
         this.seatPrice = requestDto.seatPrice();
     }
 
-    public void updateStatus() {
+    public void updateStatusBefore() {
+        this.status = Status.BEFORE;
+    }
+
+    public void updateStatusCancelled() {
         this.status = Status.CANCELLED;
     }
 

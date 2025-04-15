@@ -3,6 +3,7 @@ package com.onevoice.show.infrastructure;
 import com.onevoice.show.domain.QSession;
 import com.onevoice.show.domain.QShow;
 import com.onevoice.show.domain.Session;
+import com.onevoice.show.domain.Status;
 import com.onevoice.show.domain.repository.SessionRepository;
 import com.onevoice.show.infrastructure.jpa.SessionJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -33,7 +34,10 @@ public class SessionRepositoryImpl implements SessionRepository {
         return queryFactory
             .selectFrom(session)
             .join(session.show, show).fetchJoin()
-            .where(session.deletedAt.isNull())
+            .where(
+                session.deletedAt.isNull(),
+                session.status.ne(Status.CANCELLED)
+            )
             .fetch();
     }
 
@@ -47,7 +51,8 @@ public class SessionRepositoryImpl implements SessionRepository {
             .join(session.show, show).fetchJoin()
             .where(
                 session.show.id.eq(showId),
-                session.deletedAt.isNull()
+                session.deletedAt.isNull(),
+                session.status.ne(Status.CANCELLED)
             )
             .fetch();
     }
@@ -57,8 +62,10 @@ public class SessionRepositoryImpl implements SessionRepository {
         QSession session = QSession.session;
         return Optional.ofNullable(queryFactory
             .selectFrom(session)
-            .where(session.id.eq(sessionId)
-                .and(session.deletedAt.isNull())
+            .where(
+                session.id.eq(sessionId),
+                session.deletedAt.isNull(),
+                session.status.ne(Status.CANCELLED)
             )
             .fetchFirst()
         );
@@ -75,7 +82,8 @@ public class SessionRepositoryImpl implements SessionRepository {
             .where(
                 session.show.id.eq(showId),
                 session.sessionDate.eq(sessionDate),
-                session.deletedAt.isNull()
+                session.deletedAt.isNull(),
+                session.status.ne(Status.CANCELLED)
             )
             .fetchFirst()
         );
