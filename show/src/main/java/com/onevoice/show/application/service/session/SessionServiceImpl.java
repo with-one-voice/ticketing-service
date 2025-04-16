@@ -69,7 +69,7 @@ public class SessionServiceImpl implements SessionService {
             throw new DuplicateSessionException();
         }
 
-        // 공연장 총 수용 인원과 회차 별 수용 인원 비교
+        // 공연장 조회 -> 공연장 총 수용 인원과 회차 별 수용 인원 비교
         VenueResponseDto venue = venueClient.getVenueOne(show.getVenueId()).orElseThrow(
             InvalidVenueIdException::new);
         if (venue.totalSeatCount() < requestDto.seatCount()) {
@@ -86,19 +86,6 @@ public class SessionServiceImpl implements SessionService {
             .build();
 
         FindSessionQuery query = FindSessionQuery.of(sessionRepository.save(session));
-
-        //TODO: 좌석 생성 FeignClient 호출 -> Kafka 이벤트 적용
-//        try {
-//            Optional<List<SeatCreateResponseDto>> result = seatClient.createInternal(
-//                new SeatCreateRequestDto(session.getId(), session.getSeatCount(),
-//                    session.getSeatPrice().intValue()));
-//
-//            result.ifPresent(seatCreateResponseDtos -> log.info("공연 회차 수용인원({})- 생성된 좌석 개수 : {}",
-//                requestDto.seatCount(),
-//                seatCreateResponseDtos.size()));
-//        } catch (Exception e) {
-//            throw new SeatCreateApiFailException();
-//        }
 
         // 좌석 생성 이벤트 메시지 발행
         SeatCreateRequestMessage payload = new SeatCreateRequestMessage(query.sessionId(),
