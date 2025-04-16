@@ -46,6 +46,11 @@ spring:
             enable: true
     test-connection: false
 
+discord:
+  name: ${DISCORD_NAME:final-project}
+  webhook:
+    url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1361934260583530607/DzLzn23dpg725D3tPkzLk9-d7t6ckPQZHdkVJClivflDM5aNHlRoMJuWFjgsY8hJfEJm}
+
 springdoc:
   swagger-ui:
     enabled: false
