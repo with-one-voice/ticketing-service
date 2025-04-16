@@ -188,18 +188,9 @@ public class SeatServiceImpl implements SeatService {
                 }
             }
         }
-
-//            String currentStatus = (String) redisTemplate.opsForHash().get(redisKey, seatIdStr);
-//
-//            if (!"AVAILABLE".equals(currentStatus)) {
-//                throw new SeatAlreadyHeldException();
-//            }
-//
-//            redisTemplate.opsForHash().put(redisKey, seatIdStr, "HOLD");
-//            redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
-//        }
-
+        redisTemplate.delete("seat-cache:" + sessionId.getValue());
         return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(10), seatIdList);
+
     }
 
 
@@ -208,6 +199,8 @@ public class SeatServiceImpl implements SeatService {
         SessionId session = new SessionId(sessionId);
         seatRepository.deleteAllBySessionId(session);
         redisTemplate.delete("seat:" + sessionId.toString());
+        redisTemplate.delete("seat-cache:" + sessionId.toString());
+
     }
 
 
@@ -238,7 +231,7 @@ public class SeatServiceImpl implements SeatService {
 
             }
         }
-
+        redisTemplate.delete("seat-cache:" + seats.get(0).getSessionId().getValue());
         return seats.stream().map(SeatResponseDto::of).toList();
     }
 
@@ -268,6 +261,8 @@ public class SeatServiceImpl implements SeatService {
             // TTL 기반 hold 키 삭제
             String holdKey = "seat-hold:" + seat.getSessionId().getValue() + ":" + seatIdStr;
             redisTemplate.delete(holdKey);
+            redisTemplate.delete("seat-cache:" + seat.getSessionId().getValue());
+
         }
 
         seatRepository.saveAll(seats);
@@ -278,6 +273,7 @@ public class SeatServiceImpl implements SeatService {
             KafkaTopicType.SEAT_CONFIRM.getTopic(), message
         );
         applicationEventPublisher.publishEvent(event);
+
     }
 
     /*
@@ -305,6 +301,8 @@ public class SeatServiceImpl implements SeatService {
             // TTL 기반 hold 키 삭제
             String holdKey = "seat-hold:" + seat.getSessionId().getValue() + ":" + seatIdStr;
             redisTemplate.delete(holdKey);
+            redisTemplate.delete("seat-cache:" + seat.getSessionId().getValue());
+
         }
 
         seatRepository.saveAll(seats);
