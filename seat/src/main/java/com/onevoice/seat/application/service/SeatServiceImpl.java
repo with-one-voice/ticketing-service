@@ -235,6 +235,8 @@ public class SeatServiceImpl implements SeatService {
         for (Seat seat : seats) {
             seat.changeStatus(SeatStatus.RESERVED);
 
+            //유저 정보 저장
+            seat.assignUser(userId);
 
             String redisKey = "seat:" + seat.getSessionId().getValue();
             String seatIdStr = seat.getSeatId().toString();
@@ -270,6 +272,8 @@ public class SeatServiceImpl implements SeatService {
         for (Seat seat : seats) {
             seat.changeStatus(SeatStatus.AVAILABLE);
 
+            //userId 초기화
+            seat.clearUserId();
 
             String redisKey = "seat:" + seat.getSessionId().getValue();
             String seatIdStr = seat.getSeatId().toString();

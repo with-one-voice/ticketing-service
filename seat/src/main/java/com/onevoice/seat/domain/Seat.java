@@ -61,4 +61,11 @@ public class Seat extends BaseEntity {
     public void changeStatus(SeatStatus status) {
         this.status = status;
     }
+
+    public void assignUser(UUID userId) {
+        this.userId = userId;
+    }
+    public void clearUserId() {
+        this.userId = null;
+    }
 }
