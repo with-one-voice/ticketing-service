@@ -48,6 +48,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
         Long total = queryFactory
                 .select(ticket.count())
+                .from(ticket)
                 .where(ticket.userId.eq(userID),
                         ticket.deletedAt.isNull())
                 .fetchOne();
@@ -72,6 +73,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
         Long toal = queryFactory
                 .select(ticket.count())
+                .from(ticket)
                 .where(ticket.showName.containsIgnoreCase(keyword),
                         ticket.deletedAt.isNull())
                 .fetchOne();
@@ -102,12 +104,11 @@ public class TicketRepositoryImpl implements TicketRepository {
                 case "userid" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.userId));
                 case "sessionid" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.sessionId));
                 case "showname" ->orderSpecifiers.add(new OrderSpecifier<>(direction,ticket.showName));
-                case "seatid" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.seatId));
                 case "status" -> orderSpecifiers.add(new OrderSpecifier<>(direction, ticket.status));
                 default -> throw new IllegalArgumentException("정렬 불가능한 필드: "+property+ "\n"
-                        + "정렬 가능한 필드들 리스트 : createdAt,createdBy,userId,sessionId,showName,seatId,status");
+                        + "정렬 가능한 필드들 리스트 : createdAt,createdBy,userId,sessionId,showName,status");
             }
         }
-        return null;
+        return orderSpecifiers;
     }
 }

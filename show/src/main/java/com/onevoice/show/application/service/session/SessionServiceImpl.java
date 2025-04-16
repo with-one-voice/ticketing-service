@@ -186,9 +186,13 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SessionDetailResponseDto getSessionDetail(UUID sessionId) {
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
+
+        // Lazy 초기화
+        session.getShow().getId();
 
         return SessionDetailResponseDto.of(session);
     }

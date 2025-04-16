@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -36,8 +37,10 @@ public class Ticket extends BaseEntity {
     @Column(name = "show_name",nullable = false)
     private String showName;
 
+    @ElementCollection
+    @CollectionTable(name = "ticket_seat_ids", joinColumns = @JoinColumn(name = "ticket_id"))
     @Column(name = "seat_id", nullable = false)
-    private UUID seatId;
+    private List<UUID> seatIdList;
 
     @Column(name = "reserved_at")
     private LocalDateTime reservedAt;
@@ -50,12 +53,12 @@ public class Ticket extends BaseEntity {
     @Column(name = "version")
     private Long version;
 
-    public Ticket(UUID userId,String userName, UUID sessionId,String showName, UUID seatId) {
+    public Ticket(UUID userId,String userName, UUID sessionId,String showName, List<UUID> seatIds) {
         this.userId = userId;
         this.userName = userName;
         this.sessionId = sessionId;
         this.showName = showName;
-        this.seatId = seatId;
+        this.seatIdList = seatIds;
         this.reservedAt = LocalDateTime.now();
         this.status = TicketStatus.WAITING_PAYMENT;
     }
