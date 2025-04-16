@@ -203,6 +203,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SessionDetailResponseDto getSessionDetail(UUID sessionId) {
 
         SessionDetailResponseDto cached = cacheStore.getSessionDetail(sessionId);
@@ -212,6 +213,9 @@ public class SessionServiceImpl implements SessionService {
 
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
+
+        // Lazy 초기화
+        session.getShow().getId();
 
         SessionDetailResponseDto dto = SessionDetailResponseDto.of(session);
         cacheStore.saveSessionDetail(sessionId, dto);
