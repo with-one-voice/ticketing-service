@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>카카오페이 요청</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Payment ID 전송</h2>
+  <form id="requestForm" method="GET">
+    <input type="text" id="inputValue" name="value" placeholder="Payment ID를 입력하세요" required/>
+    <br>
+    <button type="submit" onclick="updateFormAction()">전송</button>
+  </form>
+</div>
+<script>
+  function updateFormAction() {
+    // 입력값 가져오기
+    const inputValue = document.getElementById('inputValue').value;
+
+    if (!inputValue) {
+      alert('값을 입력해주세요!');
+      return false;
+    }
+
+    // 폼의 action 동적으로 설정
+    const form = document.getElementById('requestForm');
+    const baseUrl = 'http://localhost:8007';
+    form.action = `${baseUrl}/kakao/ready/${inputValue}`;
+
+    // 폼 제출은 자동으로 진행됨 (submit 버튼이므로)
+  }
+</script>
+</body>
+</html>

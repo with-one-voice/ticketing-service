@@ -11,10 +11,10 @@ public class EmailSendEvent extends ApplicationEvent {
     @Serial
     private static final long serialVersionUID = -2685172945219633123L;
 
-    private final EmailContext message;
+    private final EmailContext context;
 
-    public EmailSendEvent(Object source, EmailContext message) {
+    public EmailSendEvent(Object source, EmailContext context) {
         super(source);
-        this.message = message;
+        this.context = context;
     }
 }

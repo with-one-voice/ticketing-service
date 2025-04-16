@@ -1,8 +1,12 @@
 package com.onevoice.seat.application.service;
 
+import com.onevoice.common.enumtype.KafkaTopicType;
 import com.onevoice.common.enumtype.SeatStatus;
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
+import com.onevoice.seat.application.dto.message.SeatConfirmedMessage;
+import com.onevoice.seat.application.dto.message.SeatFailedMessage;
+import com.onevoice.seat.application.event.GenericKafkaEvent;
 import com.onevoice.seat.domain.Seat;
 import com.onevoice.seat.domain.repository.SeatRepository;
 import com.onevoice.seat.domain.vo.Money;
@@ -27,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +45,7 @@ public class SeatServiceImpl implements SeatService {
     private final SeatRepository seatRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final RedissonClient redissonClient;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final SeatEventProducer seatEventProducer;
 
     /*
@@ -47,7 +53,6 @@ public class SeatServiceImpl implements SeatService {
      * */
     @Override
     public List<SeatCreateResponseDto> createSeat(CreateSeatCommand command) {
-        log.info("[Seat Service] 좌석 생성 {}개", command.seatCount());
         SessionId sessionId = new SessionId(command.sessionId());
         Money price = new Money(command.price());
 
@@ -183,8 +188,17 @@ public class SeatServiceImpl implements SeatService {
 //            redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
 //        }
 
-        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), seatIdList);
+        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(10), seatIdList);
     }
+
+
+    @Override
+    public void deleteSeat(UUID sessionId) {
+        SessionId session = new SessionId(sessionId);
+        seatRepository.deleteAllBySessionId(session);
+        redisTemplate.delete("seat:" + sessionId.toString());
+    }
+
 
     /*
      * 좌석 상태 변경
@@ -218,11 +232,77 @@ public class SeatServiceImpl implements SeatService {
     }
 
 
+    /*
+     * Kafka 메시지 수신 - 예매 확정 처리
+     * */
     @Override
-    public void deleteSeat(UUID sessionId) {
-        SessionId session = new SessionId(sessionId);
-        seatRepository.deleteAllBySessionId(session);
-        redisTemplate.delete("seat:" + sessionId.toString());
+    public void confirmSeats(List<UUID> seatIds, UUID userId) {
+        List<Seat> seats = seatRepository.findBySeatIdIn(seatIds);
+
+        for (Seat seat : seats) {
+            seat.changeStatus(SeatStatus.RESERVED);
+
+            //유저 정보 저장
+            seat.assignUser(userId);
+
+            String redisKey = "seat:" + seat.getSessionId().getValue();
+            String seatIdStr = seat.getSeatId().toString();
+
+            redisTemplate.opsForHash().put(
+                redisKey,
+                seatIdStr,
+                SeatStatus.RESERVED.name()
+            );
+
+            // TTL 기반 hold 키 삭제
+            String holdKey = "seat-hold:" + seat.getSessionId().getValue() + ":" + seatIdStr;
+            redisTemplate.delete(holdKey);
+        }
+
+        seatRepository.saveAll(seats);
+
+        // 이벤트 발행
+        SeatConfirmedMessage message = new SeatConfirmedMessage(userId);
+        GenericKafkaEvent<SeatConfirmedMessage> event = new GenericKafkaEvent<>(
+            KafkaTopicType.SEAT_CONFIRM.getTopic(), message
+        );
+        applicationEventPublisher.publishEvent(event);
     }
 
+    /*
+     * Kafka 메시지 수신 - 예매 실패 복구
+     * */
+    @Override
+    public void revertSeats(List<UUID> seatIds, UUID userId) {
+        List<Seat> seats = seatRepository.findBySeatIdIn(seatIds);
+
+        for (Seat seat : seats) {
+            seat.changeStatus(SeatStatus.AVAILABLE);
+
+            //userId 초기화
+            seat.clearUserId();
+
+            String redisKey = "seat:" + seat.getSessionId().getValue();
+            String seatIdStr = seat.getSeatId().toString();
+
+            redisTemplate.opsForHash().put(
+                redisKey,
+                seatIdStr,
+                SeatStatus.AVAILABLE.name()
+            );
+
+            // TTL 기반 hold 키 삭제
+            String holdKey = "seat-hold:" + seat.getSessionId().getValue() + ":" + seatIdStr;
+            redisTemplate.delete(holdKey);
+        }
+
+        seatRepository.saveAll(seats);
+
+        // 이벤트 발행
+        SeatFailedMessage message = new SeatFailedMessage(userId);
+        GenericKafkaEvent<SeatFailedMessage> event = new GenericKafkaEvent<>(
+            KafkaTopicType.SEAT_CONFIRM_FAIL.getTopic(), message
+        );
+        applicationEventPublisher.publishEvent(event);
+    }
 }
