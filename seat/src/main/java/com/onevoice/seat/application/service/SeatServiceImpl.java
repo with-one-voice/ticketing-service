@@ -252,7 +252,12 @@ public class SeatServiceImpl implements SeatService {
 
         seatRepository.saveAll(seats);
 
-
+        // 이벤트 발행
+        SeatConfirmedMessage message = new SeatConfirmedMessage(userId);
+        GenericKafkaEvent<SeatConfirmedMessage> event = new GenericKafkaEvent<>(
+                KafkaTopicType.SEAT_CONFIRM.getTopic(), message
+        );
+        applicationEventPublisher.publishEvent(event);
     }
 
     /*
@@ -282,5 +287,11 @@ public class SeatServiceImpl implements SeatService {
 
         seatRepository.saveAll(seats);
 
+        // 이벤트 발행
+        SeatFailedMessage message = new SeatFailedMessage(userId);
+        GenericKafkaEvent<SeatFailedMessage> event = new GenericKafkaEvent<>(
+                KafkaTopicType.SEAT_CONFIRM_FAIL.getTopic(), message
+        );
+        applicationEventPublisher.publishEvent(event);
     }
 }
