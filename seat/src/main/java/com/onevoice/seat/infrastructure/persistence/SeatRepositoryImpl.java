@@ -30,18 +30,6 @@ public class SeatRepositoryImpl implements SeatRepository {
     }
 
     @Override
-    public Optional<Seat> findBySessionIdAndSeatCode(SessionId sessionId, SeatCode seatCode) {
-        return Optional.ofNullable(
-                queryFactory.selectFrom(qSeat)
-                        .where(
-                                qSeat.sessionId.eq(sessionId),
-                                qSeat.seatCode.eq(seatCode)
-                        )
-                        .fetchOne()
-        );
-    }
-
-    @Override
     public void saveAll(List<Seat> seats) {
         seatJpaRepository.saveAll(seats);
     }

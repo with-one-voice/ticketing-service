@@ -11,5 +11,4 @@ import java.util.UUID;
 
 public interface SeatJpaRepository extends JpaRepository<Seat, UUID> {
     List<Seat> findBySessionId(SessionId sessionId);
-    Optional<Seat> findBySessionIdAndSeatCode(SessionId sessionId, SeatCode seatCode);
 }
