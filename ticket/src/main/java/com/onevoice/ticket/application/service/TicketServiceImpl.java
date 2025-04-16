@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -70,7 +69,7 @@ public class TicketServiceImpl implements TicketService{
             String showName = sessionQuery.showName();
 
             // 3. 좌석 선점 요청
-            List<UUID> seatIdList = List.of(requestDto.seatId());
+            List<UUID> seatIdList = requestDto.seatIds();
             HoldSeatCommand holdCommand = new HoldSeatCommand(seatIdList);
 
             seatClient.holdSeatsInternal(requestDto.sessionId(), holdCommand)
@@ -82,7 +81,7 @@ public class TicketServiceImpl implements TicketService{
                 userName,
                 requestDto.sessionId(),
                 showName,
-                requestDto.seatId()
+                requestDto.seatIds()
             );
             Ticket saved = ticketRepository.save(ticket);
 
@@ -118,6 +117,9 @@ public class TicketServiceImpl implements TicketService{
 
             throw new TicketOwnerMismatchException();
         }
+
+        // Lazy 초기화
+        ticket.getSeatIdList().size();
         return FindTicketResponseDto.of(ticket);
     }
 
@@ -161,15 +163,13 @@ public class TicketServiceImpl implements TicketService{
             }
 
             if (newStatus == TicketStatus.CONFIRM_PAYMENT) {
-                List<UUID> seatIds = new ArrayList<>();
-                seatIds.add(ticket.getSeatId());
+                List<UUID> seatIds = ticket.getSeatIdList();
 
                 UpdateSeatStatusCommand command = new UpdateSeatStatusCommand(seatIds,
                     SeatStatus.RESERVED);
                 seatClient.updateStatusInternal(ticket.getUserId(), UserRole.USER,command);
             }else{
-                List<UUID> seatIds = new ArrayList<>();
-                seatIds.add(ticket.getSeatId());
+                List<UUID> seatIds = ticket.getSeatIdList();
 
                 UpdateSeatStatusCommand command = new UpdateSeatStatusCommand(seatIds,
                     SeatStatus.AVAILABLE);
@@ -245,8 +245,7 @@ public class TicketServiceImpl implements TicketService{
 
         // 티켓 상태 변경
         ticket.updateTicketStatus(newStatus);
-        List<UUID> seatIdList = new ArrayList<>();
-        seatIdList.add(ticket.getSeatId());
+        List<UUID> seatIdList = ticket.getSeatIdList();
 
         // 좌석 확정 메시지 발행
         TicketConfirmedMessage payload = new TicketConfirmedMessage(seatIdList, ticket.getUserId());
@@ -269,8 +268,7 @@ public class TicketServiceImpl implements TicketService{
 
         // 티켓 상태 변경
         ticket.updateTicketStatus(newStatus);
-        List<UUID> seatIdList = new ArrayList<>();
-        seatIdList.add(ticket.getSeatId());
+        List<UUID> seatIdList = ticket.getSeatIdList();
 
         // 티켓 확정 실패 메시지 발행
         TicketFailedMessage payload = new TicketFailedMessage(seatIdList, ticket.getUserId());
