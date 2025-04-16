@@ -1,4 +1,4 @@
-package com.onevoice.seat.infrastructure.config;
+package com.onevoice.seat.infrastructure.redis;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
