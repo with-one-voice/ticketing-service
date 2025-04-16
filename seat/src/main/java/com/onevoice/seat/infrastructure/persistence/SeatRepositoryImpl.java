@@ -3,7 +3,6 @@ package com.onevoice.seat.infrastructure.persistence;
 import com.onevoice.seat.domain.QSeat;
 import com.onevoice.seat.domain.Seat;
 import com.onevoice.seat.domain.repository.SeatRepository;
-import com.onevoice.seat.domain.vo.SeatCode;
 import com.onevoice.seat.domain.vo.SessionId;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

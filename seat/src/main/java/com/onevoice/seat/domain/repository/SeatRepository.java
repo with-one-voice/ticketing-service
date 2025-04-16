@@ -2,7 +2,6 @@ package com.onevoice.seat.domain.repository;
 
 
 import com.onevoice.seat.domain.Seat;
-import com.onevoice.seat.domain.vo.SeatCode;
 import com.onevoice.seat.domain.vo.SessionId;
 
 import java.util.List;
