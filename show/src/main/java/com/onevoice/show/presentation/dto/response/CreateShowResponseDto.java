@@ -1,6 +1,6 @@
 package com.onevoice.show.presentation.dto.response;
 
-import com.onevoice.show.application.dto.FindShowQuery;
+import com.onevoice.show.application.dto.query.FindShowQuery;
 import com.onevoice.show.domain.ShowCategory;
 import com.onevoice.show.domain.Status;
 import java.time.LocalDateTime;

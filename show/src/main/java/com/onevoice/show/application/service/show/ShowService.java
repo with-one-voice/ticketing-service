@@ -1,4 +1,4 @@
-package com.onevoice.show.application.service;
+package com.onevoice.show.application.service.show;
 
 import com.onevoice.show.presentation.dto.request.CreateShowRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateShowRequestDto;

@@ -1,4 +1,4 @@
-package com.onevoice.show.application.service;
+package com.onevoice.show.application.service.session;
 
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
@@ -23,7 +23,11 @@ public interface SessionService {
 
     void delete(UUID sessionId, UUID userId);
 
-    void updateStatus(UUID sessionId);
+    void updateStatusCancel(UUID sessionId);
 
     SessionDetailResponseDto getSessionDetail(UUID sessionId);
+
+    void successToCreateSeat(UUID sessionId);
+
+    void failToCreateSeat(UUID sessionId);
 }

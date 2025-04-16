@@ -1,11 +1,12 @@
-package com.onevoice.show.application.service;
+package com.onevoice.show.application.service.session;
 
+import com.onevoice.common.enumtype.KafkaTopicType;
 import com.onevoice.show.application.client.SeatClient;
 import com.onevoice.show.application.client.VenueClient;
-import com.onevoice.show.application.dto.FindSessionQuery;
-import com.onevoice.show.application.dto.SeatCreateRequestDto;
-import com.onevoice.show.application.dto.SeatCreateResponseDto;
-import com.onevoice.show.application.dto.VenueResponseDto;
+import com.onevoice.show.application.dto.client.VenueResponseDto;
+import com.onevoice.show.application.dto.message.SeatCreateRequestMessage;
+import com.onevoice.show.application.dto.query.FindSessionQuery;
+import com.onevoice.show.application.event.GenericKafkaEvent;
 import com.onevoice.show.domain.Session;
 import com.onevoice.show.domain.Show;
 import com.onevoice.show.domain.Status;
@@ -18,7 +19,6 @@ import com.onevoice.show.exception.InvalidSessionDateException;
 import com.onevoice.show.exception.InvalidVenueIdException;
 import com.onevoice.show.exception.NotFoundSessionException;
 import com.onevoice.show.exception.NotFoundShowException;
-import com.onevoice.show.exception.SeatCreateApiFailException;
 import com.onevoice.show.exception.TicketingAlreadyStartedException;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
@@ -28,10 +28,10 @@ import com.onevoice.show.presentation.dto.response.SessionResponseDto;
 import com.onevoice.show.presentation.dto.response.UpdateSessionResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +42,7 @@ public class SessionServiceImpl implements SessionService {
 
     private final ShowRepository showRepository;
     private final SessionRepository sessionRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final VenueClient venueClient;
     private final SeatClient seatClient;
 
@@ -68,7 +69,7 @@ public class SessionServiceImpl implements SessionService {
             throw new DuplicateSessionException();
         }
 
-        // 공연장 총 수용 인원과 회차 별 수용 인원 비교
+        // 공연장 조회 -> 공연장 총 수용 인원과 회차 별 수용 인원 비교
         VenueResponseDto venue = venueClient.getVenueOne(show.getVenueId()).orElseThrow(
             InvalidVenueIdException::new);
         if (venue.totalSeatCount() < requestDto.seatCount()) {
@@ -86,18 +87,12 @@ public class SessionServiceImpl implements SessionService {
 
         FindSessionQuery query = FindSessionQuery.of(sessionRepository.save(session));
 
-        //TODO: 좌석 생성 FeignClient 호출 -> seat와 api 맞추면 해결 될 듯 ??
-        try {
-            Optional<List<SeatCreateResponseDto>> result = seatClient.createInternal(
-                new SeatCreateRequestDto(session.getId(), session.getSeatCount(),
-                    session.getSeatPrice().intValue()));
-            
-            result.ifPresent(seatCreateResponseDtos -> log.info("공연 회차 수용인원({})- 생성된 좌석 개수 : {}",
-                requestDto.seatCount(),
-                seatCreateResponseDtos.size()));
-        } catch (Exception e) {
-            throw new SeatCreateApiFailException();
-        }
+        // 좌석 생성 이벤트 메시지 발행
+        SeatCreateRequestMessage payload = new SeatCreateRequestMessage(query.sessionId(),
+            query.seatCount(), query.seatPrice().intValue());
+        GenericKafkaEvent<SeatCreateRequestMessage> event = new GenericKafkaEvent<>(
+            KafkaTopicType.SEAT_CREATE_REQUEST.getTopic(), payload);
+        applicationEventPublisher.publishEvent(event);
 
         return CreateSessionResponseDto.of(query);
     }
@@ -177,7 +172,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     @Transactional
-    public void updateStatus(UUID sessionId) {
+    public void updateStatusCancel(UUID sessionId) {
 
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
@@ -187,15 +182,42 @@ public class SessionServiceImpl implements SessionService {
             throw new TicketingAlreadyStartedException();
         }
 
-        session.updateStatus();
+        session.updateStatusCancelled();
     }
 
-    @Transactional(readOnly = true)
     @Override
     public SessionDetailResponseDto getSessionDetail(UUID sessionId) {
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
 
         return SessionDetailResponseDto.of(session);
+    }
+
+    /**
+     * 좌석 생성 성공 후 -> 공연 회차 상태 "BEFORE" 로 변경
+     *
+     * @param sessionId
+     */
+    @Override
+    @Transactional
+    public void successToCreateSeat(UUID sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(NotFoundSessionException::new);
+
+        session.updateStatusBefore();
+    }
+
+    /**
+     * 좌석 생성 실패 후 -> 공연 회차 상태 "CANCELLED"로 변경
+     *
+     * @param sessionId
+     */
+    @Override
+    @Transactional
+    public void failToCreateSeat(UUID sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+            .orElseThrow(NotFoundSessionException::new);
+
+        session.updateStatusCancelled();
     }
 }

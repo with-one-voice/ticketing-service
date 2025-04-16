@@ -1,7 +1,7 @@
 package com.onevoice.show.presentation;
 
 import com.onevoice.common.dto.CommonResponse;
-import com.onevoice.show.application.service.ShowService;
+import com.onevoice.show.application.service.show.ShowService;
 import com.onevoice.show.presentation.dto.request.CreateShowRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateShowRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateShowResponseDto;

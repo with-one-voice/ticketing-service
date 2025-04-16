@@ -1,6 +1,6 @@
 package com.onevoice.show.application.client;
 
-import com.onevoice.show.application.dto.VenueResponseDto;
+import com.onevoice.show.application.dto.client.VenueResponseDto;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.cloud.openfeign.FeignClient;
