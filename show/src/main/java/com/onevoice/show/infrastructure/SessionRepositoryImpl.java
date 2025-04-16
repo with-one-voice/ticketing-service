@@ -36,7 +36,7 @@ public class SessionRepositoryImpl implements SessionRepository {
             .join(session.show, show).fetchJoin()
             .where(
                 session.deletedAt.isNull(),
-                session.status.ne(Status.CANCELLED)
+                session.status.isNull().or(session.status.ne(Status.CANCELLED))
             )
             .fetch();
     }
@@ -52,7 +52,7 @@ public class SessionRepositoryImpl implements SessionRepository {
             .where(
                 session.show.id.eq(showId),
                 session.deletedAt.isNull(),
-                session.status.ne(Status.CANCELLED)
+                session.status.isNull().or(session.status.ne(Status.CANCELLED))
             )
             .fetch();
     }
@@ -65,7 +65,7 @@ public class SessionRepositoryImpl implements SessionRepository {
             .where(
                 session.id.eq(sessionId),
                 session.deletedAt.isNull(),
-                session.status.ne(Status.CANCELLED)
+                session.status.isNull().or(session.status.ne(Status.CANCELLED))
             )
             .fetchFirst()
         );
@@ -83,7 +83,7 @@ public class SessionRepositoryImpl implements SessionRepository {
                 session.show.id.eq(showId),
                 session.sessionDate.eq(sessionDate),
                 session.deletedAt.isNull(),
-                session.status.ne(Status.CANCELLED)
+                session.status.isNull().or(session.status.ne(Status.CANCELLED))
             )
             .fetchFirst()
         );
