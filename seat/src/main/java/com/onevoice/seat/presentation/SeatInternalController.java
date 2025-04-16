@@ -1,10 +1,10 @@
 package com.onevoice.seat.presentation;
 
-import com.onevoice.common.dto.CommonResponse;
+import com.onevoice.common.enumtype.SeatStatus;
+import com.onevoice.common.security.UserRole;
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
 import com.onevoice.seat.application.service.SeatService;
-import com.onevoice.seat.domain.SeatStatus;
 import com.onevoice.seat.presentation.dto.request.CreateSeatRequestDto;
 import com.onevoice.seat.presentation.dto.request.HoldSeatRequestDto;
 import com.onevoice.seat.presentation.dto.request.SeatStatusChangeRequestDto;
@@ -13,8 +13,6 @@ import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
 import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -76,7 +74,10 @@ public class SeatInternalController {
     * */
     @PutMapping("/status")
     public Optional<List<SeatResponseDto>> updateStatusInternal(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
             @RequestBody SeatStatusChangeRequestDto request
+
     ) {
         List<SeatResponseDto> updatedSeats = seatService.updateSeatStatuses(
                 request.seatIds(), request.newStatus()
@@ -89,6 +90,7 @@ public class SeatInternalController {
     * */
     @PutMapping("/recover")
     public Optional<List<SeatResponseDto>> recoverSeats(
+            @RequestHeader("X-User-Id") UUID userId,
             @RequestBody List<UUID> seatIds
     ) {
         List<SeatResponseDto> recovered = seatService.updateSeatStatuses(seatIds, SeatStatus.AVAILABLE);

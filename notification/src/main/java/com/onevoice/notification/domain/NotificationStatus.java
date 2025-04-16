@@ -8,6 +8,7 @@ public enum NotificationStatus {
     SENT,
     FAILED,
     SERVER_ERROR,
+    EVENT_FAILED,
     ;
 
     @JsonCreator

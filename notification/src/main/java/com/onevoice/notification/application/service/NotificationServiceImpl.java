@@ -1,12 +1,10 @@
 package com.onevoice.notification.application.service;
 
-import com.onevoice.notification.application.client.UserClient;
 import com.onevoice.notification.application.dto.command.CreateNotificationCommand;
-import com.onevoice.notification.application.dto.message.EmailContext;
 import com.onevoice.notification.application.dto.query.FindNotificationQuery;
-import com.onevoice.notification.application.dto.query.FindUserQuery;
 import com.onevoice.notification.application.dto.query.ListNotificationQuery;
-import com.onevoice.notification.application.event.EmailSendEvent;
+import com.onevoice.notification.application.event.NotificationEventPublisher;
+import com.onevoice.notification.application.event.NotificationEventPublisherFactory;
 import com.onevoice.notification.domain.Notification;
 import com.onevoice.notification.domain.NotificationStatus;
 import com.onevoice.notification.domain.repository.NotificationRepository;
@@ -15,7 +13,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j(topic = "NotificationServiceImpl")
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NotificationServiceImpl implements NotificationService {
 
-    private final UserClient userClient;
     private final NotificationRepository repository;
-    private final ApplicationEventPublisher publisher;
+    private final NotificationEventPublisherFactory publisherFactory;
 
     @Override
     public UUID create(CreateNotificationCommand command) {
@@ -40,9 +37,8 @@ public class NotificationServiceImpl implements NotificationService {
             command.metadata()
         );
 
-        // save 를 명시적으로 호출해야 해서 @Transactional 을 제외했다.
         Notification saved = repository.save(notification);
-        publishEvent(command, saved.getNotificationId());
+        publishEvent(saved.getNotificationId(), command);
         return saved.getNotificationId();
     }
 
@@ -66,7 +62,6 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @Transactional
     public void updateStatus(UUID notificationId, NotificationStatus status) {
         Notification notification = repository.findByNotificationId(notificationId)
             .orElseThrow(NotificationNotFoundException::new);
@@ -74,39 +69,22 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @Transactional
     public void delete(UUID notificationId) {
         Notification notification = repository.findByNotificationId(notificationId)
             .orElseThrow(NotificationNotFoundException::new);
         notification.delete(notificationId);
     }
 
-    private void publishEvent(CreateNotificationCommand command, UUID notificationId) {
-        // notificationType 발송 이벤트 발행
-        switch (command.notificationType()) {
-            case EMAIL: {
-                FindUserQuery query = userClient.findUserById(command.userId()).orElseThrow();
-                EmailContext message = new EmailContext(
-                    notificationId,
-                    "WOV", // username 이 없어서 임의로 넣음
-                    query.email(),
-                    command.title(),
-                    command.message(),
-                    command.metadata()
-                );
-                // TODO: 트랜잭션과 상관 없으니 @Async 로 변경하자.
-                publisher.publishEvent(new EmailSendEvent(this, message));
-                break;
+    private void publishEvent(UUID notificationId, CreateNotificationCommand command) {
+        // notificationType 이벤트 발행
+        NotificationEventPublisher publisher = publisherFactory.getPublisher(
+            command.notificationType());
+        if (publisher != null) {
+            if (!publisher.publish(notificationId, command)) {
+                updateStatus(notificationId, NotificationStatus.EVENT_FAILED);
             }
-            case SMS:
-                log.info("SMS event");
-                break;
-            case PUSH:
-                log.info("PUSH event");
-                break;
-            default:
-                log.info("Unknown notification type");
-                break;
+        } else {
+            log.info("Unknown notification type");
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.onevoice.common.config;
+package com.onevoice.common.config.autoConfig;
 
 
 import feign.RequestInterceptor;

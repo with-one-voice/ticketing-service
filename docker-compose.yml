@@ -1,4 +1,4 @@
-version: '3.8'
+  version: '3.8'
 
 services:
   postgres:
@@ -112,6 +112,18 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+    networks:
+      - monitoring
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    container_name: kafka-exporter
+    ports:
+      - "9308:9308"
+    environment:
+      KAFKA_URI: kafka:29092
     depends_on:
       - kafka
     networks:

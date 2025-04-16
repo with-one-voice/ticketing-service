@@ -1,14 +1,17 @@
 package com.onevoice.payment.application.service;
 
+import com.onevoice.common.enumtype.KafkaTopicType;
 import com.onevoice.payment.application.dto.command.CreatePaymentCommand;
-import com.onevoice.payment.application.dto.message.PaymentMessage;
+import com.onevoice.payment.application.dto.message.PaymentSuccessMessage;
 import com.onevoice.payment.application.dto.query.FindPaymentQuery;
 import com.onevoice.payment.application.dto.query.ListPaymentQuery;
-import com.onevoice.payment.application.event.PaymentCreateEvent;
+import com.onevoice.payment.application.event.GenericKafkaEvent;
 import com.onevoice.payment.domain.Payment;
+import com.onevoice.payment.domain.PaymentStatus;
 import com.onevoice.payment.domain.repository.PaymentRepository;
 import com.onevoice.payment.exception.PaymentNotFoundException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository repository;
-    private final ApplicationEventPublisher publisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public UUID create(CreatePaymentCommand command) {
@@ -36,10 +39,6 @@ public class PaymentServiceImpl implements PaymentService {
         );
         Payment saved = repository.save(payment);
 
-        // TODO: 결제 결과에 따라 paymentStatus 수정 후 관련 이벤트를 발행하는 방식으로 바꿔야 한다.
-        // 현재는 결제 정보 요청하면 즉시 완료 되었다고 가정하고 데이터 저장 후 이벤트 발행
-        publisher.publishEvent(
-            new PaymentCreateEvent(this, PaymentMessage.from(payment)));
         return saved.getPaymentId();
     }
 
@@ -54,11 +53,45 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public FindPaymentQuery read(UUID paymentId) {
+        return repository.findById(paymentId)
+            .map(FindPaymentQuery::from)
+            .orElseThrow(PaymentNotFoundException::new);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public FindPaymentQuery read(UUID userId, UUID paymentId) {
         return repository.findByIdAndUserId(paymentId, userId)
             .map(FindPaymentQuery::from)
             .orElseThrow(PaymentNotFoundException::new);
+    }
+
+    @Override
+    public void update(UUID paymentId, PaymentStatus paymentStatus) {
+        Payment payment = repository.findById(paymentId)
+            .orElseThrow(PaymentNotFoundException::new);
+        payment.update(paymentStatus);
+
+        KafkaTopicType kafkaTopicType;
+        if (Objects.requireNonNull(paymentStatus) == PaymentStatus.PG_APPROVE) {
+            kafkaTopicType = KafkaTopicType.PAYMENT_SUCCESS;
+        } else {
+            kafkaTopicType = KafkaTopicType.PAYMENT_FAIL;
+        }
+        // 결제 결과 이벤트 발행
+        PaymentSuccessMessage payload = new PaymentSuccessMessage(paymentId);
+        GenericKafkaEvent<PaymentSuccessMessage> event = new GenericKafkaEvent<>(
+            kafkaTopicType.getTopic(),
+            payload);
+        eventPublisher.publishEvent(event);
+    }
+
+    @Override
+    public void update(UUID paymentId, String pgKey, PaymentStatus paymentStatus) {
+        Payment payment = repository.findById(paymentId)
+            .orElseThrow(PaymentNotFoundException::new);
+        payment.update(pgKey, paymentStatus);
     }
 
     @Override

@@ -5,7 +5,7 @@ import com.onevoice.common.exception.BaseException;
 
 public class TicketSessionNotFoundException extends BaseException {
     public TicketSessionNotFoundException(){
-        super(ResponseCode.Ticket_SESSION_NOT_FOUND);
+        super(ResponseCode.TICKET_SESSION_NOT_FOUND);
     }
 
 }
