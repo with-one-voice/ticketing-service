@@ -3,24 +3,18 @@ package com.onevoice.seat.application.service;
 import com.onevoice.common.enumtype.SeatStatus;
 import com.onevoice.seat.application.dto.CreateSeatCommand;
 import com.onevoice.seat.application.dto.HoldSeatCommand;
-import com.onevoice.seat.exception.SeatAlreadyHeldException;
-import com.onevoice.seat.exception.SeatNotFoundException;
-import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
-import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
-import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
 import com.onevoice.seat.domain.Seat;
 import com.onevoice.seat.domain.repository.SeatRepository;
 import com.onevoice.seat.domain.vo.Money;
 import com.onevoice.seat.domain.vo.SeatCode;
 import com.onevoice.seat.domain.vo.SessionId;
+import com.onevoice.seat.exception.SeatAlreadyHeldException;
+import com.onevoice.seat.exception.SeatNotFoundException;
+import com.onevoice.seat.infrastructure.message.SeatEventProducer;
+import com.onevoice.seat.presentation.dto.response.HoldSeatResponseDto;
+import com.onevoice.seat.presentation.dto.response.SeatCreateResponseDto;
+import com.onevoice.seat.presentation.dto.response.SeatResponseDto;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +23,12 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -36,49 +36,55 @@ import java.util.stream.IntStream;
 @Transactional
 @Slf4j
 public class SeatServiceImpl implements SeatService {
+
     private final SeatRepository seatRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final RedissonClient redissonClient;
+    private final SeatEventProducer seatEventProducer;
 
     /*
-    * 좌석 생성
-    * */
+     * 좌석 생성
+     * */
     @Override
     public List<SeatCreateResponseDto> createSeat(CreateSeatCommand command) {
+        log.info("[Seat Service] 좌석 생성 {}개", command.seatCount());
         SessionId sessionId = new SessionId(command.sessionId());
         Money price = new Money(command.price());
 
         List<Seat> seats = IntStream.rangeClosed(1, command.seatCount())
-                .mapToObj(i -> {
-                    String code = "S" + i;
-                    return new Seat(new SeatCode(code), sessionId, SeatStatus.AVAILABLE, price);
-                }).toList();
+            .mapToObj(i -> {
+                String code = "S" + i;
+                return new Seat(new SeatCode(code), sessionId, SeatStatus.AVAILABLE, price);
+            }).toList();
 
         seatRepository.saveAll(seats);
 
         redisTemplate.opsForHash().putAll("seat:" + sessionId.getValue(),
-                seats.stream().collect(Collectors.toMap(
-                        s -> s.getSeatId().toString(),
-                        s -> s.getStatus().name()
-                ))
+            seats.stream().collect(Collectors.toMap(
+                s -> s.getSeatId().toString(),
+                s -> s.getStatus().name()
+            ))
         );
+
+        // 성공 시 -> Show 로 메시지 발행
+        seatEventProducer.sendCreateSuccess(command.sessionId());
 
         return seats.stream().map(SeatCreateResponseDto::of).toList();
     }
 
 
     /*
-    * 좌석 단건 조회
-    * */
+     * 좌석 단건 조회
+     * */
     @Override
     public SeatResponseDto getSeat(UUID sessionId, UUID seatId) {
 
         Seat seat = seatRepository.findById(seatId)
-                .orElseThrow(SeatNotFoundException::new);
+            .orElseThrow(SeatNotFoundException::new);
 
         String redisKey = "seat:" + sessionId;
         String redisStatus = (String) redisTemplate.opsForHash()
-                .get(redisKey, seatId.toString());
+            .get(redisKey, seatId.toString());
 
         if (redisStatus != null) {
             SeatStatus redisSeatStatus = SeatStatus.valueOf(redisStatus);
@@ -99,18 +105,19 @@ public class SeatServiceImpl implements SeatService {
 
         //  Redis 상태를 반영해서 Seat 객체 상태 수정
         List<SeatResponseDto> response = seats.stream()
-                .map(seat -> {
-                    String seatId = seat.getSeatId().toString();
-                    if (redisStatuses.containsKey(seatId)) {
-                        SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatId));
-                        return SeatResponseDto.of(seat.withStatus(redisStatus));
-                    }
-                    return SeatResponseDto.of(seat);
-                })
-                .toList();
+            .map(seat -> {
+                String seatId = seat.getSeatId().toString();
+                if (redisStatuses.containsKey(seatId)) {
+                    SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatId));
+                    return SeatResponseDto.of(seat.withStatus(redisStatus));
+                }
+                return SeatResponseDto.of(seat);
+            })
+            .toList();
 
         return response;
     }
+
     //좌석 선점
     public HoldSeatResponseDto holdSeat(HoldSeatCommand command) {
         SessionId sessionId = new SessionId(command.sessionId());
@@ -119,8 +126,8 @@ public class SeatServiceImpl implements SeatService {
 
         //좌석 조회
         List<Seat> seats = seatIdList.stream()
-                .map(id -> seatRepository.findById(id).orElseThrow(SeatNotFoundException::new))
-                .toList();
+            .map(id -> seatRepository.findById(id).orElseThrow(SeatNotFoundException::new))
+            .toList();
 
         String redisKey = "seat:" + sessionId.getValue();
 
@@ -163,8 +170,8 @@ public class SeatServiceImpl implements SeatService {
                     lock.unlock();
                     log.info("[{}] 락 해제 완료", seatIdStr);
                 }
-                }
             }
+        }
 
 //            String currentStatus = (String) redisTemplate.opsForHash().get(redisKey, seatIdStr);
 //
@@ -180,8 +187,8 @@ public class SeatServiceImpl implements SeatService {
     }
 
     /*
-    * 좌석 상태 변경
-    * */
+     * 좌석 상태 변경
+     * */
     @Override
     public List<SeatResponseDto> updateSeatStatuses(List<UUID> seatIds, SeatStatus newStatus) {
         List<Seat> seats = seatRepository.findBySeatIdIn(seatIds);
@@ -195,10 +202,12 @@ public class SeatServiceImpl implements SeatService {
         if (!seats.isEmpty()) {
             String redisKey = "seat:" + seats.get(0).getSessionId().getValue();
             for (Seat seat : seats) {
-                redisTemplate.opsForHash().put(redisKey, seat.getSeatId().toString(), newStatus.name());
+                redisTemplate.opsForHash()
+                    .put(redisKey, seat.getSeatId().toString(), newStatus.name());
                 //상태 AVALIABLE면 holdKey도 삭제
                 if (newStatus == SeatStatus.AVAILABLE) {  //
-                    String holdKey = "seat-hold:" + seat.getSessionId().getValue() + ":" + seat.getSeatId();
+                    String holdKey =
+                        "seat-hold:" + seat.getSessionId().getValue() + ":" + seat.getSeatId();
                     redisTemplate.delete(holdKey);
                 }
 
@@ -210,7 +219,7 @@ public class SeatServiceImpl implements SeatService {
 
 
     @Override
-    public void deleteSeat(UUID sessionId){
+    public void deleteSeat(UUID sessionId) {
         SessionId session = new SessionId(sessionId);
         seatRepository.deleteAllBySessionId(session);
         redisTemplate.delete("seat:" + sessionId.toString());

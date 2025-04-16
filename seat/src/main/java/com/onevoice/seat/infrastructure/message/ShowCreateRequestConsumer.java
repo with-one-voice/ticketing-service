@@ -30,14 +30,14 @@ public class ShowCreateRequestConsumer {
             );
             SeatCreateRequestMessage message = event.payload();
 
-            log.info("[seat_create_request] : {}", message);
+            log.info("[seat_create_request] 좌석 생성 요청 이벤트 받음: {}", message);
 
             // 좌석 생성
             seatService.createSeat(
                 new CreateSeatCommand(message.sessionId(), message.seatCount(), message.price()));
 
-            // 성공 시 -> Show 로 메시지 발행
-            seatEventProducer.sendCreateSuccess(message.sessionId());
+//            // 성공 시 -> Show 로 메시지 발행
+//            seatEventProducer.sendCreateSuccess(message.sessionId());
 
         } catch (Exception e) {
             log.error("Failed to consume seat create success message", e);

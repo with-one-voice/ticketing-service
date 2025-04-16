@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j(topic = "SeatEventProducer")
 @Component
@@ -18,6 +20,7 @@ public class SeatEventProducer {
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendCreateSuccess(UUID sessionId) {
         try {
             SeatCreateSuccessMessage message = new SeatCreateSuccessMessage(sessionId);
@@ -30,6 +33,7 @@ public class SeatEventProducer {
         }
     }
 
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendCreateFail(UUID sessionId) {
         try {
             SeatCreateFailMessage message = new SeatCreateFailMessage(sessionId);
