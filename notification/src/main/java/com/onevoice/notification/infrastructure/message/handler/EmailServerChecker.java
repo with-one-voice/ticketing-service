@@ -1,4 +1,4 @@
-package com.onevoice.notification.infrastructure.message;
+package com.onevoice.notification.infrastructure.message.handler;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;

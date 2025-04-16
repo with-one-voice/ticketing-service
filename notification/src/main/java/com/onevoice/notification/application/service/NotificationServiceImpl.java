@@ -1,10 +1,9 @@
 package com.onevoice.notification.application.service;
 
 import com.onevoice.notification.application.dto.command.CreateNotificationCommand;
+import com.onevoice.notification.application.dto.event.NotificationEvent;
 import com.onevoice.notification.application.dto.query.FindNotificationQuery;
 import com.onevoice.notification.application.dto.query.ListNotificationQuery;
-import com.onevoice.notification.application.event.NotificationEventPublisher;
-import com.onevoice.notification.application.event.NotificationEventPublisherFactory;
 import com.onevoice.notification.domain.Notification;
 import com.onevoice.notification.domain.NotificationStatus;
 import com.onevoice.notification.domain.repository.NotificationRepository;
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository repository;
-    private final NotificationEventPublisherFactory publisherFactory;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public UUID create(CreateNotificationCommand command) {
@@ -38,7 +38,9 @@ public class NotificationServiceImpl implements NotificationService {
         );
 
         Notification saved = repository.save(notification);
-        publishEvent(saved.getNotificationId(), command);
+
+        eventPublisher.publishEvent(NotificationEvent.of(saved.getNotificationId(), command));
+
         return saved.getNotificationId();
     }
 
@@ -73,18 +75,5 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = repository.findByNotificationId(notificationId)
             .orElseThrow(NotificationNotFoundException::new);
         notification.delete(notificationId);
-    }
-
-    private void publishEvent(UUID notificationId, CreateNotificationCommand command) {
-        // notificationType 이벤트 발행
-        NotificationEventPublisher publisher = publisherFactory.getPublisher(
-            command.notificationType());
-        if (publisher != null) {
-            if (!publisher.publish(notificationId, command)) {
-                updateStatus(notificationId, NotificationStatus.EVENT_FAILED);
-            }
-        } else {
-            log.info("Unknown notification type");
-        }
     }
 }
