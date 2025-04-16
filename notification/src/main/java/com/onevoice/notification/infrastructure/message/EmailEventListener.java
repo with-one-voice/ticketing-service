@@ -17,6 +17,6 @@ public class EmailEventListener {
     @Async
     @EventListener
     public void handleEvent(EmailSendEvent event) {
-        emailSender.send(event.getMessage());
+        emailSender.send(event.getContext());
     }
 }

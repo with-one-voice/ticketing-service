@@ -6,6 +6,6 @@ import com.onevoice.common.exception.BaseException;
 public class PaymentNotStatusException extends BaseException {
 
     public PaymentNotStatusException() {
-        super(ResponseCode.PAYMENT_NOT_FOUND);
+        super(ResponseCode.PAYMENT_NOT_STATUS);
     }
 }

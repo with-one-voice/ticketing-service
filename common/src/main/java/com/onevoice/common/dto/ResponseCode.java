@@ -80,8 +80,7 @@ public enum ResponseCode {
     // Notification
     NOTIFICATION_NO_CONTENT(2840, HttpStatus.NO_CONTENT, "요청 성공"),
     NOTIFICATION_NOT_FOUND(4840, HttpStatus.NOT_FOUND, "존재하지 않는 알림 정보입니다."),
-
-    ;
+    NOTIFICATION_USER_NOT_FOUND(4841, HttpStatus.NOT_FOUND, "사용자 정보를 확인해 주세요.");
 
     private final int code; // 커스텀 코드 (우리 마음대로 정하는 거)
     private final HttpStatus status;

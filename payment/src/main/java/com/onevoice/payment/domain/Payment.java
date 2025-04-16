@@ -32,7 +32,7 @@ public class Payment extends BaseEntity {
     private UUID userId;
 
     // PG 사의 결제 정보
-    private String paymentKey;
+    private String pgKey;
 
     // 결제 방법
     @Enumerated(EnumType.STRING)
@@ -74,15 +74,24 @@ public class Payment extends BaseEntity {
         PaymentMethod paymentMethod,
         Integer paymentAmount
     ) {
-        // TODO: method 에 따라 status 를 다르게 해야 한다. 일단은 바로 완료처리
-        // card: 즉시 완료(pg 연동 후에 변경)
+        // card: 대기(pg 연동 후에 변경: 성공, 실패)
         // account: 대기 (이건 스케쥴러로 일정시간 마다 업데이트 되도록 처리)
-        PaymentStatus paymentStatus = PaymentStatus.COMPLETE;
-//        if (PaymentMethod.CARD == paymentMethod) {
-//            paymentStatus = PaymentStatus.COMPLETE;
-//        }
+        PaymentStatus paymentStatus = PaymentStatus.PG_PENDING;
+        if (PaymentMethod.ACCOUNT == paymentMethod) {
+            paymentStatus = PaymentStatus.ACCOUNT_PENDING;
+        }
 
         return new Payment(ticketId, userId, paymentMethod, paymentStatus, paymentAmount);
+    }
+
+    // 상태 업데이트 메서드(오버라이딩 활용)
+    public void update(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public void update(String pgKey, PaymentStatus paymentStatus) {
+        this.pgKey = pgKey;
+        this.paymentStatus = paymentStatus;
     }
 
     // 취소 처리 메서드: 애그리거트 루트인 Payment 에서 Cancellation 을 조작한다.

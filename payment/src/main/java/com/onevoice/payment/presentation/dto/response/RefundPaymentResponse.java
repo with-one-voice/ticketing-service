@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record RefundPaymentResponse(
     UUID refundId,
-    long refundAmount,
+    int refundAmount,
     RefundStatus refundStatus
 ) {
 

@@ -3,6 +3,7 @@ package com.onevoice.payment.application.service;
 import com.onevoice.payment.application.dto.command.CreatePaymentCommand;
 import com.onevoice.payment.application.dto.query.FindPaymentQuery;
 import com.onevoice.payment.application.dto.query.ListPaymentQuery;
+import com.onevoice.payment.domain.PaymentStatus;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 
@@ -12,7 +13,13 @@ public interface PaymentService {
 
     ListPaymentQuery reads(UUID userId, Pageable pageable);
 
+    FindPaymentQuery read(UUID paymentId);
+
     FindPaymentQuery read(UUID userId, UUID paymentId);
+
+    void update(UUID paymentId, PaymentStatus paymentStatus);
+
+    void update(UUID paymentId, String pgKey, PaymentStatus paymentStatus);
 
     FindPaymentQuery cancel(UUID paymentId, UUID userId, String reason);
 
