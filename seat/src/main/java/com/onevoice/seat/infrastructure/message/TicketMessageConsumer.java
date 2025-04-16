@@ -27,7 +27,7 @@ public class TicketMessageConsumer {
             TicketConfirmedMessage message = objectMapper.treeToValue(payload, TicketConfirmedMessage.class);
 
             log.info("ticket_confirm] 수신: {}", message);
-            seatService.confirmSeats(message.seatId(), message.userId());
+            seatService.confirmSeats(message.seatIds(), message.userId());
 
         } catch (Exception e) {
             log.error("ticket_confirm 파싱 실패", e);
@@ -43,7 +43,7 @@ public class TicketMessageConsumer {
             TicketConfirmFailedMessage message = objectMapper.treeToValue(payload, TicketConfirmFailedMessage.class);
 
             log.info("[ticket_confirm_fail] 수신: {}", message);
-            seatService.revertSeats(message.seatId(), message.userId());
+            seatService.revertSeats(message.seatIds(), message.userId());
 
         } catch (Exception e) {
             log.error("ticket_confirm_fail 파싱 실패", e);

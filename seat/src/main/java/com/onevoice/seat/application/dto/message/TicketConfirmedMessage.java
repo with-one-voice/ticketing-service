@@ -4,6 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 public record TicketConfirmedMessage (
-        List<UUID> seatId,
+        List<UUID> seatIds,
         UUID userId
 ) {}
