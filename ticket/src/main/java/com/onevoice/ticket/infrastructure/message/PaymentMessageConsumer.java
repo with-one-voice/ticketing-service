@@ -1,6 +1,7 @@
 package com.onevoice.ticket.infrastructure.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onevoice.ticket.application.dto.PaymentFailMessage;
 import com.onevoice.ticket.application.dto.PaymentSuccessMessage;
@@ -21,7 +22,11 @@ public class PaymentMessageConsumer {
     @KafkaListener(topics = "payment_success", groupId = "ticket-group")
     public void consumePaymentSuccess(String messageJson) {
         try {
-            PaymentSuccessMessage message = objectMapper.readValue(messageJson,
+
+            JsonNode root = objectMapper.readTree(messageJson);
+            JsonNode payload = root.get("payload");
+
+            PaymentSuccessMessage message = objectMapper.treeToValue(payload,
                 PaymentSuccessMessage.class);
 
             log.info("[payment_success] Received :{}", message);
@@ -36,7 +41,10 @@ public class PaymentMessageConsumer {
     @KafkaListener(topics = "payment_fail", groupId = "ticket-group")
     public void consumePaymentFail(String messageJson){
         try{
-            PaymentFailMessage message = objectMapper.readValue(messageJson,
+            JsonNode root = objectMapper.readTree(messageJson);
+            JsonNode payload = root.get("payload");
+
+            PaymentFailMessage message = objectMapper.treeToValue(payload,
                 PaymentFailMessage.class);
 
             log.info("[payment_fail] Received :{}", message);
