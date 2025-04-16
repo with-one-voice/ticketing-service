@@ -3,7 +3,6 @@ package com.onevoice.seat.infrastructure.persistence;
 import com.onevoice.seat.domain.QSeat;
 import com.onevoice.seat.domain.Seat;
 import com.onevoice.seat.domain.repository.SeatRepository;
-import com.onevoice.seat.domain.vo.SeatCode;
 import com.onevoice.seat.domain.vo.SessionId;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -27,18 +26,6 @@ public class SeatRepositoryImpl implements SeatRepository {
         return queryFactory.selectFrom(qSeat)
                 .where(qSeat.sessionId.eq(sessionId))
                 .fetch();
-    }
-
-    @Override
-    public Optional<Seat> findBySessionIdAndSeatCode(SessionId sessionId, SeatCode seatCode) {
-        return Optional.ofNullable(
-                queryFactory.selectFrom(qSeat)
-                        .where(
-                                qSeat.sessionId.eq(sessionId),
-                                qSeat.seatCode.eq(seatCode)
-                        )
-                        .fetchOne()
-        );
     }
 
     @Override
