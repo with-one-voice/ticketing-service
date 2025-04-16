@@ -44,6 +44,7 @@ public class SeatServiceImpl implements SeatService {
 
     private final SeatRepository seatRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
     private final RedissonClient redissonClient;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final SeatEventProducer seatEventProducer;
@@ -102,23 +103,33 @@ public class SeatServiceImpl implements SeatService {
     //해당 회차별 좌석 목록 조회
     @Override
     public List<SeatResponseDto> getSeatBySession(UUID sessionId) {
+        String cacheKey = "seat-cache:" + sessionId;
+
+        // 1. 캐시 조회 시도
+        List<SeatResponseDto> cached = (List<SeatResponseDto>) objectRedisTemplate.opsForValue().get(cacheKey);
+        if (cached != null) {
+            log.info(">>> Redis 캐시에서 회차별 좌석 조회 결과 반환");
+            return cached;
+        }
+
+        // 2. DB 및 Redis 선점 상태 조회
         SessionId session = new SessionId(sessionId);
         List<Seat> seats = seatRepository.findAllBySessionId(session);
-        //  Redis에서 전체 좌석 상태 가져오기
         String redisKey = "seat:" + sessionId;
         Map<Object, Object> redisStatuses = redisTemplate.opsForHash().entries(redisKey);
 
-        //  Redis 상태를 반영해서 Seat 객체 상태 수정
         List<SeatResponseDto> response = seats.stream()
-            .map(seat -> {
-                String seatId = seat.getSeatId().toString();
-                if (redisStatuses.containsKey(seatId)) {
-                    SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatId));
-                    return SeatResponseDto.of(seat.withStatus(redisStatus));
-                }
-                return SeatResponseDto.of(seat);
-            })
-            .toList();
+                .map(seat -> {
+                    String seatId = seat.getSeatId().toString();
+                    if (redisStatuses.containsKey(seatId)) {
+                        SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatId));
+                        return SeatResponseDto.of(seat.withStatus(redisStatus));
+                    }
+                    return SeatResponseDto.of(seat);
+                }).toList();
+
+        // 3. 캐시에 저장 (TTL 1분)
+        objectRedisTemplate.opsForValue().set(cacheKey, response, Duration.ofMinutes(1));
 
         return response;
     }
