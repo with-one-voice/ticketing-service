@@ -1,7 +1,6 @@
 package com.onevoice.show.application.service.session;
 
 import com.onevoice.common.enumtype.KafkaTopicType;
-import com.onevoice.show.application.client.SeatClient;
 import com.onevoice.show.application.client.VenueClient;
 import com.onevoice.show.application.dto.client.VenueResponseDto;
 import com.onevoice.show.application.dto.message.SeatCreateRequestMessage;
@@ -20,6 +19,8 @@ import com.onevoice.show.exception.InvalidVenueIdException;
 import com.onevoice.show.exception.NotFoundSessionException;
 import com.onevoice.show.exception.NotFoundShowException;
 import com.onevoice.show.exception.TicketingAlreadyStartedException;
+import com.onevoice.show.infrastructure.redis.SessionCacheEvict;
+import com.onevoice.show.infrastructure.redis.SessionCacheStore;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateSessionResponseDto;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,11 +46,15 @@ public class SessionServiceImpl implements SessionService {
     private final SessionRepository sessionRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final VenueClient venueClient;
-    private final SeatClient seatClient;
+    private final SessionCacheStore cacheStore;
+    private final SessionCacheEvict cacheEvict;
+
 
     @Override
     @Transactional
     public CreateSessionResponseDto create(UUID showId, CreateSessionRequestDto requestDto) {
+
+        cacheEvict.evictShowSessions(showId); // showSessions 캐시 삭제
 
         Show show = showRepository.findById(showId).orElseThrow(NotFoundShowException::new);
 
@@ -106,7 +112,9 @@ public class SessionServiceImpl implements SessionService {
         return queries.stream().map(SessionResponseDto::of).toList();
     }
 
+
     @Override
+    @Cacheable(cacheNames = "showSessions", key = "#showId")
     public List<SessionResponseDto> getShowSessions(UUID showId) {
 
         if (showRepository.findById(showId).isEmpty()) {
@@ -135,6 +143,9 @@ public class SessionServiceImpl implements SessionService {
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
 
+        cacheStore.deleteSessionDetail(sessionId);
+        cacheEvict.evictShowSessions(session.getShow().getId());
+
         // 이미 예매가 진행된 경우 -> 공연 회차 정보 수정 불가
         if (!session.getShow().getTicketingStartTime().isAfter(LocalDateTime.now())) {
             throw new TicketingAlreadyStartedException();
@@ -162,6 +173,9 @@ public class SessionServiceImpl implements SessionService {
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
 
+        cacheStore.deleteSessionDetail(sessionId);
+        cacheEvict.evictShowSessions(session.getShow().getId());
+
         // 이미 예매가 진행된 경우 -> 공연 회차 삭제 불가
         if (!session.getShow().getTicketingStartTime().isAfter(LocalDateTime.now())) {
             throw new TicketingAlreadyStartedException();
@@ -177,6 +191,9 @@ public class SessionServiceImpl implements SessionService {
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
 
+        cacheStore.deleteSessionDetail(sessionId);
+        cacheEvict.evictShowSessions(session.getShow().getId());
+
         // 이미 예매가 진행된 경우 -> 공연 회차 상태 변경 불가
         if (!session.getShow().getTicketingStartTime().isAfter(LocalDateTime.now())) {
             throw new TicketingAlreadyStartedException();
@@ -188,13 +205,21 @@ public class SessionServiceImpl implements SessionService {
     @Override
     @Transactional(readOnly = true)
     public SessionDetailResponseDto getSessionDetail(UUID sessionId) {
+
+        SessionDetailResponseDto cached = cacheStore.getSessionDetail(sessionId);
+        if (cached != null) {
+            return cached;
+        }
+
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
 
         // Lazy 초기화
         session.getShow().getId();
 
-        return SessionDetailResponseDto.of(session);
+        SessionDetailResponseDto dto = SessionDetailResponseDto.of(session);
+        cacheStore.saveSessionDetail(sessionId, dto);
+        return dto;
     }
 
     /**
@@ -207,6 +232,9 @@ public class SessionServiceImpl implements SessionService {
     public void successToCreateSeat(UUID sessionId) {
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
+
+        cacheStore.deleteSessionDetail(sessionId);
+        cacheEvict.evictShowSessions(session.getShow().getId());
 
         session.updateStatusBefore();
     }
@@ -221,6 +249,9 @@ public class SessionServiceImpl implements SessionService {
     public void failToCreateSeat(UUID sessionId) {
         Session session = sessionRepository.findById(sessionId)
             .orElseThrow(NotFoundSessionException::new);
+
+        cacheStore.deleteSessionDetail(sessionId);
+        cacheEvict.evictShowSessions(session.getShow().getId());
 
         session.updateStatusCancelled();
     }

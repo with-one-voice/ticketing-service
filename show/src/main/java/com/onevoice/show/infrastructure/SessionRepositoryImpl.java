@@ -60,8 +60,11 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public Optional<Session> findById(UUID sessionId) {
         QSession session = QSession.session;
+        QShow show = QShow.show;
+
         return Optional.ofNullable(queryFactory
             .selectFrom(session)
+            .join(session.show, show).fetchJoin()
             .where(
                 session.id.eq(sessionId),
                 session.deletedAt.isNull(),

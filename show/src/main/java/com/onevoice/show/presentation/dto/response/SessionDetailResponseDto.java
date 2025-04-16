@@ -1,10 +1,12 @@
 package com.onevoice.show.presentation.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.onevoice.show.domain.Session;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
+@JsonDeserialize(builder = SessionDetailResponseDto.class)
 public record SessionDetailResponseDto(
     UUID sessionId,
     UUID showId,
