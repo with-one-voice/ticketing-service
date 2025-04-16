@@ -80,7 +80,7 @@ public class PaymentServiceImpl implements PaymentService {
             kafkaTopicType = KafkaTopicType.PAYMENT_FAIL;
         }
         // 결제 결과 이벤트 발행
-        PaymentSuccessMessage payload = new PaymentSuccessMessage(paymentId);
+        PaymentSuccessMessage payload = new PaymentSuccessMessage(payment.getTicketId());
         GenericKafkaEvent<PaymentSuccessMessage> event = new GenericKafkaEvent<>(
             kafkaTopicType.getTopic(),
             payload);
