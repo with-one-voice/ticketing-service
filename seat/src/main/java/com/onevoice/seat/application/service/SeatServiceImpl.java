@@ -159,7 +159,7 @@ public class SeatServiceImpl implements SeatService {
             try {
                 //  락 시도 (2초 대기, 5초 유지)
                 log.info("[{}] 락 획득 시도 중... (락 키: {})", seatIdStr, lockKey);
-                boolean locked = lock.tryLock(2, 60, TimeUnit.SECONDS);
+                boolean locked = lock.tryLock(2, 10, TimeUnit.SECONDS);
                 if (!locked) {
                     log.warn("[{}] 락 획득 실패 - 이미 다른 사용자가 점유 중", seatIdStr);
                     throw new SeatAlreadyHeldException(); // 락 획득 실패
@@ -189,7 +189,7 @@ public class SeatServiceImpl implements SeatService {
             }
         }
         redisTemplate.delete("seat-cache:" + sessionId.getValue());
-        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(10), seatIdList);
+        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), seatIdList);
 
     }
 
