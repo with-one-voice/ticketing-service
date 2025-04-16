@@ -22,4 +22,7 @@ public interface SeatService {
     List<SeatResponseDto> updateSeatStatuses(List<UUID> seatIds, SeatStatus newStatus);
 
 
+    void confirmSeats(List<UUID> seatIds, UUID userId);
+
+    void revertSeats(List<UUID> seatIds, UUID userId);
 }
