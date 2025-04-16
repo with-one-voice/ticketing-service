@@ -1,4 +1,4 @@
-package com.onevoice.show.application.dto;
+package com.onevoice.show.application.dto.client;
 
 import java.util.UUID;
 

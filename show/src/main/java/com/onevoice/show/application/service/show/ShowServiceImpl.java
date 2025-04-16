@@ -1,7 +1,7 @@
-package com.onevoice.show.application.service;
+package com.onevoice.show.application.service.show;
 
 import com.onevoice.show.application.client.VenueClient;
-import com.onevoice.show.application.dto.FindShowQuery;
+import com.onevoice.show.application.dto.query.FindShowQuery;
 import com.onevoice.show.domain.Show;
 import com.onevoice.show.domain.Status;
 import com.onevoice.show.domain.repository.ShowRepository;

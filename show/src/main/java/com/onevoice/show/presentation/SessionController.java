@@ -1,7 +1,7 @@
 package com.onevoice.show.presentation;
 
 import com.onevoice.common.dto.CommonResponse;
-import com.onevoice.show.application.service.SessionService;
+import com.onevoice.show.application.service.session.SessionService;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
 import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
 import com.onevoice.show.presentation.dto.response.CreateSessionResponseDto;
@@ -81,11 +81,11 @@ public class SessionController {
         return CommonResponse.success("공연 회차 삭제가 완료되었습니다.");
     }
 
-    @PatchMapping("/sessions/{sessionId}/status")
-    public ResponseEntity<CommonResponse<String>> updateStatus(
+    @PatchMapping("/sessions/{sessionId}/status-cancel")
+    public ResponseEntity<CommonResponse<String>> updateStatusCancel(
         @PathVariable("sessionId") UUID sessionId
     ) {
-        sessionService.updateStatus(sessionId);
+        sessionService.updateStatusCancel(sessionId);
         return CommonResponse.success("공연 회차 상태가 취소로 변경되었습니다.");
     }
 

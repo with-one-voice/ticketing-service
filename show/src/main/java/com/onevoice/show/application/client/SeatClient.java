@@ -1,7 +1,7 @@
 package com.onevoice.show.application.client;
 
-import com.onevoice.show.application.dto.SeatCreateRequestDto;
-import com.onevoice.show.application.dto.SeatCreateResponseDto;
+import com.onevoice.show.application.dto.client.SeatCreateRequestDto;
+import com.onevoice.show.application.dto.client.SeatCreateResponseDto;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
