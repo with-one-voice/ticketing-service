@@ -16,11 +16,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -41,17 +43,10 @@ public class PaymentServiceImpl implements PaymentService {
         );
         Payment saved = repository.save(payment);
 
-        KafkaTopicType kafkaTopicType = KafkaTopicType.PAYMENT_CREATE;
+        KafkaTopicType topicType = KafkaTopicType.PAYMENT_CREATE;
         PaymentCreateMessage payload = new PaymentCreateMessage(command.ticketId());
-        eventPublish(kafkaTopicType, payload);
+        eventPublish(topicType, payload);
         return saved.getPaymentId();
-    }
-
-    private <T> void eventPublish(KafkaTopicType kafkaTopicType, T payload) {
-        GenericKafkaEvent<T> event = new GenericKafkaEvent<>(
-            kafkaTopicType.getTopic(),
-            payload);
-        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -81,20 +76,21 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void update(UUID paymentId, PaymentStatus paymentStatus) {
+        log.info("Updating payment {}", paymentId);
         Payment payment = repository.findById(paymentId)
             .orElseThrow(PaymentNotFoundException::new);
         payment.update(paymentStatus);
 
         // 결제 결과 이벤트 발행
-        KafkaTopicType kafkaTopicType;
+        KafkaTopicType topicType;
         if (Objects.requireNonNull(paymentStatus) == PaymentStatus.PG_APPROVE) {
             PaymentSuccessMessage payload = new PaymentSuccessMessage(payment.getTicketId());
-            kafkaTopicType = KafkaTopicType.PAYMENT_SUCCESS;
-            eventPublish(kafkaTopicType, payload);
+            topicType = KafkaTopicType.PAYMENT_SUCCESS;
+            eventPublish(topicType, payload);
         } else {
-            kafkaTopicType = KafkaTopicType.PAYMENT_FAIL;
+            topicType = KafkaTopicType.PAYMENT_FAIL;
             PaymentFailMessage payload = new PaymentFailMessage(payment.getTicketId());
-            eventPublish(kafkaTopicType, payload);
+            eventPublish(topicType, payload);
         }
     }
 
@@ -156,5 +152,12 @@ public class PaymentServiceImpl implements PaymentService {
             .map(FindPaymentQuery::from)
             .toList();
         return new ListPaymentQuery(queryList);
+    }
+
+    private <T> void eventPublish(KafkaTopicType topicType, T payload) {
+        GenericKafkaEvent<T> event = new GenericKafkaEvent<>(
+            topicType.getTopic(),
+            payload);
+        eventPublisher.publishEvent(event);
     }
 }

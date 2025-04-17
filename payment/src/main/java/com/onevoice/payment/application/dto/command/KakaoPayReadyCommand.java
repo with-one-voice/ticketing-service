@@ -19,7 +19,6 @@ public class KakaoPayReadyCommand {
     private Integer quantity;
     private Integer totalAmount;
     private Integer taxFreeAmount;
-    private Integer vatAmount;
     private String approvalUrl;
     private String cancelUrl;
     private String failUrl;
