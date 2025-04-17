@@ -141,7 +141,7 @@ public class SeatServiceImpl implements SeatService {
         SessionId sessionId = new SessionId(command.sessionId());
         List<UUID> seatIdList = command.seatIds();
         UUID userId = command.userId();
-
+        LocalDateTime expireAt = LocalDateTime.now().plusMinutes(5);
 
         //좌석 조회
         List<Seat> seats = seatIdList.stream()
@@ -177,8 +177,10 @@ public class SeatServiceImpl implements SeatService {
                 }
 
                 redisTemplate.opsForHash().put(redisKey, seatIdStr, "HOLD");
-                redisTemplate.opsForValue().set(holdKey, userId.toString(), Duration.ofMinutes(5));
-                log.info("[{}] 선점 성공 → 상태: HOLD, TTL 5분 설정 완료", seatIdStr);
+                // 문자열: userId,expireAt 저장 (TTL x)
+                String redisValue = userId + "," + expireAt;
+                redisTemplate.opsForValue().set(holdKey, redisValue);
+                log.info("[{}] 선점 성공 → 상태: HOLD", seatIdStr);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.error("[{}] 락 대기 중 인터럽트 발생", seatIdStr, e);
@@ -192,7 +194,7 @@ public class SeatServiceImpl implements SeatService {
             }
         }
         redisTemplate.delete(RedisKeyUtil.seatCacheKey(sessionId.getValue()));
-        return HoldSeatResponseDto.success(LocalDateTime.now().plusMinutes(5), seatIdList);
+        return HoldSeatResponseDto.success(expireAt, seatIdList);
 
     }
 
