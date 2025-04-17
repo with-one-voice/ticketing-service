@@ -47,9 +47,9 @@ spring:
     test-connection: false
 
 discord:
-  name: ${DISCORD_NAME:final-project}
+  name: ${DISCORD_NAME:notification}
   webhook:
-    url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1361934260583530607/DzLzn23dpg725D3tPkzLk9-d7t6ckPQZHdkVJClivflDM5aNHlRoMJuWFjgsY8hJfEJm}
+    url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1362258183048925205/lpvOYdaEwe2xkILzvYcAIKhCXEf6z2mZXcuKkLMbfGy90tBy8AJrrBc1bJ9oxRGa2EJs}
 
 springdoc:
   swagger-ui:
