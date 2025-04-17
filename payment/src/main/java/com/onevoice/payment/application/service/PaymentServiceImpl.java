@@ -2,6 +2,8 @@ package com.onevoice.payment.application.service;
 
 import com.onevoice.common.enumtype.KafkaTopicType;
 import com.onevoice.payment.application.dto.command.CreatePaymentCommand;
+import com.onevoice.payment.application.dto.message.PaymentCreateMessage;
+import com.onevoice.payment.application.dto.message.PaymentFailMessage;
 import com.onevoice.payment.application.dto.message.PaymentSuccessMessage;
 import com.onevoice.payment.application.dto.query.FindPaymentQuery;
 import com.onevoice.payment.application.dto.query.ListPaymentQuery;
@@ -39,7 +41,17 @@ public class PaymentServiceImpl implements PaymentService {
         );
         Payment saved = repository.save(payment);
 
+        KafkaTopicType kafkaTopicType = KafkaTopicType.PAYMENT_CREATE;
+        PaymentCreateMessage payload = new PaymentCreateMessage(command.ticketId());
+        eventPublish(kafkaTopicType, payload);
         return saved.getPaymentId();
+    }
+
+    private <T> void eventPublish(KafkaTopicType kafkaTopicType, T payload) {
+        GenericKafkaEvent<T> event = new GenericKafkaEvent<>(
+            kafkaTopicType.getTopic(),
+            payload);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -73,18 +85,17 @@ public class PaymentServiceImpl implements PaymentService {
             .orElseThrow(PaymentNotFoundException::new);
         payment.update(paymentStatus);
 
+        // 결제 결과 이벤트 발행
         KafkaTopicType kafkaTopicType;
         if (Objects.requireNonNull(paymentStatus) == PaymentStatus.PG_APPROVE) {
+            PaymentSuccessMessage payload = new PaymentSuccessMessage(payment.getTicketId());
             kafkaTopicType = KafkaTopicType.PAYMENT_SUCCESS;
+            eventPublish(kafkaTopicType, payload);
         } else {
             kafkaTopicType = KafkaTopicType.PAYMENT_FAIL;
+            PaymentFailMessage payload = new PaymentFailMessage(payment.getTicketId());
+            eventPublish(kafkaTopicType, payload);
         }
-        // 결제 결과 이벤트 발행
-        PaymentSuccessMessage payload = new PaymentSuccessMessage(payment.getTicketId());
-        GenericKafkaEvent<PaymentSuccessMessage> event = new GenericKafkaEvent<>(
-            kafkaTopicType.getTopic(),
-            payload);
-        eventPublisher.publishEvent(event);
     }
 
     @Override
