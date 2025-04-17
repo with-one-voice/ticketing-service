@@ -2,6 +2,8 @@ package com.onevoice.notification.presentation;
 
 import com.onevoice.common.dto.CommonResponse;
 import com.onevoice.common.dto.ResponseCode;
+import com.onevoice.notification.application.dto.query.FindNotificationQuery;
+import com.onevoice.notification.application.dto.query.ListNotificationQuery;
 import com.onevoice.notification.application.service.NotificationService;
 import com.onevoice.notification.presentation.dto.request.CreateNotificationRequest;
 import jakarta.validation.Valid;
@@ -32,7 +34,7 @@ public class NotificationController {
      * 알림 생성 API
      */
     @PostMapping
-    public ResponseEntity<?> post(
+    public ResponseEntity<CommonResponse<URI>> post(
         @RequestBody @Valid CreateNotificationRequest request,
         @AuthenticationPrincipal UUID userId
     ) {
@@ -50,7 +52,7 @@ public class NotificationController {
      * 알림 목록 조회 API
      */
     @GetMapping
-    public ResponseEntity<?> getList(
+    public ResponseEntity<CommonResponse<ListNotificationQuery>> getList(
         @AuthenticationPrincipal UUID userId,
         Pageable pageable
     ) {
@@ -63,11 +65,12 @@ public class NotificationController {
      * 알림 조회 API
      */
     @GetMapping("/{notificationId}")
-    public ResponseEntity<?> get(
+    public ResponseEntity<CommonResponse<FindNotificationQuery>> get(
         @PathVariable UUID notificationId,
         @AuthenticationPrincipal UUID userId
     ) {
         log.info("Get request: {}", notificationId);
+        // user 가 작성한 알람만 볼 수 있다.
         return CommonResponse.success(notificationService.read(notificationId, userId));
     }
 
@@ -76,7 +79,7 @@ public class NotificationController {
      */
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/{notificationId}")
-    public ResponseEntity<?> delete(@PathVariable UUID notificationId) {
+    public ResponseEntity<CommonResponse<String>> delete(@PathVariable UUID notificationId) {
         log.info("Delete request: {}", notificationId);
         //  관리자만 삭제할 수 있다.
         notificationService.delete(notificationId);
