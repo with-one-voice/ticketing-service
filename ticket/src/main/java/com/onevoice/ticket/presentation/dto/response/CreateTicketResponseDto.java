@@ -2,6 +2,7 @@ package com.onevoice.ticket.presentation.dto.response;
 
 import com.onevoice.ticket.domain.Ticket;
 
+import com.onevoice.ticket.domain.TicketSeat;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ public record CreateTicketResponseDto(
         List<UUID> seatId
 ) {
     public static CreateTicketResponseDto of(Ticket ticket) {
-        return new CreateTicketResponseDto(ticket.getId(), ticket.getUserId(), ticket.getUserName() , ticket.getSessionId(), ticket.getShowName(), ticket.getSeatIdList());
+        return new CreateTicketResponseDto(ticket.getId(), ticket.getUserId(), ticket.getUserName(),
+            ticket.getSessionId(), ticket.getShowName(), ticket.getTicketSeatList().stream().map(
+            TicketSeat::getSeatId).toList());
     }
 }

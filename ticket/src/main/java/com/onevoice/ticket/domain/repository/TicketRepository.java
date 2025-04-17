@@ -1,6 +1,7 @@
 package com.onevoice.ticket.domain.repository;
 
 import com.onevoice.ticket.domain.Ticket;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,4 +16,8 @@ public interface TicketRepository {
     Page<Ticket> searchTicketByKeyword(UUID ticketID, Pageable pageable, String keyword);
 
     Optional<Ticket> findById(UUID ticketId);
+
+    Optional<Ticket> findByIdWithJoinSeat(UUID ticketId);
+
+    Optional<Ticket> findBySeatIdAndUserId(List<UUID> seatIds, UUID userId);
 }

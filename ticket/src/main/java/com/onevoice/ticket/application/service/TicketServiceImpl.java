@@ -10,12 +10,15 @@ import com.onevoice.ticket.application.client.UserClient;
 import com.onevoice.ticket.application.dto.FindUserQuery;
 import com.onevoice.ticket.application.dto.HoldSeatCommand;
 import com.onevoice.ticket.application.dto.SessionDetailsQuery;
-import com.onevoice.ticket.application.dto.TicketConfirmedMessage;
-import com.onevoice.ticket.application.dto.TicketFailedMessage;
+import com.onevoice.ticket.application.dto.message.TicketConfirmedMessage;
+import com.onevoice.ticket.application.dto.message.TicketFailedMessage;
 import com.onevoice.ticket.application.dto.UpdateSeatStatusCommand;
+import com.onevoice.ticket.application.dto.message.TicketStatusMessage;
 import com.onevoice.ticket.application.event.GenericKafkaEvent;
 import com.onevoice.ticket.domain.Ticket;
+import com.onevoice.ticket.domain.TicketSeat;
 import com.onevoice.ticket.domain.repository.TicketRepository;
+import com.onevoice.ticket.domain.repository.TicketSeatRepository;
 import com.onevoice.ticket.exception.DuplicateTicketException;
 import com.onevoice.ticket.exception.RemoteUserNotFoundException;
 import com.onevoice.ticket.exception.TicketNotFoundException;
@@ -27,7 +30,6 @@ import com.onevoice.ticket.presentation.dto.response.CreateTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.DeleteTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.FindTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.ListReservedTicketResponseDto;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -45,15 +47,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TicketServiceImpl implements TicketService{
+public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
+    private final TicketSeatRepository ticketSeatRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final UserClient userClient;
     private final ShowClient showClient;
     private final SeatClient seatClient;
 
     @Override
+    @Transactional
     public CreateTicketResponseDto createTicket(CreateTicketRequestDto requestDto) {
 
         try {
@@ -80,14 +84,18 @@ public class TicketServiceImpl implements TicketService{
                 requestDto.userId(),
                 userName,
                 requestDto.sessionId(),
-                showName,
-                requestDto.seatIds()
+                showName
             );
-            Ticket saved = ticketRepository.save(ticket);
 
+            for (UUID seatId : seatIdList) {
+                TicketSeat ticketSeat = new TicketSeat(ticket, seatId);
+                ticketSeatRepository.save(ticketSeat);
+            }
+
+            Ticket saved = ticketRepository.save(ticket);
             return CreateTicketResponseDto.of(saved);
 
-        }catch (DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains("uk_session_seat")) {
                 throw new DuplicateTicketException();
             }
@@ -97,9 +105,10 @@ public class TicketServiceImpl implements TicketService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ListReservedTicketResponseDto> getReservedTickets(UUID userID, int page, int size, String sortBy, boolean isAsc) {
+    public Page<ListReservedTicketResponseDto> getReservedTickets(UUID userID, int page, int size,
+        String sortBy, boolean isAsc) {
 
-        Sort.Direction direction =isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Page<Ticket> ticketList = ticketRepository.searchByUserId(userID, pageable);
@@ -111,23 +120,23 @@ public class TicketServiceImpl implements TicketService{
     @Transactional(readOnly = true)
     public FindTicketResponseDto getTicket(UUID ticketId, UUID userId) {
 
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(TicketNotFoundException::new);
+        Ticket ticket = ticketRepository.findByIdWithJoinSeat(ticketId)
+            .orElseThrow(TicketNotFoundException::new);
 
         if (!ticket.getUserId().equals(userId)) {
 
             throw new TicketOwnerMismatchException();
         }
 
-        // Lazy 초기화
-        ticket.getSeatIdList().size();
         return FindTicketResponseDto.of(ticket);
     }
 
     @Override
     @Transactional
-    public FindTicketResponseDto updateTicketStatus(UUID ticketId, UUID userId, UpdateTicketStatusRequestDto requestDto) {
+    public FindTicketResponseDto updateTicketStatus(UUID ticketId, UUID userId,
+        UpdateTicketStatusRequestDto requestDto) {
         try {
-            Ticket ticket = ticketRepository.findById(ticketId)
+            Ticket ticket = ticketRepository.findByIdWithJoinSeat(ticketId)
                 .orElseThrow(TicketNotFoundException::new);
 
             if (!ticket.getUserId().equals(userId)) {
@@ -151,25 +160,29 @@ public class TicketServiceImpl implements TicketService{
         UpdateTicketStatusRequestDto requestDto) {
         try {
 
-            Ticket ticket = ticketRepository.findById(ticketID).orElseThrow(TicketNotFoundException::new);
+            Ticket ticket = ticketRepository.findByIdWithJoinSeat(ticketID)
+                .orElseThrow(TicketNotFoundException::new);
 
             TicketStatus newStatus = requestDto.status();
-            log.info("newStatus : {}",newStatus.toString());
+            log.info("newStatus : {}", newStatus.toString());
 
             // 상태가 이미 원하는 값이면 무시
             if (ticket.getStatus() == newStatus) {
-                log.info("이미 처리된 메시지입니다. ticketId={}, status={}", ticket.getId(), ticket.getStatus());
+                log.info("이미 처리된 메시지입니다. ticketId={}, status={}", ticket.getId(),
+                    ticket.getStatus());
                 FindTicketResponseDto.of(ticket);
             }
 
             if (newStatus == TicketStatus.CONFIRM_PAYMENT) {
-                List<UUID> seatIds = ticket.getSeatIdList();
+                List<UUID> seatIds = ticket.getTicketSeatList().stream().map(TicketSeat::getSeatId)
+                    .toList();
 
                 UpdateSeatStatusCommand command = new UpdateSeatStatusCommand(seatIds,
                     SeatStatus.RESERVED);
-                seatClient.updateStatusInternal(ticket.getUserId(), UserRole.USER,command);
-            }else{
-                List<UUID> seatIds = ticket.getSeatIdList();
+                seatClient.updateStatusInternal(ticket.getUserId(), UserRole.USER, command);
+            } else {
+                List<UUID> seatIds = ticket.getTicketSeatList().stream().map(TicketSeat::getSeatId)
+                    .toList();
 
                 UpdateSeatStatusCommand command = new UpdateSeatStatusCommand(seatIds,
                     SeatStatus.AVAILABLE);
@@ -179,8 +192,7 @@ public class TicketServiceImpl implements TicketService{
             }
             ticket.updateTicketStatus(newStatus);
             return FindTicketResponseDto.of(ticket);
-        }
-        catch (ObjectOptimisticLockingFailureException e) {
+        } catch (ObjectOptimisticLockingFailureException e) {
             // 다른 트랜잭션이 먼저 상태를 변경한 경우 발생
             throw new IllegalStateException("다른 요청에서 이미 상태가 변경되었습니다. 다시 시도해주세요.");
         }
@@ -191,7 +203,7 @@ public class TicketServiceImpl implements TicketService{
     public FindTicketResponseDto expireTicket(UUID ticketId) {
 
         try {
-            Ticket ticket = ticketRepository.findById(ticketId)
+            Ticket ticket = ticketRepository.findByIdWithJoinSeat(ticketId)
                 .orElseThrow(TicketNotFoundException::new);
 
             ticket.updateTicketStatus(TicketStatus.EXPIRED);
@@ -220,12 +232,13 @@ public class TicketServiceImpl implements TicketService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ListReservedTicketResponseDto> searchTickets(UUID userId, int page, int size, String sortBy, boolean isAsc, String keyword) {
+    public Page<ListReservedTicketResponseDto> searchTickets(UUID userId, int page, int size,
+        String sortBy, boolean isAsc, String keyword) {
 
-        Sort.Direction direction =isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Page<Ticket> ticketList = ticketRepository.searchTicketByKeyword(userId, pageable,keyword);
+        Page<Ticket> ticketList = ticketRepository.searchTicketByKeyword(userId, pageable, keyword);
 
         return ticketList.map(ListReservedTicketResponseDto::of);
     }
@@ -238,18 +251,19 @@ public class TicketServiceImpl implements TicketService{
         Ticket ticket = ticketRepository.findById(ticketId)
             .orElseThrow(TicketNotFoundException::new);
 
-        TicketStatus newStatus = TicketStatus.CONFIRM_PAYMENT;
+        TicketStatus newStatus = TicketStatus.WAITING_PAYMENT;
         if (newStatus == ticket.getStatus()) {
             log.info("이미 처리된 메시지입니다. ticketId={}, status={}", ticket.getId(), ticket.getStatus());
         }
 
         // 티켓 상태 변경
         ticket.updateTicketStatus(newStatus);
-        List<UUID> seatIdList = ticket.getSeatIdList();
+        List<UUID> seatIdList = ticket.getTicketSeatList().stream().map(TicketSeat::getSeatId).toList();
 
         // 좌석 확정 메시지 발행
         TicketConfirmedMessage payload = new TicketConfirmedMessage(seatIdList, ticket.getUserId());
-        GenericKafkaEvent<TicketConfirmedMessage> event = new GenericKafkaEvent<>(KafkaTopicType.TICKET_CONFIRM.getTopic(),
+        GenericKafkaEvent<TicketConfirmedMessage> event = new GenericKafkaEvent<>(
+            KafkaTopicType.TICKET_CONFIRM.getTopic(),
             payload);
         applicationEventPublisher.publishEvent(event);
     }
@@ -268,12 +282,45 @@ public class TicketServiceImpl implements TicketService{
 
         // 티켓 상태 변경
         ticket.updateTicketStatus(newStatus);
-        List<UUID> seatIdList = ticket.getSeatIdList();
+        List<UUID> seatIdList = ticket.getTicketSeatList().stream().map(TicketSeat::getSeatId).toList();
 
         // 티켓 확정 실패 메시지 발행
         TicketFailedMessage payload = new TicketFailedMessage(seatIdList, ticket.getUserId());
         GenericKafkaEvent<TicketFailedMessage> event = new GenericKafkaEvent<>(
-            KafkaTopicType.TICKET_CONFIRM_FAIL.getTopic(), payload);
+            KafkaTopicType.TICKET_CANCEL.getTopic(), payload);
         applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    @Transactional
+    public void updateTicketStatusAfterPaymentSuccess(UUID ticketId) {
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+            .orElseThrow(TicketNotFoundException::new);
+
+        TicketStatus newStatus = TicketStatus.CONFIRM_PAYMENT;
+        if (newStatus == ticket.getStatus()) {
+            log.info("이미 처리된 메시지입니다. ticketId={}, status={}", ticket.getId(), ticket.getStatus());
+        }
+
+        // 티켓 상태 변경 메시지 발행
+        TicketStatusMessage payload = new TicketStatusMessage(ticket.getUserId());
+        GenericKafkaEvent<TicketStatusMessage> event = new GenericKafkaEvent<>(
+            KafkaTopicType.TICKET_STATUS.getTopic(), payload
+        );
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    @Transactional
+    public void expiredTicketAfterPayment(List<UUID> seatIds, UUID userId) {
+
+        // 티켓 조회
+        Ticket ticket = ticketRepository.findBySeatIdAndUserId(seatIds, userId)
+            .orElseThrow(TicketNotFoundException::new);
+
+        // 티켓 상태 변경 ( 메시지 발행 x)
+        TicketStatus newStatus = TicketStatus.EXPIRED;
+        ticket.updateTicketStatus(newStatus);
     }
 }

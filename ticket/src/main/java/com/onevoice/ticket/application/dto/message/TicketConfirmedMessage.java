@@ -1,4 +1,4 @@
-package com.onevoice.ticket.application.dto;
+package com.onevoice.ticket.application.dto.message;
 
 import java.util.List;
 import java.util.UUID;

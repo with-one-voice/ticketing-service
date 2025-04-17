@@ -1,6 +1,8 @@
 package com.onevoice.ticket.infrastructure;
 
+import com.onevoice.common.enumtype.TicketStatus;
 import com.onevoice.ticket.domain.QTicket;
+import com.onevoice.ticket.domain.QTicketSeat;
 import com.onevoice.ticket.domain.Ticket;
 import com.onevoice.ticket.domain.repository.TicketRepository;
 import com.onevoice.ticket.infrastructure.jpa.TicketJpaRepository;
@@ -84,11 +86,40 @@ public class TicketRepositoryImpl implements TicketRepository {
     @Override
     public Optional<Ticket> findById(UUID ticketId) {
         QTicket ticket = QTicket.ticket;
+
         return Optional.ofNullable(queryFactory
                 .selectFrom(ticket)
                 .where(ticket.id.eq(ticketId),
                         ticket.deletedAt.isNull())
                 .fetchFirst());
+    }
+
+    @Override
+    public Optional<Ticket> findByIdWithJoinSeat(UUID ticketId) {
+        QTicket ticket = QTicket.ticket;
+        QTicketSeat ticketSeat = QTicketSeat.ticketSeat;
+
+        return Optional.ofNullable(queryFactory
+            .selectFrom(ticket)
+            .join(ticket.ticketSeatList,ticketSeat).fetchJoin()
+            .where(ticket.id.eq(ticketId),
+                ticket.deletedAt.isNull())
+            .fetchFirst());
+    }
+
+    @Override
+    public Optional<Ticket> findBySeatIdAndUserId(List<UUID> seatIds, UUID userId) {
+        QTicket ticket = QTicket.ticket;
+        QTicketSeat ticketSeat = QTicketSeat.ticketSeat;
+
+        return Optional.ofNullable(queryFactory
+            .selectFrom(ticket)
+            .distinct()
+            .join(ticket.ticketSeatList, ticketSeat).fetchJoin()
+            .where(ticket.userId.eq(userId),
+                ticketSeat.seatId.in(seatIds),
+                ticket.status.eq(TicketStatus.WAITING_PAYMENT))
+            .fetchFirst());
     }
 
     private List<OrderSpecifier<?>> getOrderSpecifiers(Sort sort, QTicket ticket) {
