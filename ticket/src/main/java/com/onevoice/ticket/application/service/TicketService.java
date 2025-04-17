@@ -6,6 +6,7 @@ import com.onevoice.ticket.presentation.dto.response.CreateTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.DeleteTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.FindTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.ListReservedTicketResponseDto;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 
@@ -29,4 +30,6 @@ public interface TicketService {
     void confirmTicketAfterPayment(UUID ticketId);
     void failTicketAfterPayment(UUID ticketId);
     void updateTicketStatusAfterPaymentSuccess(UUID ticketId);
+
+    void expiredTicketAfterPayment(List<UUID> seatIds, UUID userId);
 }

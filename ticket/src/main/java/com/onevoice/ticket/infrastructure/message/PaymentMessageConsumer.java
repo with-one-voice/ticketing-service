@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onevoice.ticket.application.dto.message.PaymentFailMessage;
 import com.onevoice.ticket.application.dto.message.PaymentCreateMessage;
 import com.onevoice.ticket.application.dto.message.PaymentSuccessMessage;
+import com.onevoice.ticket.application.dto.message.SeatExpiredMessage;
 import com.onevoice.ticket.application.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,56 +22,55 @@ public class PaymentMessageConsumer {
     private final TicketService ticketService;
 
     @KafkaListener(topics = "payment_create", groupId = "ticket-group")
-    public void consumePaymentCreate(String messageJson) {
-        try {
+    public void consumePaymentCreate(String messageJson) throws JsonProcessingException {
 
-            JsonNode root = objectMapper.readTree(messageJson);
-            JsonNode payload = root.get("payload");
+        JsonNode root = objectMapper.readTree(messageJson);
+        JsonNode payload = root.get("payload");
 
-            PaymentCreateMessage message = objectMapper.treeToValue(payload,
-                PaymentCreateMessage.class);
+        PaymentCreateMessage message = objectMapper.treeToValue(payload,
+            PaymentCreateMessage.class);
 
-            log.info("[payment_create] Received :{}", message);
+        log.info("[payment_create] Received :{}", message);
 
-            ticketService.confirmTicketAfterPayment(message.ticketId());
-
-        } catch (Exception e) {
-            log.error("Failed to process payment_success message", e);
-        }
+        ticketService.confirmTicketAfterPayment(message.ticketId());
     }
 
     @KafkaListener(topics = "payment_success", groupId = "ticket-group")
-    public void consumePaymentSuccess(String messageJson) {
-        try {
-            JsonNode root = objectMapper.readTree(messageJson);
-            JsonNode payload = root.get("payload");
+    public void consumePaymentSuccess(String messageJson) throws JsonProcessingException {
 
-            PaymentSuccessMessage message = objectMapper.treeToValue(payload,
-                PaymentSuccessMessage.class);
+        JsonNode root = objectMapper.readTree(messageJson);
+        JsonNode payload = root.get("payload");
 
-            log.info("[payment_success] Received :{}",message);
+        PaymentSuccessMessage message = objectMapper.treeToValue(payload,
+            PaymentSuccessMessage.class);
 
-        } catch (Exception e) {
-            log.error("Failed to process payment_success message", e);
-        }
+        log.info("[payment_success] Received :{}", message);
+
+        ticketService.updateTicketStatusAfterPaymentSuccess(message.ticketId());
     }
 
     @KafkaListener(topics = "payment_fail", groupId = "ticket-group")
-    public void consumePaymentFail(String messageJson) {
+    public void consumePaymentFail(String messageJson) throws JsonProcessingException {
 
-        try {
-            JsonNode root = objectMapper.readTree(messageJson);
-            JsonNode payload = root.get("payload");
+        JsonNode root = objectMapper.readTree(messageJson);
+        JsonNode payload = root.get("payload");
 
-            PaymentFailMessage message = objectMapper.treeToValue(payload,
-                PaymentFailMessage.class);
+        PaymentFailMessage message = objectMapper.treeToValue(payload,
+            PaymentFailMessage.class);
 
-            log.info("[payment_fail] Received :{}", message);
-            ticketService.failTicketAfterPayment(message.ticketId());
+        log.info("[payment_fail] Received :{}", message);
+        ticketService.failTicketAfterPayment(message.ticketId());
+    }
 
-        } catch (JsonProcessingException e) {
-            log.error("Failed to process payment_fail message");
-        }
+    @KafkaListener(topics = "seat_expired", groupId = "ticket-group")
+    public void consumeSeatExpired(String messageJson) throws JsonProcessingException {
 
+        JsonNode root = objectMapper.readTree(messageJson);
+        JsonNode payload = root.get("payload");
+
+        SeatExpiredMessage message = objectMapper.treeToValue(payload,
+            SeatExpiredMessage.class);
+
+        ticketService.expiredTicketAfterPayment(message.seatIds(), message.userId());
     }
 }
