@@ -1,4 +1,4 @@
-package com.onevoice.notification.infrastructure.message;
+package com.onevoice.notification.infrastructure.message.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Slf4j(topic = "NotificationEmailConsumer")
 @Component
 @RequiredArgsConstructor
-public class NotificationKafkaConsumer extends SecuredKafkaListener {
+public class NotificationTopicConsumer extends SecuredKafkaListener {
 
     private final NotificationService service;
     private final ObjectMapper objectMapper;
