@@ -10,9 +10,10 @@ import com.onevoice.ticket.application.client.UserClient;
 import com.onevoice.ticket.application.dto.FindUserQuery;
 import com.onevoice.ticket.application.dto.HoldSeatCommand;
 import com.onevoice.ticket.application.dto.SessionDetailsQuery;
-import com.onevoice.ticket.application.dto.TicketConfirmedMessage;
-import com.onevoice.ticket.application.dto.TicketFailedMessage;
+import com.onevoice.ticket.application.dto.message.TicketConfirmedMessage;
+import com.onevoice.ticket.application.dto.message.TicketFailedMessage;
 import com.onevoice.ticket.application.dto.UpdateSeatStatusCommand;
+import com.onevoice.ticket.application.dto.message.TicketStatusMessage;
 import com.onevoice.ticket.application.event.GenericKafkaEvent;
 import com.onevoice.ticket.domain.Ticket;
 import com.onevoice.ticket.domain.repository.TicketRepository;
@@ -27,7 +28,6 @@ import com.onevoice.ticket.presentation.dto.response.CreateTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.DeleteTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.FindTicketResponseDto;
 import com.onevoice.ticket.presentation.dto.response.ListReservedTicketResponseDto;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -238,7 +238,7 @@ public class TicketServiceImpl implements TicketService{
         Ticket ticket = ticketRepository.findById(ticketId)
             .orElseThrow(TicketNotFoundException::new);
 
-        TicketStatus newStatus = TicketStatus.CONFIRM_PAYMENT;
+        TicketStatus newStatus = TicketStatus.WAITING_PAYMENT;
         if (newStatus == ticket.getStatus()) {
             log.info("이미 처리된 메시지입니다. ticketId={}, status={}", ticket.getId(), ticket.getStatus());
         }
@@ -273,7 +273,30 @@ public class TicketServiceImpl implements TicketService{
         // 티켓 확정 실패 메시지 발행
         TicketFailedMessage payload = new TicketFailedMessage(seatIdList, ticket.getUserId());
         GenericKafkaEvent<TicketFailedMessage> event = new GenericKafkaEvent<>(
-            KafkaTopicType.TICKET_CONFIRM_FAIL.getTopic(), payload);
+            KafkaTopicType.TICKET_CANCEL.getTopic(), payload);
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    @Transactional
+    public void updateTicketStatusAfterPaymentSuccess(UUID ticketId) {
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+            .orElseThrow(TicketNotFoundException::new);
+
+        TicketStatus newStatus = TicketStatus.CONFIRM_PAYMENT;
+        if (newStatus == ticket.getStatus()) {
+            log.info("이미 처리된 메시지입니다. ticketId={}, status={}", ticket.getId(), ticket.getStatus());
+        }
+
+        // 티켓 상태 변경
+        ticket.updateTicketStatus(newStatus);
+
+        // 티켓 상태 변경 메시지 발행
+        TicketStatusMessage payload = new TicketStatusMessage(ticket.getUserId());
+        GenericKafkaEvent<TicketStatusMessage> event = new GenericKafkaEvent<>(
+            KafkaTopicType.TICKET_STATUS.getTopic(), payload
+        );
         applicationEventPublisher.publishEvent(event);
     }
 }

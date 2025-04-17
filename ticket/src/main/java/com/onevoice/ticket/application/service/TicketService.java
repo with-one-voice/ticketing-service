@@ -28,4 +28,5 @@ public interface TicketService {
 
     void confirmTicketAfterPayment(UUID ticketId);
     void failTicketAfterPayment(UUID ticketId);
+    void updateTicketStatusAfterPaymentSuccess(UUID ticketId);
 }

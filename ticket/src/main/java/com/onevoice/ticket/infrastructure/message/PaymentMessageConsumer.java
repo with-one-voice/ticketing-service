@@ -3,8 +3,9 @@ package com.onevoice.ticket.infrastructure.message;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onevoice.ticket.application.dto.PaymentFailMessage;
-import com.onevoice.ticket.application.dto.PaymentSuccessMessage;
+import com.onevoice.ticket.application.dto.message.PaymentFailMessage;
+import com.onevoice.ticket.application.dto.message.PaymentCreateMessage;
+import com.onevoice.ticket.application.dto.message.PaymentSuccessMessage;
 import com.onevoice.ticket.application.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,17 +20,17 @@ public class PaymentMessageConsumer {
     private final ObjectMapper objectMapper;
     private final TicketService ticketService;
 
-    @KafkaListener(topics = "payment_success", groupId = "ticket-group")
-    public void consumePaymentSuccess(String messageJson) {
+    @KafkaListener(topics = "payment_create", groupId = "ticket-group")
+    public void consumePaymentCreate(String messageJson) {
         try {
 
             JsonNode root = objectMapper.readTree(messageJson);
             JsonNode payload = root.get("payload");
 
-            PaymentSuccessMessage message = objectMapper.treeToValue(payload,
-                PaymentSuccessMessage.class);
+            PaymentCreateMessage message = objectMapper.treeToValue(payload,
+                PaymentCreateMessage.class);
 
-            log.info("[payment_success] Received :{}", message);
+            log.info("[payment_create] Received :{}", message);
 
             ticketService.confirmTicketAfterPayment(message.ticketId());
 
@@ -38,9 +39,26 @@ public class PaymentMessageConsumer {
         }
     }
 
+    @KafkaListener(topics = "payment_success", groupId = "ticket-group")
+    public void consumePaymentSuccess(String messageJson) {
+        try {
+            JsonNode root = objectMapper.readTree(messageJson);
+            JsonNode payload = root.get("payload");
+
+            PaymentSuccessMessage message = objectMapper.treeToValue(payload,
+                PaymentSuccessMessage.class);
+
+            log.info("[payment_success] Received :{}",message);
+
+        } catch (Exception e) {
+            log.error("Failed to process payment_success message", e);
+        }
+    }
+
     @KafkaListener(topics = "payment_fail", groupId = "ticket-group")
-    public void consumePaymentFail(String messageJson){
-        try{
+    public void consumePaymentFail(String messageJson) {
+
+        try {
             JsonNode root = objectMapper.readTree(messageJson);
             JsonNode payload = root.get("payload");
 
@@ -50,7 +68,7 @@ public class PaymentMessageConsumer {
             log.info("[payment_fail] Received :{}", message);
             ticketService.failTicketAfterPayment(message.ticketId());
 
-        }catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             log.error("Failed to process payment_fail message");
         }
 
