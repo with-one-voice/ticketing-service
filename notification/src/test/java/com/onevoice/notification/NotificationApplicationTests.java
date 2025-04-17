@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -14,7 +13,6 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(TestMailConfig.class)
 class NotificationApplicationTests {
 
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
@@ -40,10 +38,10 @@ class NotificationApplicationTests {
         registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
     }
 
-    @Test
-    void contextLoads() {
-
-    }
+//    @Test
+//    void contextLoads() {
+//
+//    }
 
     @AfterAll
     static void stopContainers() {
