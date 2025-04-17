@@ -304,7 +304,7 @@ public class SeatServiceImpl implements SeatService {
         // 이벤트 발행
         SeatFailedMessage message = new SeatFailedMessage(userId);
         GenericKafkaEvent<SeatFailedMessage> event = new GenericKafkaEvent<>(
-            KafkaTopicType.SEAT_CONFIRM_FAIL.getTopic(), message
+            KafkaTopicType.SEAT_CANCEL.getTopic(), message
         );
         applicationEventPublisher.publishEvent(event);
     }

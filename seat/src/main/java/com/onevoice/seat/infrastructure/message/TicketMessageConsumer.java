@@ -34,7 +34,7 @@ public class TicketMessageConsumer {
         }
     }
 
-    @KafkaListener(topics = "ticket_confirm_fail", groupId = "seat-group")
+    @KafkaListener(topics = "ticket_cancel", groupId = "seat-group")
     public void consumeTicketConfirmFail(String messageJson) {
         try {
             JsonNode root = objectMapper.readTree(messageJson);
@@ -42,11 +42,11 @@ public class TicketMessageConsumer {
 
             TicketConfirmFailedMessage message = objectMapper.treeToValue(payload, TicketConfirmFailedMessage.class);
 
-            log.info("[ticket_confirm_fail] 수신: {}", message);
+            log.info("[ticket_cancel] 수신: {}", message);
             seatService.revertSeats(message.seatIds(), message.userId());
 
         } catch (Exception e) {
-            log.error("ticket_confirm_fail 파싱 실패", e);
+            log.error("ticket_cancel 파싱 실패", e);
         }
     }
 }
