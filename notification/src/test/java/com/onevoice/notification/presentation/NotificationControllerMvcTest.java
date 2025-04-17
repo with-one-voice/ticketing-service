@@ -50,7 +50,7 @@ class NotificationControllerMvcTest {
     @Test
     @DisplayName("알림 생성 요청 성공 테스트")
     @WithMockUser
-    void createSuccess() throws JsonProcessingException {
+    void testCreateSuccess() throws JsonProcessingException {
         // given
         UUID notificationId = UUID.randomUUID();
         var notification = new CreateNotificationRequest(
@@ -80,7 +80,7 @@ class NotificationControllerMvcTest {
     @Test
     @DisplayName("알림 생성 요청 실패 테스트 - 필수 필드 누락")
     @WithMockUser
-    void createFailField() throws JsonProcessingException {
+    void testCreateFailField() throws JsonProcessingException {
         // given
         UUID notificationId = UUID.randomUUID();
         var notification = new CreateNotificationRequest(
@@ -109,7 +109,7 @@ class NotificationControllerMvcTest {
 
     @Test
     @DisplayName("알림 목록 조회")
-    void getList() {
+    void testGetList() {
         UUID userId = UUID.randomUUID();
 
         var notificationList = new ListNotificationQuery(
@@ -139,7 +139,7 @@ class NotificationControllerMvcTest {
 
     @Test
     @DisplayName("알림 상세 조회")
-    void get() {
+    void testGet() {
         UUID userId = UUID.randomUUID();
         UUID notificationId = UUID.randomUUID();
 
@@ -176,7 +176,7 @@ class NotificationControllerMvcTest {
 
     @Test
     @DisplayName("알림 삭제")
-    void delete() {
+    void testDelete() {
         UUID userId = UUID.randomUUID();
         UUID notificationId = UUID.randomUUID();
 
