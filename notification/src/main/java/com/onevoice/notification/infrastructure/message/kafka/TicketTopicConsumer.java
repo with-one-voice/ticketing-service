@@ -25,20 +25,25 @@ public class TicketTopicConsumer extends SecuredKafkaListener {
     public void ticketStatus(String message) {
         log.info("received ticket status: {}", message);
 
+        UUID userId = getUserId(message);
+        CreateNotificationCommand command = new CreateNotificationCommand(
+            userId,
+            NotificationType.PUSH,
+            "티켓 확정 알림",
+            "결제하신 티켓이 확정되었습니다. 마이페이지를 확인해주세요.",
+            "topic: ticket_status"
+        );
+        withSecurityContext(userId, () -> service.create(command));
+    }
+
+    private UUID getUserId(String message) {
         try {
             KafkaTopicMessage topicMessage = objectMapper.readValue(message,
                 KafkaTopicMessage.class);
-            UUID userId = topicMessage.payload().userId();
-            CreateNotificationCommand command = new CreateNotificationCommand(
-                userId,
-                NotificationType.PUSH,
-                "티켓 확정 알림",
-                "결제하신 티켓이 확정되었습니다. 마이페이지를 확인해주세요.",
-                "topic: ticket_status"
-            );
-            withSecurityContext(userId, () -> service.create(command));
+            return topicMessage.payload().userId();
         } catch (JsonProcessingException e) {
             log.error("failed to parse", e);
         }
+        return null;
     }
 }
