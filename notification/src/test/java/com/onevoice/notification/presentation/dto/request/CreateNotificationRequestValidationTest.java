@@ -30,7 +30,7 @@ class CreateNotificationRequestValidationTest {
 
     @Test
     @DisplayName("유효한 값으로 요청")
-    void validate() {
+    void testValid() {
         // given
         var notification = new CreateNotificationRequest(
             NotificationType.EMAIL,
@@ -49,7 +49,7 @@ class CreateNotificationRequestValidationTest {
 
     @Test
     @DisplayName("유효하지 않은 값으로 요청")
-    void validateNotificationType() {
+    void testInvalid() {
         var notification = new CreateNotificationRequest(
             null,
             "title",

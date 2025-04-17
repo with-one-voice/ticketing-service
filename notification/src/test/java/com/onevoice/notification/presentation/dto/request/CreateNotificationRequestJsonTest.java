@@ -20,7 +20,7 @@ class CreateNotificationRequestJsonTest {
     private JacksonTester<CreateNotificationRequest> json;
 
     @Test
-    @DisplayName("request dto 데이터 역직렬화 테스트")
+    @DisplayName("request dto 역직렬화 테스트")
     void deserialize() throws IOException {
         // given
         var content = """

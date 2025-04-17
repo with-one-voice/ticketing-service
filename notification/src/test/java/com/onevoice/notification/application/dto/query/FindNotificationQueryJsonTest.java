@@ -25,7 +25,7 @@ class FindNotificationQueryJsonTest {
     private JacksonTester<CommonResponse<FindNotificationQuery>> json;
 
     @Test
-    @DisplayName("응답 객체 직렬화 테스트")
+    @DisplayName("response dto 직렬화 테스트")
     void toJson() throws IOException {
         // given
         var query = new FindNotificationQuery(
