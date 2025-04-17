@@ -40,7 +40,7 @@ public class SeatHoldRecoveryScheduler {
             Map<Object, Object> seatStatusMap = redisTemplate.opsForHash().entries(redisKey);
 
 
-            // userId → 만료된 seatId 리스트
+            //userId → 만료된 seatId 리스트
             //각 사용자마다 만료된 좌석들 모아두는 자료구조
             Map<UUID, List<UUID>> expiredSeatsByUser = new HashMap<>();
 
@@ -53,13 +53,13 @@ public class SeatHoldRecoveryScheduler {
                     UUID seatId = UUID.fromString(seatIdStr);
                     String holdKey = RedisKeyUtil.seatHoldKey(sessionId, seatId);
 
+                    //삭제 전 userId 먼저 조회
+                    String userIdStr = redisTemplate.opsForValue().get(holdKey);
                     Boolean stillExists = redisTemplate.hasKey(holdKey);
                     if (Boolean.FALSE.equals(stillExists)) {
                         redisTemplate.opsForHash().put(redisKey, seatIdStr, "AVAILABLE");
                         log.info("TTL 만료 → [{}] 상태 복구 완료 (sessionId: {})", seatId, sessionId);
 
-                        //userId 확인
-                        String userIdStr = redisTemplate.opsForValue().get(holdKey);
                         if(userIdStr != null) {
                             UUID userId = UUID.fromString(userIdStr);
                             if (!expiredSeatsByUser.containsKey(userId)) {
