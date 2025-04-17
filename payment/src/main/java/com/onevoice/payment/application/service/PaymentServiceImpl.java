@@ -84,8 +84,8 @@ public class PaymentServiceImpl implements PaymentService {
         // 결제 결과 이벤트 발행
         KafkaTopicType topicType;
         if (Objects.requireNonNull(paymentStatus) == PaymentStatus.PG_APPROVE) {
-            PaymentSuccessMessage payload = new PaymentSuccessMessage(payment.getTicketId());
             topicType = KafkaTopicType.PAYMENT_SUCCESS;
+            PaymentSuccessMessage payload = new PaymentSuccessMessage(payment.getTicketId());
             eventPublish(topicType, payload);
         } else {
             topicType = KafkaTopicType.PAYMENT_FAIL;
