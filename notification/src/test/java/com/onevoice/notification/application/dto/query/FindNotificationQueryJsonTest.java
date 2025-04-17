@@ -47,7 +47,7 @@ class FindNotificationQueryJsonTest {
 
         assertThat(jsonContent).extractingJsonPathMapValue("@.result")
             .containsEntry("notificationType", NotificationType.EMAIL.name())
-            .containsEntry("title", "title");
+            .containsEntry("message", "message");
 
     }
 }

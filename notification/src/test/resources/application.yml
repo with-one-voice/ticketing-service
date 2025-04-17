@@ -39,10 +39,10 @@ logging:
     org.springframework: INFO
     com.onevoice: DEBUG
 
+swagger:
+  server-url: localhost
+
 discord:
   name: test
   webhook:
     url: localhost
-
-swagger:
-  server-url: localhost

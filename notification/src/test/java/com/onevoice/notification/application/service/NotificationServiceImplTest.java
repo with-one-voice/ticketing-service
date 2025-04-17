@@ -17,7 +17,7 @@ class NotificationServiceImplTest {
     public NotificationServiceImplTest() {
         NotificationRepository repository = new StubNotificationRepository();
 
-        // event 는 테스트 시 사용하지 않으므로 임의의 객체를 생성
+        // event 는 테스트 시 사용하지 않으므로 임의의 객체 생성
         ApplicationEventPublisher publisher = new ApplicationEventPublisher() {
             @Override
             public void publishEvent(Object event) {

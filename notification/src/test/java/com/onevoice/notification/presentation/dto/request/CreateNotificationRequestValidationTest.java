@@ -48,7 +48,7 @@ class CreateNotificationRequestValidationTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 값으로 요청")
+    @DisplayName("유효하지 않은 값 요청")
     void testInvalid() {
         var notification = new CreateNotificationRequest(
             null,

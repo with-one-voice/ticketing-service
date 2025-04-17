@@ -20,7 +20,7 @@ class NotificationRepositoryImplTest {
 
     @Test
     void test() {
-        // 설정이 잘 불러와 지는지 확인
+        // 설정이 불러와 지는지 확인
     }
 
     @Test

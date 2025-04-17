@@ -30,7 +30,6 @@ public class NotificationFixture {
     }
 
     public static Notification createNotification(Notification notification) {
-
         ReflectionTestUtils.setField(notification, "notificationId", nextUUID());
         return notification;
     }

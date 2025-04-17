@@ -29,7 +29,7 @@ public class StubNotificationRepository implements NotificationRepository {
     public Notification save(Notification notification) {
         Notification save = createNotification(notification);
         notificationMap.put(save.getNotificationId(), save);
-        // map 은 key 가 처음 저장되는 거면 put() 메소드는 null 을 반환한다.
+        // map 은 key 가 처음 저장되는 거면 put() 메소드는 null 을 반환
         // 기존 key 에 저장되어 있는 값이 있었으면 put() 은 저장하는 값을 저장하고 기존 key 에 저장되어 있던 값을 리턴한다.
         return save;
     }

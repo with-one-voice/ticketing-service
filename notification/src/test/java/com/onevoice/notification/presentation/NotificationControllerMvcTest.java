@@ -89,7 +89,6 @@ class NotificationControllerMvcTest {
             "",
             "metadata"
         );
-
         var createRequest = objectMapper.writeValueAsString(notification);
 
         given(

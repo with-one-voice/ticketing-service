@@ -11,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 
 /**
- * Notification 생성 요청: CreateNotificationRequest 역직렬화 테스트
+ * Notification 생성 요청: CreateNotificationRequest 역직렬화
  */
 @JsonTest
 class CreateNotificationRequestJsonTest {
