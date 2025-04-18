@@ -16,7 +16,6 @@ public enum KafkaTopicType {
     TICKET_CANCEL("ticket_cancel"),
 
     SEAT_CONFIRM("seat_confirm"),
-    SEAT_CONFIRM_FAIL("seat_confirm_fail"),
     SEAT_CANCEL("seat_cancel"),
     SEAT_CREATE_REQUEST("seat_create_request"),
     SEAT_EXPIRED("seat_expired"),
