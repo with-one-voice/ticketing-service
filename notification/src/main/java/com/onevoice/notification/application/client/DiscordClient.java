@@ -1,6 +1,6 @@
 package com.onevoice.notification.application.client;
 
-import com.onevoice.notification.application.dto.event.DiscordMessage;
+import com.onevoice.notification.application.dto.message.DiscordMessage;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

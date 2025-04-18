@@ -48,13 +48,12 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         // Request param: 필수 값만 지정
         KakaoPayReadyCommand readyCommand = KakaoPayReadyCommand.builder()
             .cid(cid)
-            .partnerOrderId("1")
+            .partnerOrderId(paymentQuery.paymentId().toString())
             .partnerUserId("1")
-            .itemName("상품명")
+            .itemName(paymentQuery.paymentId().toString())
             .quantity(1)
-            .totalAmount(1100)
+            .totalAmount(paymentQuery.paymentAmount())
             .taxFreeAmount(0)
-            .vatAmount(100)
             .approvalUrl(host + "/kakao/approve/" + paymentId)
             .cancelUrl(host + "/kakao/cancel/" + paymentId)
             .failUrl(host + "/kakao/fail/" + paymentId)
@@ -79,7 +78,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
 
     @Override
     public String approve(UUID paymentId, String pgToken) {
-
+        log.info("APPROVING kakaoPayService: {}", paymentId);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaoPaySecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -87,12 +86,12 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         // ready 할 때 저장해놓은 TID(pgKey)로 승인 요청
         FindPaymentQuery paymentQuery = paymentService.read(paymentId);
         String tid = paymentQuery.pgKey();
-
+        log.info("APPROVED tid: {}", tid);
         // Request param
         KakaoPayApproveCommand approveCommand = KakaoPayApproveCommand.builder()
             .cid(cid)
             .tid(tid)
-            .partnerOrderId("1")
+            .partnerOrderId(paymentQuery.paymentId().toString())
             .partnerUserId("1")
             .pgToken(pgToken)
             .build();

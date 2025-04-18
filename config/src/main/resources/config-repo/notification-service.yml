@@ -49,7 +49,7 @@ spring:
 discord:
   name: ${DISCORD_NAME:notification}
   webhook:
-    url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1362258183048925205/lpvOYdaEwe2xkILzvYcAIKhCXEf6z2mZXcuKkLMbfGy90tBy8AJrrBc1bJ9oxRGa2EJs}
+    url: ${DISCORD_WEBHOOK_URL}
 
 springdoc:
   swagger-ui:

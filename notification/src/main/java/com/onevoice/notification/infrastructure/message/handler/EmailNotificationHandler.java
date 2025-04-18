@@ -25,7 +25,6 @@ public class EmailNotificationHandler implements NotificationHandler {
     private final EmailServerChecker emailServerChecker;
     private final NotificationService notificationService;
 
-    // 각 구현체가 자신의 구현체를 반환하도록 하여 팩토리에서 타입을 따로 비교하지 않아도 된다.
     @Override
     public NotificationType supports() {
         return NotificationType.EMAIL;
@@ -74,7 +73,7 @@ public class EmailNotificationHandler implements NotificationHandler {
     }
 
     private String getText(String username, String message) {
-        return "to: " + username + "," + System.lineSeparator() + System.lineSeparator()
+        return "to: " + username + "님," + System.lineSeparator() + System.lineSeparator()
             + message + System.lineSeparator()
             + System.lineSeparator() + System.lineSeparator()
             + "from: " + System.lineSeparator() + "With One Voice";

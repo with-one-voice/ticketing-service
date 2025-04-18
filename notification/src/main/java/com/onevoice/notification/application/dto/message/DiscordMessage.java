@@ -1,4 +1,4 @@
-package com.onevoice.notification.application.dto.event;
+package com.onevoice.notification.application.dto.message;
 
 import java.util.List;
 
