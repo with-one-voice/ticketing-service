@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-@Slf4j(topic = "ShowEventPublisher")
+@Slf4j(topic = "KafkaTransactionalEventPublisher")
 @Component
 @RequiredArgsConstructor
 public class KafkaTransactionalEventPublisher {
