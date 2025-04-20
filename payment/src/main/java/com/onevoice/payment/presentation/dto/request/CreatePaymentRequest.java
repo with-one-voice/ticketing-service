@@ -23,8 +23,8 @@ public record CreatePaymentRequest(
         return CreatePaymentCommand.of(
             ticketId,
             userId,
-            paymentAmount,
-            paymentMethod
+            paymentMethod,
+            paymentAmount
         );
     }
 }

@@ -12,9 +12,9 @@ public interface PaymentRepository {
 
     Page<Payment> findAllByUserId(UUID userId, Pageable pageable);
 
-    Optional<Payment> findByIdAndUserId(UUID paymentId, UUID userId);
+    Optional<Payment> findByPaymentIdAndUserId(UUID paymentId, UUID userId);
 
-    Optional<Payment> findById(UUID paymentId);
+    Optional<Payment> findByPaymentId(UUID paymentId);
 
     Page<Payment> retrieve(UUID userId, String keyword, Pageable pageable);
 }

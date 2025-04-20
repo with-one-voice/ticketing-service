@@ -68,7 +68,7 @@ public class Payment extends BaseEntity {
     }
 
     // 결제 정보 생성
-    public static Payment createPayment(
+    public static Payment create(
         UUID ticketId,
         UUID userId,
         PaymentMethod paymentMethod,

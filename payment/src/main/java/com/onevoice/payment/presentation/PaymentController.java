@@ -40,7 +40,7 @@ public class PaymentController {
      * 결제 생성 API
      */
     @PostMapping
-    public ResponseEntity<?> post(
+    public ResponseEntity<CommonResponse<URI>> post(
         @RequestBody @Valid CreatePaymentRequest request,
         @AuthenticationPrincipal UUID userId
     ) {
@@ -57,7 +57,7 @@ public class PaymentController {
      * 결제 내역 조회 API
      */
     @GetMapping
-    public ResponseEntity<?> getList(
+    public ResponseEntity<CommonResponse<ListPaymentQuery>> getList(
         @AuthenticationPrincipal UUID userId,
         Pageable pageable
     ) {
@@ -70,7 +70,7 @@ public class PaymentController {
      * 결제 상태 확인 API
      */
     @GetMapping("/{paymentId}")
-    public ResponseEntity<?> get(
+    public ResponseEntity<CommonResponse<FindPaymentQuery>> get(
         @PathVariable UUID paymentId,
         @AuthenticationPrincipal UUID userId
     ) {
@@ -82,7 +82,7 @@ public class PaymentController {
      * 결제 취소 API
      */
     @PutMapping("/{paymentId}/cancel")
-    public ResponseEntity<?> cancel(
+    public ResponseEntity<CommonResponse<CancelPaymentResponse>> cancel(
         @PathVariable UUID paymentId,
         @RequestBody @Valid CancelPaymentRequest request,
         @AuthenticationPrincipal UUID userId
@@ -97,7 +97,7 @@ public class PaymentController {
      * 환불 요청 API
      */
     @PutMapping("/{paymentId}/refund")
-    public ResponseEntity<?> refund(
+    public ResponseEntity<CommonResponse<RefundPaymentResponse>> refund(
         @PathVariable UUID paymentId,
         @RequestBody @Valid RefundPaymentRequest request,
         @AuthenticationPrincipal UUID userId
@@ -113,7 +113,7 @@ public class PaymentController {
      */
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/{paymentId}")
-    public ResponseEntity<?> delete(
+    public ResponseEntity<CommonResponse<String>> delete(
         @PathVariable UUID paymentId
     ) {
         log.info("Delete payment request: {}", paymentId);
@@ -125,7 +125,7 @@ public class PaymentController {
      * 결제 내역 검색 API
      */
     @GetMapping("/search")
-    public ResponseEntity<?> search(
+    public ResponseEntity<CommonResponse<ListPaymentQuery>> search(
         @RequestParam(defaultValue = "PENDING") String keyword,
         @AuthenticationPrincipal UUID userId,
         Pageable pageable

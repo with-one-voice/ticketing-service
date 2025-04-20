@@ -35,7 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
     public UUID create(CreatePaymentCommand command) {
 
         // 엔티티에 객체 생성에 대한 책임을 부여한다.
-        Payment payment = Payment.createPayment(
+        Payment payment = Payment.create(
             command.ticketId(),
             command.userId(),
             command.paymentMethod(),
@@ -61,7 +61,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public FindPaymentQuery read(UUID paymentId) {
-        return repository.findById(paymentId)
+        return repository.findByPaymentId(paymentId)
             .map(FindPaymentQuery::from)
             .orElseThrow(PaymentNotFoundException::new);
     }
@@ -69,7 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(readOnly = true)
     public FindPaymentQuery read(UUID userId, UUID paymentId) {
-        return repository.findByIdAndUserId(paymentId, userId)
+        return repository.findByPaymentIdAndUserId(paymentId, userId)
             .map(FindPaymentQuery::from)
             .orElseThrow(PaymentNotFoundException::new);
     }
@@ -77,7 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void update(UUID paymentId, PaymentStatus paymentStatus) {
         log.info("Updating payment {}", paymentId);
-        Payment payment = repository.findById(paymentId)
+        Payment payment = repository.findByPaymentId(paymentId)
             .orElseThrow(PaymentNotFoundException::new);
         payment.update(paymentStatus);
 
@@ -96,7 +96,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void update(UUID paymentId, String pgKey, PaymentStatus paymentStatus) {
-        Payment payment = repository.findById(paymentId)
+        Payment payment = repository.findByPaymentId(paymentId)
             .orElseThrow(PaymentNotFoundException::new);
         payment.update(pgKey, paymentStatus);
     }
@@ -108,7 +108,7 @@ public class PaymentServiceImpl implements PaymentService {
         String reason
     ) {
         // 요청된 결제 정보 가져오기
-        Payment payment = repository.findByIdAndUserId(paymentId, userId)
+        Payment payment = repository.findByPaymentIdAndUserId(paymentId, userId)
             .orElseThrow(PaymentNotFoundException::new);
 
         // 애그리거트 루트에 취소 처리 책임을 부여
@@ -125,7 +125,7 @@ public class PaymentServiceImpl implements PaymentService {
         String reason
     ) {
         // 요청된 결제 정보 가져오기
-        Payment payment = repository.findByIdAndUserId(paymentId, userId)
+        Payment payment = repository.findByPaymentIdAndUserId(paymentId, userId)
             .orElseThrow(PaymentNotFoundException::new);
 
         payment.refund(reason);
@@ -136,7 +136,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void delete(UUID paymentId) {
-        Payment payment = repository.findById(paymentId)
+        Payment payment = repository.findByPaymentId(paymentId)
             .orElseThrow(PaymentNotFoundException::new);
         payment.delete(paymentId);
     }
