@@ -27,4 +27,7 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
+
+    // test log
+    testImplementation 'org.slf4j:jul-to-slf4j:2.0.9'
 }
