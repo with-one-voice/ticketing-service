@@ -1,4 +1,4 @@
-package com.onevoice.notification.application.service;
+package com.onevoice.notification.fixture;
 
 import com.onevoice.notification.domain.Notification;
 import com.onevoice.notification.domain.NotificationType;
@@ -13,24 +13,31 @@ public class NotificationFixture {
 
     public static UUID nextUUID() {
         long count = counter.getAndIncrement();
-        return UUID.nameUUIDFromBytes(String.valueOf(count).getBytes(StandardCharsets.UTF_8));
+        return UUID.nameUUIDFromBytes(String.valueOf(count)
+            .getBytes(StandardCharsets.UTF_8));
     }
 
     public static Notification createNotification() {
-        Notification notification = Notification.create(
+
+        return Notification.create(
             UUID.randomUUID(),
             NotificationType.EMAIL,
             "title",
             "message",
             "metadata"
         );
-
-        ReflectionTestUtils.setField(notification, "notificationId", nextUUID());
-        return notification;
     }
 
-    public static Notification createNotification(Notification notification) {
-        ReflectionTestUtils.setField(notification, "notificationId", nextUUID());
+    public static Notification createNotificationWithId() {
+        return createNotificationWithId(createNotification());
+    }
+
+    public static Notification createNotificationWithId(Notification notification) {
+        ReflectionTestUtils.setField(
+            notification,
+            "notificationId",
+            nextUUID()
+        );
         return notification;
     }
 }
