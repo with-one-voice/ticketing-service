@@ -40,7 +40,7 @@ public class NotificationController {
     ) {
         log.info("Request Body:{}", request);
 
-        UUID notificationId = notificationService.create(request.toCommand(userId));
+        UUID notificationId = notificationService.create(request.to(userId));
         URI location = UriComponentsBuilder.newInstance()
             .path("/api/notifications/{notificationId}")
             .buildAndExpand(notificationId)

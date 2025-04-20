@@ -1,9 +1,8 @@
 package com.onevoice.notification.application.service;
 
+import static com.onevoice.notification.fixture.RequestFixture.validRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.onevoice.notification.application.dto.command.CreateNotificationCommand;
-import com.onevoice.notification.domain.NotificationType;
 import com.onevoice.notification.domain.repository.NotificationRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -30,11 +29,7 @@ class NotificationServiceImplTest {
     @DisplayName("create")
     void testCreate() {
         // given
-        var command = new CreateNotificationCommand(
-            UUID.randomUUID(),
-            NotificationType.EMAIL,
-            "title", "message", "metadata"
-        );
+        var command = validRequest().to(UUID.randomUUID());
 
         // when
         UUID notificationId = service.create(command);

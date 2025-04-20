@@ -18,7 +18,7 @@ public record CreateNotificationRequest(
     String metadata
 ) {
 
-    public CreateNotificationCommand toCommand(UUID userId) {
+    public CreateNotificationCommand to(UUID userId) {
         return new CreateNotificationCommand(
             userId,
             this.notificationType,
