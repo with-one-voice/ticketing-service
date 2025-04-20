@@ -58,7 +58,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional(readOnly = true)
     public FindNotificationQuery read(UUID notificationId, UUID userId) {
-        return repository.findByIdAndUserId(notificationId, userId)
+        return repository.findByNotificationIdAndUserId(notificationId, userId)
             .map(FindNotificationQuery::from)
             .orElseThrow(NotificationNotFoundException::new);
     }

@@ -12,7 +12,7 @@ public interface NotificationRepository {
 
     Page<Notification> findAllByUserId(UUID userId, Pageable pageable);
 
-    Optional<Notification> findByIdAndUserId(UUID notificationId, UUID userId);
+    Optional<Notification> findByNotificationIdAndUserId(UUID notificationId, UUID userId);
 
     Optional<Notification> findByNotificationId(UUID notificationId);
 }

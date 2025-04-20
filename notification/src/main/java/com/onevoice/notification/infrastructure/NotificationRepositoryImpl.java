@@ -28,7 +28,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public Optional<Notification> findByIdAndUserId(UUID userId, UUID notificationId) {
+    public Optional<Notification> findByNotificationIdAndUserId(UUID userId, UUID notificationId) {
         return jpaRepository.findByNotificationIdAndUserIdAndDeletedAtIsNull(notificationId,
             userId);
     }
