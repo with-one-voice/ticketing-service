@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 주요 라이브러리 로그 제한 -->
+  <logger name="org.apache" level="INFO"/>
+  <logger name="org.apache.catalina" level="INFO"/>
+  <logger name="org.apache.coyote" level="INFO"/>
+  <logger name="org.apache.tomcat" level="INFO"/>
+  <logger name="org.hibernate" level="INFO"/>
+  <logger name="org.hibernate.SQL" level="INFO"/>
+  <logger name="org.hibernate.validator" level="INFO"/>
+  <logger name="com.zaxxer.hikari" level="INFO"/>
+  <logger name="org.jboss" level="INFO"/>
+  <logger name="org.springframework" level="WARN"/>
+
+  <!-- PostgreSQL, Netty, Redisson 로그 레벨 설정 -->
+  <logger name="org.postgresql" level="INFO"/>
+  <logger name="org.postgresql.Driver" level="INFO"/>
+  <logger name="org.postgresql.jdbc" level="INFO"/>
+  <logger name="org.redisson" level="INFO"/>
+  <logger name="io.netty" level="INFO"/>
+  <logger name="io.netty.util" level="INFO"/>
+  <logger name="io.netty.util.internal" level="INFO"/>
+  <logger name="io.netty.resolver.dns" level="INFO"/>
+
+  <!-- JDK 보안 이벤트 로그 레벨 설정 -->
+  <logger name="jdk.event.security" level="WARN"/>
+
+  <!-- 전체 로그 레벨 제한 -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+
+</configuration>
