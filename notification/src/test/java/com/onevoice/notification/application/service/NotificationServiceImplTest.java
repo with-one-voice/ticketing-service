@@ -37,10 +37,10 @@ class NotificationServiceImplTest {
         );
 
         // when
-        UUID savedId = service.create(command);
+        UUID notificationId = service.create(command);
 
         // then
-        assertThat(savedId).isNotNull();
+        assertThat(notificationId).isNotNull();
     }
 
     // TODO: 나머지 메서드 테스트

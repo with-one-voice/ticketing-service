@@ -1,10 +1,9 @@
 package com.onevoice.notification.infrastructure;
 
+import static com.onevoice.notification.fixture.NotificationFixture.createNotification;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.onevoice.notification.domain.Notification;
-import com.onevoice.notification.domain.NotificationType;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +26,7 @@ class NotificationRepositoryImplTest {
     @DisplayName("저장")
     void testSave() {
         // given
-        Notification notification = Notification.create(
-            UUID.randomUUID(),
-            NotificationType.EMAIL,
-            "title", "message", "metadata"
-        );
+        Notification notification = createNotification();
 
         // when
         Notification saved = repository.save(notification);
@@ -39,4 +34,6 @@ class NotificationRepositoryImplTest {
         // then
         assertThat(saved.getUserId()).isEqualTo(notification.getUserId());
     }
+
+    // TODO: 나머지 메서드 테스트
 }

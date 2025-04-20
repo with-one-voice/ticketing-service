@@ -1,6 +1,6 @@
 package com.onevoice.notification.application.service;
 
-import static com.onevoice.notification.application.service.NotificationFixture.createNotification;
+import static com.onevoice.notification.fixture.NotificationFixture.createNotificationWithId;
 
 import com.onevoice.notification.domain.Notification;
 import com.onevoice.notification.domain.repository.NotificationRepository;
@@ -27,7 +27,7 @@ public class StubNotificationRepository implements NotificationRepository {
 
     @Override
     public Notification save(Notification notification) {
-        Notification save = createNotification(notification);
+        Notification save = createNotificationWithId(notification);
         notificationMap.put(save.getNotificationId(), save);
         // map 은 key 가 처음 저장되는 거면 put() 메소드는 null 을 반환
         // 기존 key 에 저장되어 있는 값이 있었으면 put() 은 저장하는 값을 저장하고 기존 key 에 저장되어 있던 값을 리턴한다.
@@ -49,7 +49,7 @@ public class StubNotificationRepository implements NotificationRepository {
                         notification -> {
                             if (sort.getProperty().equalsIgnoreCase("title")) {
                                 return notification.getTitle();
-                            } else if (sort.getProperty().equalsIgnoreCase("status")) {
+                            } else if (sort.getProperty().equalsIgnoreCase("notificationStatus")) {
                                 return notification.getNotificationStatus().name();
                             } else {
                                 return notification.getMetadata();
@@ -61,7 +61,9 @@ public class StubNotificationRepository implements NotificationRepository {
                 .reduce(Comparator::thenComparing)
                 .orElse(Comparator.comparing(Notification::getNotificationId)); // 기본 정렬
             // comparator 로 정렬
-            notificationList = notificationList.stream().sorted(comparator).toList();
+            notificationList = notificationList.stream()
+                .sorted(comparator)
+                .toList();
         }
 
         // 페이징 처리
@@ -75,7 +77,7 @@ public class StubNotificationRepository implements NotificationRepository {
     }
 
     @Override
-    public Optional<Notification> findByIdAndUserId(UUID notificationId, UUID userId) {
+    public Optional<Notification> findByNotificationIdAndUserId(UUID notificationId, UUID userId) {
         return notificationMap.values().stream()
             .filter(notification -> notification.getUserId().equals(userId))
             .filter(notification -> notification.getNotificationId().equals(notificationId))

@@ -1,5 +1,8 @@
 package com.onevoice.notification.presentation;
 
+import static com.onevoice.notification.fixture.RequestFixture.createFindQuery;
+import static com.onevoice.notification.fixture.RequestFixture.invalidRequest;
+import static com.onevoice.notification.fixture.RequestFixture.validRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -10,13 +13,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onevoice.notification.application.dto.command.CreateNotificationCommand;
-import com.onevoice.notification.application.dto.query.FindNotificationQuery;
 import com.onevoice.notification.application.dto.query.ListNotificationQuery;
 import com.onevoice.notification.application.service.NotificationService;
 import com.onevoice.notification.domain.NotificationStatus;
 import com.onevoice.notification.domain.NotificationType;
-import com.onevoice.notification.presentation.dto.request.CreateNotificationRequest;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 /**
- * NotificationController 테스트
+ * NotificationController 테스트 모든 요청 객체는 Fixture 클래스 사용해 생성
  */
 @WebMvcTest(NotificationController.class)
 class NotificationControllerMvcTest {
@@ -45,31 +45,24 @@ class NotificationControllerMvcTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private NotificationService notificationService;
+    private NotificationService service;
 
     @Test
-    @DisplayName("알림 생성 요청 성공 테스트")
+    @DisplayName("알림 생성 요청: 성공 테스트")
     @WithMockUser
     void testCreateSuccess() throws JsonProcessingException {
-        // given
+        // given: 요청 객체 생성은 Fixture 클래스를 사용
         UUID notificationId = UUID.randomUUID();
-        var notification = new CreateNotificationRequest(
-            NotificationType.EMAIL,
-            "title",
-            "message",
-            "metadata"
-        );
-
-        var createRequest = objectMapper.writeValueAsString(notification);
+        var requestBody = objectMapper.writeValueAsString(validRequest());
 
         given(
-            notificationService.create(any(CreateNotificationCommand.class)))
+            service.create(any(CreateNotificationCommand.class)))
             .willReturn(notificationId);
 
         // when & then
         assertThat(mvcTester.post().uri("/")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(createRequest)
+            .content(requestBody)
             .with(csrf())
         ).hasStatus(HttpStatus.CREATED)
             .bodyJson()
@@ -83,16 +76,10 @@ class NotificationControllerMvcTest {
     void testCreateFailField() throws JsonProcessingException {
         // given
         UUID notificationId = UUID.randomUUID();
-        var notification = new CreateNotificationRequest(
-            null,
-            "title",
-            "",
-            "metadata"
-        );
-        var createRequest = objectMapper.writeValueAsString(notification);
+        var createRequest = objectMapper.writeValueAsString(invalidRequest());
 
         given(
-            notificationService.create(any(CreateNotificationCommand.class)))
+            service.create(any(CreateNotificationCommand.class)))
             .willReturn(notificationId);
 
         // when & then
@@ -112,28 +99,25 @@ class NotificationControllerMvcTest {
         UUID userId = UUID.randomUUID();
 
         var notificationList = new ListNotificationQuery(
-            List.of(new FindNotificationQuery(
-                UUID.randomUUID(),
-                NotificationType.EMAIL,
-                NotificationStatus.PENDING,
-                "title",
-                "message",
-                "metadata",
-                LocalDateTime.now()
-            ))
+            List.of(
+                createFindQuery(UUID.randomUUID()),
+                createFindQuery(UUID.randomUUID())
+            )
         );
-        given(notificationService.reads(eq(userId), any(Pageable.class)))
+        given(service.reads(eq(userId), any(Pageable.class)))
             .willReturn(notificationList);
 
         // when & then
         assertThat(mvcTester.get().uri("/")
             .contentType(MediaType.APPLICATION_JSON)
             .with(csrf())
+            // 요청 userId와 service.reads userId 가 같아야 하므로 @WithMockUser 사용으로는 빈리스트만 받는다
+            // authentication 을 임의로 생성해서 요청에 넣어준다.
             .with(authentication(getAuthentication(userId)))
         ).hasStatus(HttpStatus.OK)
             .bodyJson()
             .extractingPath("result.queryList")
-            .asArray().hasSize(1);
+            .asArray().hasSize(2);
     }
 
     @Test
@@ -141,18 +125,9 @@ class NotificationControllerMvcTest {
     void testGet() {
         UUID userId = UUID.randomUUID();
         UUID notificationId = UUID.randomUUID();
+        var findQuery = createFindQuery(notificationId);
 
-        var findQuery = new FindNotificationQuery(
-            notificationId,
-            NotificationType.EMAIL,
-            NotificationStatus.PENDING,
-            "title",
-            "message",
-            "metadata",
-            LocalDateTime.now()
-        );
-
-        given(notificationService.read(notificationId, userId))
+        given(service.read(notificationId, userId))
             .willReturn(findQuery);
 
         // when & then
