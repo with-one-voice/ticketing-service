@@ -39,3 +39,5 @@ spec:
                   key: JWT_SECRET_KEY
             - name: SWAGGER_URL
               value: "http://localhost:8080"
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000
