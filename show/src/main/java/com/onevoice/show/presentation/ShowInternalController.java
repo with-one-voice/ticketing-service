@@ -2,16 +2,17 @@ package com.onevoice.show.presentation;
 
 import com.onevoice.show.application.service.session.SessionService;
 import com.onevoice.show.application.service.show.ShowService;
-import com.onevoice.show.presentation.dto.response.SessionDetailResponseDto;
-import com.onevoice.show.presentation.dto.response.ShowResponseDto;
+import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
+import com.onevoice.show.presentation.dto.request.CreateShowRequestDto;
+import com.onevoice.show.presentation.dto.request.UpdateSessionRequestDto;
+import com.onevoice.show.presentation.dto.request.UpdateShowRequestDto;
+import com.onevoice.show.presentation.dto.response.*;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,5 +46,46 @@ public class ShowInternalController {
     public List<ShowResponseDto> getTop5ViewedShows() {
 
         return showService.getTop5ViewedShows();
+    }
+
+    /*
+    * 공연 생성
+    * */
+    @PostMapping("/shows")
+    public Optional<CreateShowResponseDto> createShowInternal(@RequestBody CreateShowRequestDto requestDto) {
+        return Optional.ofNullable(showService.create(requestDto));
+    }
+
+    /*
+    * 공연 회차 생성
+    * */
+    @PostMapping("/sessions/{showId}")
+    public Optional<CreateSessionResponseDto> createSessionInternal(
+            @PathVariable("showId") UUID showId,
+            @RequestBody CreateSessionRequestDto requestDto
+    ) {
+        return Optional.ofNullable(sessionService.create(showId, requestDto));
+    }
+
+    /*
+    * 공연 정보 수정
+    * */
+    @PatchMapping("/{showId}")
+    public Optional<UpdateShowResponseDto> updateShowInternal(
+            @PathVariable UUID showId,
+            @RequestBody UpdateShowRequestDto requestDto
+    ) {
+        return Optional.ofNullable(showService.update(showId, requestDto));
+    }
+
+    /*
+    * 공연 회차 정보 수정
+    * */
+    @PatchMapping("/{sessionId}")
+    public Optional<UpdateSessionResponseDto> updateSessionInternal(
+            @PathVariable UUID sessionId,
+            @RequestBody UpdateSessionRequestDto requestDto
+    ) {
+        return Optional.ofNullable(sessionService.update(sessionId, requestDto));
     }
 }
