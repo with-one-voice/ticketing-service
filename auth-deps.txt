@@ -1,4 +1,3 @@
-Starting a Gradle Daemon (subsequent builds will be faster)
 
 > Configure project :
 [INFO][user] ? Cloud config & eureka dependencies included
@@ -2081,5 +2080,5 @@ testRuntimeOnly - Runtime only dependencies for source set 'test'. (n)
 
 A web-based, searchable dependency report is available by adding the --scan option.
 
-BUILD SUCCESSFUL in 12s
+BUILD SUCCESSFUL in 2s
 1 actionable task: 1 executed
