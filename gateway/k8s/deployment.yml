@@ -1,20 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: admin-service
+  name: gateway-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: admin
+      app: gateway
   template:
     metadata:
       labels:
-        app: admin
+        app: gateway
     spec:
       containers:
-        - name: admin
-          image: joon97/admin-service:latest
+        - name: gateway
+          image: joon97/gateway-service:latest
           ports:
-            - name: admin-port
-              containerPort: 8009
+            - containerPort: 8080

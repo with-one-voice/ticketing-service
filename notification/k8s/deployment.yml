@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: admin-service
+  name: notification-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: admin
+      app: notification
   template:
     metadata:
       labels:
-        app: admin
+        app: notification
     spec:
       containers:
-        - name: admin
-          image: joon97/admin-service:latest
+        - name: notification
+          image: joon97/notification-service:latest
           ports:
-            - name: admin-port
-              containerPort: 8009
+            - name: notification-port
+              containerPort: 8008

@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: admin-service
+  name: config-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: admin
+      app: config
   template:
     metadata:
       labels:
-        app: admin
+        app: config
     spec:
       containers:
-        - name: admin
-          image: joon97/admin-service:latest
+        - name: config
+          image: joon97/config-service:latest
           ports:
-            - name: admin-port
-              containerPort: 8009
+            - name: config-port
+              containerPort: 19000

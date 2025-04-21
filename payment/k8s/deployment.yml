@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: admin-service
+  name: payment-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: admin
+      app: payment
   template:
     metadata:
       labels:
-        app: admin
+        app: payment
     spec:
       containers:
-        - name: admin
-          image: joon97/admin-service:latest
+        - name: payment
+          image: joon97/payment-service:latest
           ports:
-            - name: admin-port
-              containerPort: 8009
+            - name: payment-port
+              containerPort: 8007

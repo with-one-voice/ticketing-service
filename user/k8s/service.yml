@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: admin-service
+  name: user-service
 spec:
   selector:
-    app: admin
+    app: user
   ports:
     - port: 80           # 외부에서 접근할 포트
-      targetPort: admin-port   # 컨테이너 내부 포트 (Deployment의 containerPort와 일치)
+      targetPort: user-port   # 컨테이너 내부 포트 (Deployment의 containerPort와 일치)
   type: ClusterIP        # 내부 서비스용 (기본값)

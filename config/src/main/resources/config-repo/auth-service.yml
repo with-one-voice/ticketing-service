@@ -35,7 +35,7 @@ springdoc:
     path: /v3/api-docs
 
 swagger:
-  server-url: http://localhost:8080/api/auth
+  server-url: http://${SWAGGER-URL:localhost:8080}/api/auth
 
 management:
   endpoints:

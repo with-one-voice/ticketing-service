@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: admin-service
+  name: eureka-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: admin
+      app: eureka
   template:
     metadata:
       labels:
-        app: admin
+        app: eureka
     spec:
       containers:
-        - name: admin
-          image: joon97/admin-service:latest
+        - name: eureka
+          image: joon97/eureka-server:latest
           ports:
-            - name: admin-port
-              containerPort: 8009
+            - name: eureka-port
+              containerPort: 8761
