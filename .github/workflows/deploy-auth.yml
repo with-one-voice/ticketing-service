@@ -11,15 +11,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: .
-
-    env:  # 공통 환경 변수
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      KUBECONFIG: ${{ secrets.KUBECONFIG }}
-
     steps:
       - name: 📦 Checkout code
         uses: actions/checkout@v4
@@ -30,26 +21,24 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: ✅ Grant execute permission to gradlew
+      - name: ✅ Grant permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: 🧪 Build JAR (auth + dependencies)
-        run: ./gradlew :auth:build -x test
+      - name: 🧪 Build whole project
+        run: ./gradlew :auth:clean :auth:build -x test
 
       - name: 🔖 Set Git SHA tag
-        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        id: vars
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
       - name: 🐳 Docker Build & Push
         run: |
-          echo "🔍 DOCKER_USERNAME = $DOCKER_USERNAME"
-          echo "🔍 SHORT_SHA = $SHORT_SHA"
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA} -f auth/Dockerfile .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/auth-service:latest
           
-          docker build -t $DOCKER_USERNAME/auth-service:$SHORT_SHA auth/
-          docker tag $DOCKER_USERNAME/auth-service:$SHORT_SHA $DOCKER_USERNAME/auth-service:latest
-          
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker push $DOCKER_USERNAME/auth-service:$SHORT_SHA
-          docker push $DOCKER_USERNAME/auth-service:latest
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA}
+          docker push ${{ secrets.DOCKER_USERNAME }}/auth-service:latest
 
       - name: 🔐 Create Kubernetes Secret from GitHub Secrets
         run: |
@@ -58,8 +47,12 @@ jobs:
             --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --from-literal=JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
             --dry-run=client -o yaml | kubectl apply -f -
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
       - name: 🚀 Deploy to Kubernetes
         run: |
-          sed -i "s|image: .*|image: $DOCKER_USERNAME/auth-service:$SHORT_SHA|" k8s/deployment.yaml
-          kubectl apply -f k8s/
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA}|" auth/k8s/deployment.yml
+          kubectl apply -f auth/k8s/
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
