@@ -25,7 +25,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: 🧪 Build project (eureka-server)
-        run: ./gradlew :eureka-server:clean :eureka-server:build -x test
+        run: ./gradlew :eureka:clean :eureka:build -x test
 
       - name: 🔖 Set Git SHA tag
         id: vars
