@@ -93,7 +93,8 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+      defaultZone: http://${EUREKA_HOST:eureka-server:8761}/eureka
+
 
 cors:
   allowed-origins: "*"

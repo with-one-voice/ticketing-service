@@ -43,3 +43,10 @@ management:
       prometheus:
         enabled: true
 
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${EUREKA_HOST:eureka-server:8761}/eureka
+

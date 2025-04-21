@@ -57,3 +57,10 @@ kakaopay:
       key: ${KAKAO_PAY_SECRET_KEY}
   cid: ${KAKAO_PAY_CID}
   host: ${KAKAO_PAY_HOST}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${EUREKA_HOST:eureka-server:8761}/eureka
