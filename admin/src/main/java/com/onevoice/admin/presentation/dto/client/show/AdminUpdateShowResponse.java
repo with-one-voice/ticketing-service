@@ -1,15 +1,16 @@
-package com.onevoice.admin.presentation.dto.client;
+package com.onevoice.admin.presentation.dto.client.show;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record AdminCreateShowRequest (
-        UUID venueId,
+public record AdminUpdateShowResponse(
+        UUID showId,
         String title,
         String artist,
         String category,
         String posterUrl,
         String description,
         LocalDateTime ticketingStartTime,
-        LocalDateTime ticketingEndTime
+        LocalDateTime ticketingEndTime,
+        String status
 ) {}

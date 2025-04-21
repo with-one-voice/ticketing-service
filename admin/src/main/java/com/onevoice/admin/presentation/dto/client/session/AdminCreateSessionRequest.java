@@ -1,4 +1,4 @@
-package com.onevoice.admin.presentation.dto.client;
+package com.onevoice.admin.presentation.dto.client.session;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

@@ -88,4 +88,58 @@ public class ShowInternalController {
     ) {
         return Optional.ofNullable(sessionService.update(sessionId, requestDto));
     }
+
+
+    /*
+    * 공연 전체 조회
+    * */
+    @GetMapping("/shows")
+    public List<ShowResponseDto> getAllShowsInternal() {
+        return showService.getAll();
+    }
+
+    /*
+    * 공연 단건 조회
+    * */
+    @GetMapping("/shows/{showId}")
+    public ShowResponseDto getShowDetailInternal(@PathVariable UUID showId) {
+        return showService.getOne(showId);
+    }
+    /*
+    * 회차 전체 조회
+    */
+    @GetMapping("/sessions")
+    public List<SessionResponseDto> getAllSessionsInternal() {
+        return sessionService.getAllSessions();
+    }
+
+    /*
+     * 회차 단건 조회
+     */
+    @GetMapping("/sessions/{sessionId}")
+    public SessionResponseDto getSessionDetailInternal(@PathVariable UUID sessionId) {
+        return sessionService.getOneSession(sessionId);
+    }
+    /*
+     * 공연 삭제
+     */
+    @DeleteMapping("/shows/{showId}")
+    public void deleteShowInternal(
+            @PathVariable UUID showId,
+            @RequestHeader("X-User-Id") UUID userId
+    ) {
+        showService.delete(showId, userId);
+    }
+
+    /*
+     * 공연 회차 삭제
+     */
+    @DeleteMapping("/sessions/{sessionId}")
+    public void deleteSessionInternal(
+            @PathVariable UUID sessionId,
+            @RequestHeader("X-User-Id") UUID userId
+    ) {
+        sessionService.delete(sessionId, userId);
+    }
+
 }
