@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: config-service
+  name: config-server
 spec:
   replicas: 1
   selector:
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: config
-          image: joon97/config-service:latest
+          image: joon97/config-server:latest
           ports:
             - name: config-port
               containerPort: 19000

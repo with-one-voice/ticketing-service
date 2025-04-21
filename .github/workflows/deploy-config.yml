@@ -1,0 +1,51 @@
+name: Deploy Config Server
+
+on:
+  push:
+    branches: [ develop, "feature/**" ]
+    paths:
+      - 'config/**'
+      - '.github/workflows/deploy-config.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: ✅ Grant permission to gradlew
+        run: chmod +x ./gradlew
+
+      - name: 🧪 Build project (config-server)
+        run: ./gradlew :config-server:clean :config-server:build -x test
+
+      - name: 🔖 Set Git SHA tag
+        id: vars
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: 🐳 Docker Build & Push
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/config-server:${SHORT_SHA} -f config/Dockerfile config/
+          docker tag ${{ secrets.DOCKER_USERNAME }}/config-server:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/config-server:latest
+
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_USERNAME }}/config-server:${SHORT_SHA}
+          docker push ${{ secrets.DOCKER_USERNAME }}/config-server:latest
+
+      - name: 🧾 Decode and save kubeconfig
+        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+
+      - name: 🚀 Deploy to Kubernetes
+        run: |
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/config-server:${SHORT_SHA}|" config-server/k8s/deployment.yml
+          kubectl --kubeconfig=kubeconfig.yaml apply -f config-server/k8s/
