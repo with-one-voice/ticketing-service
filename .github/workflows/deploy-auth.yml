@@ -42,7 +42,7 @@ jobs:
 
       - name: 🧾 Set up KUBECONFIG
         run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
 
@@ -59,4 +59,4 @@ jobs:
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA}|" auth/k8s/deployment.yml
           kubectl apply -f auth/k8s/
         env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
