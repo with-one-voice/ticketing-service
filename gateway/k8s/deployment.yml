@@ -17,3 +17,16 @@ spec:
           image: joon97/gateway-service:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: CONFIG_SERVER_URL
+              value: "http://config-server:19000"
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eureka-host-secret
+                  key: EUREKA_HOST
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: JWT_SECRET_KEY

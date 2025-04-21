@@ -14,7 +14,59 @@ spec:
     spec:
       containers:
         - name: notification
-          image: joon97/notification-service:latest
+          image: joon97/notification-service:latest  # GitHub Actions에서 sed로 SHORT_SHA 대체
           ports:
             - name: notification-port
               containerPort: 8008
+          env:
+            - name: DB_HOST
+              value: "postgres"
+            - name: DB_PORT
+              value: "5433"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PASSWORD
+
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eureka-host-secret
+                  key: EUREKA_HOST
+
+            - name: KAFKA_HOST
+              value: kafka:9092
+
+            - name: MAIL_HOST
+              value: smtp.gmail.com
+            - name: MAIL_PORT
+              value: "587"
+            - name: MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: MAIL_USERNAME
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: MAIL_PASSWORD
+
+            - name: DISCORD_NAME
+              value: notification
+            - name: DISCORD_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DISCORD_WEBHOOK_URL
+
+            - name: SWAGGER_URL
+              value: "http://localhost:8080"

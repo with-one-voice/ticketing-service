@@ -14,7 +14,36 @@ spec:
     spec:
       containers:
         - name: seat
-          image: joon97/seat-service:latest
+          image: joon97/seat-service:latest  # GitHub Actions에서 SHA로 교체됨
           ports:
             - name: seat-port
               containerPort: 8006
+          env:
+            - name: DB_HOST
+              value: "postgres"
+            - name: DB_PORT
+              value: "5433"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PASSWORD
+
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eureka-host-secret
+                  key: EUREKA_HOST
+
+            - name: KAFKA_HOST
+              value: kafka:9092
+
+            - name: SWAGGER_URL
+              value: "http://localhost:8080"

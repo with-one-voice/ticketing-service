@@ -14,7 +14,33 @@ spec:
     spec:
       containers:
         - name: user
-          image: joon97/user-service:latest
+          image: joon97/user-service:latest  # GitHub Actions에서 SHA로 치환됨
           ports:
             - name: user-port
               containerPort: 8002
+          env:
+            - name: DB_HOST
+              value: "postgres"
+            - name: DB_PORT
+              value: "5433"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PASSWORD
+
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eureka-host-secret
+                  key: EUREKA_HOST
+
+            - name: SWAGGER_URL
+              value: "http://localhost:8080"

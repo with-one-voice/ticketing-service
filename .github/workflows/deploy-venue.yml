@@ -1,0 +1,62 @@
+name: Deploy venue Service
+
+on:
+  push:
+    branches: [ develop, "feature/**" ]
+    paths:
+      - 'venue/**'
+      - '.github/workflows/deploy-venue.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: ✅ Grant permission to gradlew
+        run: chmod +x ./gradlew
+
+      - name: 🧪 Build whole project
+        run: ./gradlew :venue:clean :venue:build -x test
+
+      - name: 🔖 Set Git SHA tag
+        id: vars
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: 🐳 Docker Build & Push
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/venue-service:${SHORT_SHA} -f venue/Dockerfile .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/venue-service:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/venue-service:latest
+          
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_USERNAME }}/venue-service:${SHORT_SHA}
+          docker push ${{ secrets.DOCKER_USERNAME }}/venue-service:latest
+
+      - name: 🧾 Set up KUBECONFIG
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+
+      - name: 🔐 Create Kubernetes Secret from GitHub Secrets
+        run: |
+          kubectl --kubeconfig=kubeconfig.yaml create secret generic onevoice-secret \
+            --from-literal=DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --from-literal=JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+            --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yaml apply -f -
+
+      - name: 🚀 Deploy to Kubernetes
+        run: |
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/venue-service:${SHORT_SHA}|" venue/k8s/deployment.yml
+          kubectl apply -f venue/k8s/
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
