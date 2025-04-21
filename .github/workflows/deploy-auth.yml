@@ -40,15 +40,19 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/auth-service:latest
 
+      - name: 🧾 Set up KUBECONFIG
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+
       - name: 🔐 Create Kubernetes Secret from GitHub Secrets
         run: |
-          kubectl create secret generic onevoice-secret \
+          kubectl --kubeconfig=kubeconfig.yaml create secret generic onevoice-secret \
             --from-literal=DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --from-literal=JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-            --dry-run=client -o yaml | kubectl apply -f -
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+            --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yaml apply -f -
 
       - name: 🚀 Deploy to Kubernetes
         run: |
