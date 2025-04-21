@@ -18,3 +18,10 @@ spec:
           ports:
             - name: config-port
               containerPort: 19000
+
+          env:
+          - name: EUREKA_HOST
+            valueFrom:
+              secretKeyRef:
+                name: eureka-host-secret
+                key: EUREKA_HOST

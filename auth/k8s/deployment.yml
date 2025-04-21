@@ -41,3 +41,8 @@ spec:
               value: "http://localhost:8080"
             - name: CONFIG_SERVER_URL
               value: http://config-server:19000
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eureka-host-secret
+                  key: EUREKA_HOST
