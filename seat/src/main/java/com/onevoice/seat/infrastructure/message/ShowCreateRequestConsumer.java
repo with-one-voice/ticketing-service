@@ -36,20 +36,9 @@ public class ShowCreateRequestConsumer {
             seatService.createSeat(
                 new CreateSeatCommand(message.sessionId(), message.seatCount(), message.price()));
 
-//            // 성공 시 -> Show 로 메시지 발행
-//            seatEventProducer.sendCreateSuccess(message.sessionId());
-
         } catch (Exception e) {
+            //TODO: 좌석 생성 요청 메시지 응답 역직렬화 시 에러 처리..?
             log.error("Failed to consume seat create success message", e);
-            // 실패 시 → Show 로 보상 메시지 발행
-            try {
-                SeatCreateRequestMessage failedMsg = objectMapper.readValue(
-                    messageJson, SeatCreateRequestMessage.class
-                );
-                seatEventProducer.sendCreateFail(failedMsg.sessionId());
-            } catch (Exception ex) {
-                log.error("seat_create_fail 메시지 전송 실패", ex);
-            }
         }
     }
 }
