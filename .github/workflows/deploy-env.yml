@@ -1,0 +1,40 @@
+name: Deploy Shared Secrets
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-secret:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🧾 Decode and save kubeconfig
+        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+
+
+      - name: 🔐 Create Shared Kubernetes Secret
+        run: |
+          kubectl --kubeconfig=kubeconfig.yaml create secret generic onevoice-secret \
+            --from-literal=DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --from-literal=DB_HOST=${{ secrets.DB_HOST }} \
+            --from-literal=DB_PORT=${{ secrets.DB_PORT }} \
+            --from-literal=JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+            --from-literal=SWAGGER_URL=${{ secrets.SWAGGER_URL }} \
+            --from-literal=EUREKA_HOST=${{ secrets.EUREKA_HOST }} \
+            --from-literal=KAFKA_HOST=${{ secrets.KAFKA_HOST }} \
+            --from-literal=MAIL_USERNAME=${{ secrets.MAIL_USERNAME }} \
+            --from-literal=MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
+            --from-literal=MAIL_HOST=${{ secrets.MAIL_HOST }} \
+            --from-literal=MAIL_PORT=${{ secrets.MAIL_PORT }} \
+            --from-literal=DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }} \
+            --from-literal=KAKAO_PAY_SECRET_KEY=${{ secrets.KAKAO_PAY_SECRET_KEY }} \
+            --from-literal=KAKAO_PAY_CID=${{ secrets.KAKAO_PAY_CID }} \
+            --from-literal=KAKAO_PAY_HOST=${{ secrets.KAKAO_PAY_HOST }} \
+            --from-literal=REDIS_HOST=${{ secrets.REDIS_HOST }} \
+            --from-literal=REDIS_PORT=${{ secrets.REDIS_PORT }} \
+            --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yaml apply -f -
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
