@@ -18,3 +18,6 @@ spec:
           ports:
             - name: admin-port
               containerPort: 8009
+          env:
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000

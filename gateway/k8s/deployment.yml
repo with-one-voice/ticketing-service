@@ -19,11 +19,11 @@ spec:
             - containerPort: 8080
           env:
             - name: CONFIG_SERVER_URL
-              value: "http://config-server:19000"
+              value: http://config-server:19000
             - name: EUREKA_HOST
               valueFrom:
                 secretKeyRef:
-                  name: eureka-host-secret
+                  name: onevoice-secret
                   key: EUREKA_HOST
             - name: JWT_SECRET_KEY
               valueFrom:
