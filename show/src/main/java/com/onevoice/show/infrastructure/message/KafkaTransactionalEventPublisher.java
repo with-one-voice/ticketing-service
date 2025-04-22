@@ -10,16 +10,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-@Slf4j(topic = "ShowEventPublisher")
+@Slf4j(topic = "KafkaTransactionalEventPublisher")
 @Component
 @RequiredArgsConstructor
-public class ShowEventPublisher {
+public class KafkaTransactionalEventPublisher {
 
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleSeatCreateRequestEvent(KafkaEvent event) {
+    public void handleKafkaEvent(KafkaEvent event) {
         try {
             String json = objectMapper.writeValueAsString(event);
             kafkaTemplate.send(event.topic(), json);

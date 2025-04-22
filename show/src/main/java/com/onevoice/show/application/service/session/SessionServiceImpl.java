@@ -19,6 +19,7 @@ import com.onevoice.show.exception.InvalidVenueIdException;
 import com.onevoice.show.exception.NotFoundSessionException;
 import com.onevoice.show.exception.NotFoundShowException;
 import com.onevoice.show.exception.TicketingAlreadyStartedException;
+import com.onevoice.show.infrastructure.message.KafkaTransactionalEventPublisher;
 import com.onevoice.show.infrastructure.redis.SessionCacheEvict;
 import com.onevoice.show.infrastructure.redis.SessionCacheStore;
 import com.onevoice.show.presentation.dto.request.CreateSessionRequestDto;
@@ -33,7 +34,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,10 +44,10 @@ public class SessionServiceImpl implements SessionService {
 
     private final ShowRepository showRepository;
     private final SessionRepository sessionRepository;
-    private final ApplicationEventPublisher applicationEventPublisher;
     private final VenueClient venueClient;
     private final SessionCacheStore cacheStore;
     private final SessionCacheEvict cacheEvict;
+    private final KafkaTransactionalEventPublisher kafkaTransactionalEventPublisher;
 
 
     @Override
@@ -98,7 +98,7 @@ public class SessionServiceImpl implements SessionService {
             query.seatCount(), query.seatPrice().intValue());
         GenericKafkaEvent<SeatCreateRequestMessage> event = new GenericKafkaEvent<>(
             KafkaTopicType.SEAT_CREATE_REQUEST.getTopic(), payload);
-        applicationEventPublisher.publishEvent(event);
+        kafkaTransactionalEventPublisher.handleKafkaEvent(event);
 
         return CreateSessionResponseDto.of(query);
     }

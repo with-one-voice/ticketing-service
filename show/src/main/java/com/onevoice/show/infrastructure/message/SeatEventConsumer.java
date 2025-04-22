@@ -1,8 +1,10 @@
 package com.onevoice.show.infrastructure.message;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onevoice.show.application.dto.message.SeatCreateFailMessage;
 import com.onevoice.show.application.dto.message.SeatCreateSuccessMessage;
+import com.onevoice.show.application.event.GenericKafkaEvent;
 import com.onevoice.show.application.service.session.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +22,11 @@ public class SeatEventConsumer {
     @KafkaListener(topics = "seat_create_success", groupId = "show")
     public void consumeSeatCreateSuccess(String messageJson) {
         try {
-            SeatCreateSuccessMessage message = objectMapper.readValue(messageJson,
-                SeatCreateSuccessMessage.class);
+            GenericKafkaEvent<SeatCreateSuccessMessage> event = objectMapper.readValue(messageJson,
+                new TypeReference<GenericKafkaEvent<SeatCreateSuccessMessage>>() {
+                }
+            );
+            SeatCreateSuccessMessage message = event.payload();
 
             log.info("[seat_create_success] : {}", message);
 
@@ -35,8 +40,11 @@ public class SeatEventConsumer {
     @KafkaListener(topics = "seat_create_fail", groupId = "show")
     public void consumeSeatCreateFail(String messageJson) {
         try {
-            SeatCreateFailMessage message = objectMapper.readValue(messageJson,
-                SeatCreateFailMessage.class);
+            GenericKafkaEvent<SeatCreateFailMessage> event = objectMapper.readValue(messageJson,
+                new TypeReference<GenericKafkaEvent<SeatCreateFailMessage>>() {
+                }
+            );
+            SeatCreateFailMessage message = event.payload();
 
             log.info("[seat_create_fail] : {}", message);
 
