@@ -1,4 +1,4 @@
-name: Deploy Gateway
+name: Deploy Gateway Service
 
 on:
   push:
@@ -24,6 +24,16 @@ jobs:
       - name: ✅ Grant permission to gradlew
         run: chmod +x ./gradlew
 
+      - name: 💾 Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
       - name: 🧪 Build project (gateway)
         run: ./gradlew :gateway:clean :gateway:build -x test
 
@@ -40,12 +50,13 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/gateway-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/gateway-service:latest
 
-      - name: 🧾 Decode and save kubeconfig
+      - name: 🗒️ Decode and save kubeconfig
         run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
 
       - name: 🚀 Deploy to Kubernetes
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/gateway-service:${SHORT_SHA}|" gateway-service/k8s/deployment.yml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/gateway-service:${SHORT_SHA}|" gateway/k8s/deployment.yml
           kubectl --kubeconfig=kubeconfig.yaml apply -f gateway/k8s/
+          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment gateway-service
