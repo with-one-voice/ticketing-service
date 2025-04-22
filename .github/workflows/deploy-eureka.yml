@@ -49,3 +49,6 @@ jobs:
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/eureka-server:${SHORT_SHA}|" eureka/k8s/deployment.yml
           kubectl --kubeconfig=kubeconfig.yaml apply -f eureka/k8s/
+
+      - name: 🔄 Restart Deployment
+        run: kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment eureka-server
