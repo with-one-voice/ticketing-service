@@ -8,11 +8,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RedissonConfig {
+
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://localhost:6379"); // 혹은 도커 주소
+                .setAddress("redis://redis-master.default.svc.cluster.local:6379"); // 혹은 도커 주소
         return Redisson.create(config);
     }
 }
