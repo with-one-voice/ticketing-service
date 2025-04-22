@@ -96,6 +96,8 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://${EUREKA_HOST:eureka-server:8761}/eureka
+  instance:
+    prefer-ip-address: true
 
 
 cors:
