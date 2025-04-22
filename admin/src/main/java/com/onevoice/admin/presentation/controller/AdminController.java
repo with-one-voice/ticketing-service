@@ -28,7 +28,7 @@ public class AdminController {
             @RequestBody AdminCreateShowRequest request) {
         return adminService.createShow(request);
     }
-    @PatchMapping("/shows/{showId}")
+    @PutMapping("/shows/{showId}")
     public ResponseEntity<CommonResponse<AdminUpdateShowResponse>> updateShow(
             @PathVariable UUID showId,
             @RequestBody AdminUpdateShowRequest request,
@@ -79,7 +79,7 @@ public class AdminController {
     ) {
         return adminService.createSession(showId, request, userId);
     }
-    @PatchMapping("/sessions/{sessionId}")
+    @PutMapping("/sessions/{sessionId}")
     public ResponseEntity<CommonResponse<AdminUpdateSessionResponse>> updateSession(
             @PathVariable UUID sessionId,
             @RequestBody AdminUpdateSessionRequest request,

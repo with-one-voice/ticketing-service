@@ -70,7 +70,7 @@ public class ShowInternalController {
     /*
     * 공연 정보 수정
     * */
-    @PatchMapping("/{showId}")
+    @PutMapping("/shows/{showId}")
     public Optional<UpdateShowResponseDto> updateShowInternal(
             @PathVariable UUID showId,
             @RequestBody UpdateShowRequestDto requestDto
@@ -81,7 +81,7 @@ public class ShowInternalController {
     /*
     * 공연 회차 정보 수정
     * */
-    @PatchMapping("/{sessionId}")
+    @PutMapping("/sessions/{sessionId}")
     public Optional<UpdateSessionResponseDto> updateSessionInternal(
             @PathVariable UUID sessionId,
             @RequestBody UpdateSessionRequestDto requestDto

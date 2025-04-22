@@ -7,6 +7,5 @@ public record AdminUpdateSessionRequest(
         LocalDate sessionDate,
         LocalTime startTime,
         LocalTime endTime,
-        int seatCount,
-        int seatPrice
+        Long seatPrice
 ) {}

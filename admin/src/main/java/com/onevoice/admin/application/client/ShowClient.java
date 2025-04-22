@@ -18,7 +18,7 @@ public interface ShowClient {
     @PostMapping("/internal/shows")
     Optional<AdminCreateShowResponse> createShow(@RequestBody AdminCreateShowRequest request);
 
-    @PatchMapping("/internal/shows/{showId}")
+    @PutMapping("/internal/shows/{showId}")
     Optional<AdminUpdateShowResponse> updateShow(
             @PathVariable UUID showId,
             @RequestBody AdminUpdateShowRequest request,
@@ -55,7 +55,7 @@ public interface ShowClient {
             @RequestHeader("X-User-Id") UUID userId
     );
 
-    @PatchMapping("/internal/sessions/{sessionId}")
+    @PutMapping("/internal/sessions/{sessionId}")
     Optional<AdminUpdateSessionResponse> updateSession(
             @PathVariable UUID sessionId,
             @RequestBody AdminUpdateSessionRequest request,
