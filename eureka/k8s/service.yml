@@ -6,6 +6,6 @@ spec:
   selector:
     app: eureka
   ports:
-    - port: 80           # 외부에서 접근할 포트
-      targetPort: eureka-port   # 컨테이너 내부 포트 (Deployment의 containerPort와 일치)
-  type: NodePort        # 내부 서비스용 (기본값)
+    - port: 8761
+      targetPort: eureka-port
+  type: ClusterIP

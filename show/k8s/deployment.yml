@@ -20,14 +20,23 @@ spec:
               containerPort: 8003
           env:
             - name: DB_HOST
-              value: "postgres"
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_HOST
+
             - name: DB_PORT
-              value: "5433"
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PORT
+
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: onevoice-secret
                   key: DB_USERNAME
+
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -36,14 +45,30 @@ spec:
 
             - name: CONFIG_SERVER_URL
               value: http://config-server:19000
+
             - name: EUREKA_HOST
               valueFrom:
                 secretKeyRef:
-                  name: eureka-host-secret
+                  name: onevoice-secret
                   key: EUREKA_HOST
 
             - name: KAFKA_HOST
-              value: kafka:9092
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: KAFKA_HOST
 
             - name: SWAGGER_URL
               value: "http://localhost:8080"
+
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_HOST
+                  name: onevoice-secret
+
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_PORT
+                  name: onevoice-secret

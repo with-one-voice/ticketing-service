@@ -24,16 +24,19 @@ spec:
                 secretKeyRef:
                   name: onevoice-secret
                   key: DB_HOST
+
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
                   name: onevoice-secret
                   key: DB_PORT
+
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: onevoice-secret
                   key: DB_USERNAME
+
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -42,6 +45,7 @@ spec:
 
             - name: CONFIG_SERVER_URL
               value: http://config-server:19000
+
             - name: EUREKA_HOST
               valueFrom:
                 secretKeyRef:

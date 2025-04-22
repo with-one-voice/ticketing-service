@@ -19,9 +19,15 @@ spec:
             - containerPort: 8001
           env:
             - name: DB_HOST
-              value: "postgres"         # K8s 내 postgres 서비스 이름
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_HOST
             - name: DB_PORT
-              value: "5433"
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PORT
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -32,6 +38,14 @@ spec:
                 secretKeyRef:
                   name: onevoice-secret
                   key: DB_PASSWORD
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000
+
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: EUREKA_HOST
             - name: JWT_SECRET_KEY
               valueFrom:
                 secretKeyRef:
@@ -39,5 +53,3 @@ spec:
                   key: JWT_SECRET_KEY
             - name: SWAGGER_URL
               value: "http://localhost:8080"
-            - name: CONFIG_SERVER_URL
-              value: http://config-server:19000
