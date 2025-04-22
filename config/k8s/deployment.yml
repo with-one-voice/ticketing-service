@@ -18,10 +18,3 @@ spec:
           ports:
             - name: config-port
               containerPort: 19000
-
-          env:
-          - name: EUREKA_HOST
-            valueFrom:
-              secretKeyRef:
-                name: onevoice-secret
-                key: EUREKA_HOST
