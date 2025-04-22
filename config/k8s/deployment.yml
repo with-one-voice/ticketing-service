@@ -23,5 +23,5 @@ spec:
           - name: EUREKA_HOST
             valueFrom:
               secretKeyRef:
-                name: eureka-host-secret
+                name: onevoice-secret
                 key: EUREKA_HOST
