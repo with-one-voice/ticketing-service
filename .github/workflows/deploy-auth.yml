@@ -24,6 +24,16 @@ jobs:
       - name: ✅ Grant permission to gradlew
         run: chmod +x ./gradlew
 
+      - name: 💾 Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
       - name: 🧪 Build whole project
         run: ./gradlew :auth:clean :auth:build -x test
 
@@ -41,22 +51,12 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/auth-service:latest
 
       - name: 🧾 Set up KUBECONFIG
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
-
-      - name: 🔐 Create Kubernetes Secret from GitHub Secrets
-        run: |
-          kubectl --kubeconfig=kubeconfig.yaml create secret generic onevoice-secret \
-            --from-literal=DB_USERNAME=${{ secrets.DB_USERNAME }} \
-            --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            --from-literal=JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-            --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yaml apply -f -
+        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
 
       - name: 🚀 Deploy to Kubernetes
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA}|" auth/k8s/deployment.yml
-          kubectl apply -f auth/k8s/
+          kubectl --kubeconfig=kubeconfig.yaml apply -f auth/k8s/
+          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment auth-service
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
