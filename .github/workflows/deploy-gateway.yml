@@ -50,13 +50,13 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/gateway-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/gateway-service:latest
 
-      - name: 🗒️ Decode and save kubeconfig
+      - name: 🧾 Set up KUBECONFIG
         run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
 
       - name: 🚀 Deploy to Kubernetes
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/gateway-service:${SHORT_SHA}|" gateway/k8s/deployment.yml
           kubectl --kubeconfig=kubeconfig.yaml apply -f gateway/k8s/
           kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment gateway-service
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
