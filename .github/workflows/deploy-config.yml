@@ -58,7 +58,7 @@ jobs:
       - name: 🚀 Deploy to Kubernetes
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/config-server:${SHORT_SHA}|" config-server/k8s/deployment.yml
-          kubectl --kubeconfig=kubeconfig.yaml apply -f config-server/k8s/
+          kubectl --kubeconfig=kubeconfig.yaml apply -f config/k8s/
 
       - name: 🔄 Restart Deployment
         run: kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment config-server
