@@ -8,10 +8,6 @@ spring:
     password: ${DB_PASSWORD:sa}
     driver-class-name: org.postgresql.Driver
 
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -64,3 +60,7 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://${EUREKA_HOST:eureka-server:8761}/eureka
+
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
