@@ -1,0 +1,76 @@
+name: Deploy admin Service
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'admin/**'
+      - '.github/workflows/deploy-admin.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: ✅ Grant permission to gradlew
+        run: chmod +x ./gradlew
+
+      - name: 💾 Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+       
+
+      - name: 🧪 Build whole project
+        run: ./gradlew :admin:clean :admin:build -x test
+
+      - name: 🔖 Set Git SHA tag
+        id: vars
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: 🐳 Docker Build & Push
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA} -f admin/Dockerfile .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/admin-service:latest
+          
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA}
+          docker push ${{ secrets.DOCKER_USERNAME }}/admin-service:latest
+
+      - name: 🧾 Set up KUBECONFIG
+        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+
+      - name: 🔐 Create Kubernetes Secret from GitHub Secrets
+        run: |
+          kubectl --kubeconfig=kubeconfig.yaml create secret generic onevoice-secret \
+            --from-literal=DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --from-literal=DB_HOST=${{ secrets.DB_HOST }} \
+            --from-literal=DB_PORT=${{ secrets.DB_PORT }} \
+            --from-literal=SWAGGER_URL=${{ secrets.SWAGGER_URL }} \
+            --from-literal=EUREKA_HOST=${{ secrets.EUREKA_HOST }} \
+            --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yaml apply -f -
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+
+      - name: 🚀 Deploy to Kubernetes
+        run: |
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA}|" admin/k8s/deployment.yml
+          kubectl --kubeconfig=kubeconfig.yaml apply -f admin/k8s/
+          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment admin-service
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
