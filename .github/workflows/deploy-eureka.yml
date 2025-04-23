@@ -2,7 +2,7 @@ name: Deploy Eureka Server
 
 on:
   push:
-    branches: [ develop, "feature/**" ]
+    branches: [develop]
     paths:
       - 'eureka/**'
       - '.github/workflows/deploy-eureka.yml'
