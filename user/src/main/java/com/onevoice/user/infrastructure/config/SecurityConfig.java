@@ -1,7 +1,6 @@
 package com.onevoice.user.infrastructure.config;
 
 import com.onevoice.common.security.CustomAuthorizationFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,31 +22,31 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 )
 public class SecurityConfig {
 
-
     @Bean
-    public CustomAuthorizationFilter customAuthorizationFilter(){
+    public CustomAuthorizationFilter customAuthorizationFilter() {
         return new CustomAuthorizationFilter();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-            .addFilterBefore(customAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(customAuthorizationFilter(),
+                UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/signup", "/login",
+                .requestMatchers("/signup", "/login", "/oauth2/**",
                     "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
                     "/swagger-resources/**", "/webjars/**",
-                    "/actuator/prometheus","/actuator/health","/metrics").permitAll()
+                    "/actuator/prometheus", "/actuator/health", "/metrics").permitAll()
                 .anyRequest().authenticated()
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(
+                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .httpBasic(AbstractHttpConfigurer::disable);
-
 
         return http.build();
     }
