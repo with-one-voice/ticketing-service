@@ -16,7 +16,7 @@ spec:
         - name: notification
           image: joon97/notification-service:latest  # GitHub Actions에서 sed로 SHORT_SHA 대체
           ports:
-            - name: notification-port
+            - name: notif-port
               containerPort: 8008
           env:
             - name: DB_HOST
