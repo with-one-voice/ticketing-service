@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  namespace: monitoring
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -15,19 +15,15 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: grafana/grafana:latest
+          image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.grafana.service.port }}
           volumeMounts:
             - name: grafana-config
               mountPath: /etc/grafana/grafana.ini
               subPath: grafana.ini
             - name: grafana-datasources
               mountPath: /etc/grafana/provisioning/datasources
-            - name: dashboards-config
-              mountPath: /etc/grafana/provisioning/dashboards
-            - name: dashboards-json
-              mountPath: /etc/grafana/provisioning/dashboards/json
       volumes:
         - name: grafana-config
           configMap:
@@ -35,9 +31,3 @@ spec:
         - name: grafana-datasources
           configMap:
             name: grafana-datasources
-        - name: dashboards-config
-          configMap:
-            name: grafana-dashboards
-        - name: dashboards-json
-          configMap:
-            name: grafana-dashboards

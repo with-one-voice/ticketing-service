@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: loki
-  namespace: monitoring
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -15,16 +15,16 @@ spec:
     spec:
       containers:
         - name: loki
-          image: grafana/loki:2.9.4
+          image: "{{ .Values.loki.image.repository }}:{{ .Values.loki.image.tag }}"
           args:
             - -config.file=/etc/loki/loki-config.yaml
           ports:
-            - containerPort: 3100
+            - containerPort: {{ .Values.loki.service.port }}
           volumeMounts:
             - name: config
               mountPath: /etc/loki
             - name: storage
-              mountPath: /etc/loki/chunks
+              mountPath: /data/loki
       volumes:
         - name: config
           configMap:

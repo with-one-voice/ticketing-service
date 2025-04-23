@@ -2,9 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
-  namespace: monitoring
-  labels:
-    app: prometheus
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -17,15 +15,15 @@ spec:
     spec:
       containers:
         - name: prometheus
-          image: prom/prometheus:latest
+          image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus"
           ports:
-            - containerPort: 9090
+            - containerPort: {{ .Values.prometheus.service.port }}
           volumeMounts:
             - name: config-volume
-              mountPath: /etc/prometheus/
+              mountPath: /etc/prometheus
             - name: data-volume
               mountPath: /prometheus
       volumes:
