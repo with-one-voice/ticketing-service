@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+data:
+  spring-http-status.json: |
+    {}
+  k8s-overview.json: |
+    {}
+  loki-logs.json: |
+    {}
+  redis.json: |
+    {}
+  kafka.json: |
+    {}
+  postgres.json: |
+    {}
+  prometheus-metrics.json: |
+    {}
