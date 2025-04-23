@@ -2,7 +2,7 @@ name: Deploy Config Server
 
 on:
   push:
-    branches: [develop]
+    branches: [develop,"feature/**"]
     paths:
       - 'config/**'
       - '.github/workflows/deploy-config.yml'

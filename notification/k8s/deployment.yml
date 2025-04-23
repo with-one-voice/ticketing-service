@@ -83,3 +83,9 @@ spec:
 
             - name: SWAGGER_URL
               value: "http://localhost:8080"
+
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: KAFKA_PASSWORD
+                  name: onevoice-secret

@@ -2,7 +2,7 @@ name: Deploy Seat Service
 
 on:
   push:
-    branches: [develop]
+    branches: [develop,"feature/**"]
     paths:
       - 'seat/**'
       - '.github/workflows/deploy-seat.yml'

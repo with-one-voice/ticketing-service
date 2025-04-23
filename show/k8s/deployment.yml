@@ -72,3 +72,9 @@ spec:
                 secretKeyRef:
                   key: REDIS_PORT
                   name: onevoice-secret
+
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: KAFKA_PASSWORD
+                  name: onevoice-secret
