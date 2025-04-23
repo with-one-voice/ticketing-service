@@ -10,13 +10,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Duration;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
@@ -25,6 +29,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserClient userClient;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final Duration expiration = Duration.ofMinutes(5);
 
     @Override
     public void onAuthenticationSuccess(
@@ -58,21 +64,21 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 });
 
             // jwt 발급
-            String jwt = jwtTokenProvider.createAccessToken(query.userId(),
+            String token = jwtTokenProvider.createAccessToken(query.userId(),
                 UserRole.from(query.role()));
 
-            // json 응답
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.addHeader("Authorization", "Bearer " + jwt);
-            log.info("Successfully authenticated user {}", jwt);
+            // redis 에 저장
+            String key = UUID.randomUUID().toString();
+            redisTemplate.opsForValue().set(key, token, expiration);
+            String redirectUrl = UriComponentsBuilder.fromPath("/api/auth/oauth2/success")
+                .queryParam("key", key)
+                .build()
+                .toUriString();
+            log.info("Successfully authenticated user {}", token);
+            getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         } catch (Exception e) {
             log.error("Failed to authenticate user", e);
             response.sendRedirect("/api/auth/oauth2/failure");
         }
-
-        // 인증 성공 후 리디렉션할 기본 URL
-        setDefaultTargetUrl("/api/auth/oauth2/success");
-        super.onAuthenticationSuccess(request, response, authentication);
     }
 }
