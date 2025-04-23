@@ -1,16 +1,13 @@
 package com.onevoice.auth.infrastructure;
 
-import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import java.time.Duration;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -31,8 +28,13 @@ public class RedisOAuth2Repository implements
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
         String key = buildKey(request);
-        log.info("loadAuthorizationRequest: {}", key);
-        return (OAuth2AuthorizationRequest) redisTemplate.opsForValue().get(key);
+        log.debug("loadAuthorizationRequest: {}", key);
+        try {
+            return (OAuth2AuthorizationRequest) redisTemplate.opsForValue().get(key);
+        } catch (Exception e) {
+            log.error("Redis 연산 중 오류 발생: {}", e.getMessage(), e);
+            return null;
+        }
     }
 
     @Override
@@ -43,7 +45,7 @@ public class RedisOAuth2Repository implements
             return;
         }
         String key = buildKey(request);
-        log.info("saveAuthorizationRequest: {}", key);
+        log.debug("saveAuthorizationRequest: {}", key);
         redisTemplate.opsForValue().set(key, authorizationRequest, expiration);
     }
 
@@ -51,17 +53,16 @@ public class RedisOAuth2Repository implements
     public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request,
         HttpServletResponse response) {
         String key = buildKey(request);
-        log.info("removeAuthorizationRequest: {}", key);
+        log.debug("removeAuthorizationRequest: {}", key);
         OAuth2AuthorizationRequest requestObj = (OAuth2AuthorizationRequest) redisTemplate.opsForValue()
             .get(key);
-        redisTemplate.delete(key);
-        return requestObj;
+        try {
+            redisTemplate.delete(key);
+            return requestObj;
+        } catch (Exception e) {
+            log.error("Redis 연산 중 오류 발생: {}", e.getMessage(), e);
+            return requestObj; // 에러가 발생해도 요청 객체는 반환
+        }
     }
-
-    @PostConstruct
-    public void init() {
-        log.info("✅ RedisOAuth2Repository initialized");
-    }
-
 }
 

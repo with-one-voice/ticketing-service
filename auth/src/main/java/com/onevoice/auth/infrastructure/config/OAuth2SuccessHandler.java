@@ -6,7 +6,6 @@ import com.onevoice.auth.infrastructure.jwt.JwtTokenProvider;
 import com.onevoice.auth.presentation.dto.request.OAuth2SignupRequestDto;
 import com.onevoice.common.security.Provider;
 import com.onevoice.common.security.UserRole;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -29,7 +28,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserClient userClient;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final Duration expiration = Duration.ofMinutes(5);
 
     @Override
@@ -37,13 +36,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         HttpServletRequest request,
         HttpServletResponse response,
         Authentication authentication
-    ) throws IOException, ServletException {
+    ) throws IOException {
 
-        log.info("onAuthenticationSuccess");
         try {
             // Principal 정보 확인
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-            log.info("OAuth2 login success: {}", oAuth2User.getAttributes());
             String email = oAuth2User.getAttribute("email");
             String name = oAuth2User.getAttribute("name");
 
@@ -56,8 +53,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 이미 등록된 유저인지 확인
             FindUserQuery query = userClient.findUserByEmail(email)
                 .orElseGet(() -> {
-                    // 최초 로그인 시 신규 유저 저장
-                    // name 을 password 로 사용
+                    // 최초 로그인 시 신규 유저 저장 name 을 password 로 사용
+                    // TODO: password 방식 변경
                     return userClient.signupByOAuth2(
                             new OAuth2SignupRequestDto(name, email, provider))
                         .orElseThrow(RuntimeException::new);
@@ -74,7 +71,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .queryParam("key", key)
                 .build()
                 .toUriString();
-            log.info("Successfully authenticated user {}", token);
+            log.info("Successfully authenticated user {}", query.userId());
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         } catch (Exception e) {
             log.error("Failed to authenticate user", e);

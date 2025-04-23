@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @PostMapping("/signup")
     public ResponseEntity<CommonResponse<SignupResponseDto>> signup(
@@ -51,10 +51,15 @@ public class AuthController {
         @RequestParam("key") String key) {
         String token = Optional.ofNullable(redisTemplate.opsForValue().get(key))
             .map(jwt -> {
+                // 토큰을 읽어온 후 삭제
                 redisTemplate.delete(key);
-                return jwt.toString();
+                return jwt;
             }).orElse(null);
-        log.info("Successfully oauth2 login");
+        if (token == null) {
+            return ResponseEntity.status(403)
+                .body(CommonResponse.createCommonResponse(
+                    ResponseCode.FORBIDDEN, new LoginResponseDto("유요하지 않은 OAuth2 세션입니다.")));
+        }
         return ResponseEntity.ok()
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
             .body(CommonResponse.createCommonResponse(
