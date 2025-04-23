@@ -1,6 +1,8 @@
 spring:
   cloud:
     gateway:
+      default-filters:
+        - PreserveHostHeader
       discovery:
         locator:
           enabled: true
@@ -15,12 +17,20 @@ spring:
             - StripPrefix=2
 
         # auth
-        - id: auth-service
+        - id: auth-api
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
           filters:
             - StripPrefix=2
+
+        # oauth2
+        - id: auth-oauth2
+          uri: lb://auth-service
+          predicates:
+            - Path=/oauth2/**, /login/oauth2/**
+          filters:
+            - StripPrefix=0
 
         # notification
         - id: notification-service
@@ -102,6 +112,7 @@ cors:
 
 server:
   port: 8080
+  forward-headers-strategy: framework
 
 management:
   endpoints:
