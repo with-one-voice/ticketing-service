@@ -64,18 +64,23 @@ public class SeatServiceImpl implements SeatService {
                 return new Seat(new SeatCode(code), sessionId, SeatStatus.AVAILABLE, price);
             }).toList();
 
-        seatRepository.saveAll(seats);
+        try {
+            seatRepository.saveAll(seats);
 
-        redisTemplate.opsForHash().putAll(
+            redisTemplate.opsForHash().putAll(
                 RedisKeyUtil.seatStatusKey(sessionId.getValue()),
                 seats.stream().collect(Collectors.toMap(
-                        s -> s.getSeatId().toString(),
-                        s -> s.getStatus().name()
+                    s -> s.getSeatId().toString(),
+                    s -> s.getStatus().name()
                 ))
-        );
+            );
+            // 성공 시 -> Show 로 성공 메시지 발행
+            seatEventProducer.sendCreateSuccess(command.sessionId());
 
-        // 성공 시 -> Show 로 메시지 발행
-        seatEventProducer.sendCreateSuccess(command.sessionId());
+        } catch (Exception ex) {
+            // 실패 시 -> Show 로 실패 메시지 발행
+            seatEventProducer.sendCreateFail(command.sessionId());
+        }
 
         return seats.stream().map(SeatCreateResponseDto::of).toList();
     }
@@ -108,7 +113,8 @@ public class SeatServiceImpl implements SeatService {
         String cacheKey = RedisKeyUtil.seatCacheKey(sessionId);
 
         // 1. 캐시 조회 시도
-        List<SeatResponseDto> cached = (List<SeatResponseDto>) objectRedisTemplate.opsForValue().get(cacheKey);
+        List<SeatResponseDto> cached = (List<SeatResponseDto>) objectRedisTemplate.opsForValue()
+            .get(cacheKey);
         if (cached != null) {
             log.info(">>> Redis 캐시에서 회차별 좌석 조회 결과 반환");
             return cached;
@@ -121,14 +127,14 @@ public class SeatServiceImpl implements SeatService {
         Map<Object, Object> redisStatuses = redisTemplate.opsForHash().entries(redisKey);
 
         List<SeatResponseDto> response = seats.stream()
-                .map(seat -> {
-                    String seatId = seat.getSeatId().toString();
-                    if (redisStatuses.containsKey(seatId)) {
-                        SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatId));
-                        return SeatResponseDto.of(seat.withStatus(redisStatus));
-                    }
-                    return SeatResponseDto.of(seat);
-                }).toList();
+            .map(seat -> {
+                String seatId = seat.getSeatId().toString();
+                if (redisStatuses.containsKey(seatId)) {
+                    SeatStatus redisStatus = SeatStatus.valueOf((String) redisStatuses.get(seatId));
+                    return SeatResponseDto.of(seat.withStatus(redisStatus));
+                }
+                return SeatResponseDto.of(seat);
+            }).toList();
 
         // 3. 캐시에 저장 (TTL 1분)
         objectRedisTemplate.opsForValue().set(cacheKey, response, Duration.ofMinutes(1));
@@ -289,14 +295,14 @@ public class SeatServiceImpl implements SeatService {
             //userId 초기화
             seat.clearUserId();
 
-
             UUID sessionId = seat.getSessionId().getValue();
             UUID seatId = seat.getSeatId();
 
             String redisKey = RedisKeyUtil.seatStatusKey(sessionId);
             String holdKey = RedisKeyUtil.seatHoldKey(sessionId, seatId);
 
-            redisTemplate.opsForHash().put(redisKey, seatId.toString(), SeatStatus.AVAILABLE.name());
+            redisTemplate.opsForHash()
+                .put(redisKey, seatId.toString(), SeatStatus.AVAILABLE.name());
             redisTemplate.delete(holdKey);
             redisTemplate.delete(RedisKeyUtil.seatCacheKey(sessionId));
         }

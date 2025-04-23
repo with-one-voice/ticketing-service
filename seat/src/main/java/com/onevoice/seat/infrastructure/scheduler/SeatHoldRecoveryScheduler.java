@@ -1,9 +1,13 @@
 package com.onevoice.seat.infrastructure.scheduler;
 
+import com.onevoice.common.enumtype.KafkaTopicType;
+import com.onevoice.seat.application.dto.message.SeatExpiredMessage;
+import com.onevoice.seat.application.event.GenericKafkaEvent;
 import com.onevoice.seat.infrastructure.message.SeatEventProducer;
 import com.onevoice.seat.infrastructure.redis.RedisKeyUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,7 +20,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SeatHoldRecoveryScheduler {
     private final StringRedisTemplate redisTemplate;
-    private final SeatEventProducer seatEventProducer;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Scheduled(fixedDelay = 60_000) //1분마다
     public void recoverExpiredHolds() {
@@ -75,7 +79,16 @@ public class SeatHoldRecoveryScheduler {
             for (Map.Entry<UUID, List<UUID>> entry : expiredSeatsByUser.entrySet()) {
                 UUID userId = entry.getKey();
                 List<UUID> expiredSeats = entry.getValue();
-                seatEventProducer.sendSeatExpired(expiredSeats, userId);
+                // 메시지 객체 생성
+                SeatExpiredMessage message = new SeatExpiredMessage(expiredSeats, userId);
+
+                // Generic Kafka 이벤트 래핑
+                GenericKafkaEvent<SeatExpiredMessage> event = new GenericKafkaEvent<>(
+                        KafkaTopicType.SEAT_EXPIRED.getTopic(),
+                        message
+                );
+                applicationEventPublisher.publishEvent(event);
+
                 log.info("Kafka 발행 완료 - userId={}, expiredSeats={}", userId, expiredSeats);
             }
         }

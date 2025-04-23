@@ -1,35 +1,47 @@
 package com.onevoice.ticket.infrastructure.config;
 
-import com.onevoice.common.config.manualConfig.RedisSupportFactory;
-
-import com.onevoice.common.config.manualConfig.RedissonSupportFactory;
+import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+@Configuration
 public class RedisConfig {
 
     @Value("${redis.host}")
-    private static String REDIS_HOST;
+    private  String REDIS_HOST;
 
     @Value("${redis.port}")
-    private static int REDIS_PORT;
+    private  int REDIS_PORT;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory(){
-        return RedisSupportFactory.redisConnectionFactory(REDIS_HOST, REDIS_PORT);
+        return new LettuceConnectionFactory(REDIS_HOST, REDIS_PORT);
     }
 
     @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
-        return RedisSupportFactory.redisTemplate(factory);
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+        return template;
     }
 
     @Bean
     public RedissonClient redissonClient() {
-        return RedissonSupportFactory.create(REDIS_HOST,REDIS_PORT);
+        Config config = new Config();
+        config.useSingleServer()
+            .setAddress("redis://" + REDIS_HOST + ":" + REDIS_PORT)
+            .setConnectionMinimumIdleSize(5)
+            .setConnectionPoolSize(10);
+        return Redisson.create(config);
     }
 
 }

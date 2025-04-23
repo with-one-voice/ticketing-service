@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seat-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seat
+  template:
+    metadata:
+      labels:
+        app: seat
+    spec:
+      containers:
+        - name: seat
+          image: joon97/seat-service:latest  # GitHub Actions에서 SHA로 교체됨
+          ports:
+            - name: seat-port
+              containerPort: 8006
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_HOST
+
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PORT
+
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_USERNAME
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PASSWORD
+
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000
+
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: EUREKA_HOST
+
+            - name: KAFKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: KAFKA_HOST
+
+            - name: SWAGGER_URL
+              value: "http://localhost:8080"
+
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_HOST
+                  name: onevoice-secret
+
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_PORT
+                  name: onevoice-secret
+
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: KAFKA_PASSWORD
+                  name: onevoice-secret

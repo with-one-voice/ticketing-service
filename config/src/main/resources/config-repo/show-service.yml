@@ -8,6 +8,10 @@ spring:
     password: ${DB_PASSWORD:sa}
     driver-class-name: org.postgresql.Driver
 
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,6 +23,10 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_HOST:localhost:9092}
+    properties:
+      security.protocol: SASL_PLAINTEXT
+      sasl.mechanism: SCRAM-SHA-256
+      sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="user1" password=${KAFKA_PASSWORD};
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -41,7 +49,7 @@ springdoc:
     path: /v3/api-docs
 
 swagger:
-  server-url: http://localhost:8080/api/shows
+  server-url: http://${SWAGGER-URL:localhost:8080}/api/shows
 
 management:
   endpoints:
@@ -52,3 +60,12 @@ management:
     export:
       prometheus:
         enabled: true
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${EUREKA_HOST:eureka-server:8761}/eureka
+  instance:
+    prefer-ip-address: true

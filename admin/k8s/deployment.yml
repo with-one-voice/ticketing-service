@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin
+  template:
+    metadata:
+      labels:
+        app: admin
+    spec:
+      containers:
+        - name: admin
+          image: joon97/admin-service:latest
+          ports:
+            - name: admin-port
+              containerPort: 8009
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_HOST
+
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PORT
+
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_USERNAME
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PASSWORD
+
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000
+
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: EUREKA_HOST

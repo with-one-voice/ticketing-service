@@ -87,6 +87,8 @@ spring:
             - Path=/api/venues/**
           filters:
             - StripPrefix=2
+    discovery:
+      enabled: true
 
   config:
     import: configserver:${CONFIG_SERVER_URL:http://localhost:19000}
@@ -103,7 +105,10 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+      defaultZone: http://${EUREKA_HOST:eureka-server:8761}/eureka
+  instance:
+    prefer-ip-address: true
+
 
 cors:
   allowed-origins: "*"
