@@ -1,4 +1,4 @@
-name: Deploy show Service
+name: Deploy Show Service
 
 on:
   push:
@@ -24,39 +24,41 @@ jobs:
       - name: ✅ Grant permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: 🧪 Build whole project
+      - name: 💾 Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: 🧪 Build show service
         run: ./gradlew :show:clean :show:build -x test
 
       - name: 🔖 Set Git SHA tag
         id: vars
         run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
-      - name: 🐳 Docker Build & Push
+      - name: 🐋 Docker Build & Push
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/show-service:${SHORT_SHA} -f show/Dockerfile .
           docker tag ${{ secrets.DOCKER_USERNAME }}/show-service:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/show-service:latest
-          
+
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push ${{ secrets.DOCKER_USERNAME }}/show-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/show-service:latest
 
-      - name: 🧾 Set up KUBECONFIG
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+      - name: 📜 Decode and save kubeconfig
+        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
-
-      - name: 🔐 Create Kubernetes Secret from GitHub Secrets
-        run: |
-          kubectl --kubeconfig=kubeconfig.yaml create secret generic onevoice-secret \
-            --from-literal=DB_USERNAME=${{ secrets.DB_USERNAME }} \
-            --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            --from-literal=JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-            --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yaml apply -f -
 
       - name: 🚀 Deploy to Kubernetes
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/show-service:${SHORT_SHA}|" show/k8s/deployment.yml
-          kubectl apply -f show/k8s/
+          kubectl --kubeconfig=kubeconfig.yaml apply -f show/k8s/
+          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment show-service
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
