@@ -3,6 +3,7 @@ package com.onevoice.user.application.service;
 import com.onevoice.common.security.UserRole;
 import com.onevoice.user.application.dto.FindUserQuery;
 import com.onevoice.user.application.dto.LoginRequestDto;
+import com.onevoice.user.application.dto.OAuth2SignupRequestDto;
 import com.onevoice.user.application.dto.SignupRequestDto;
 import com.onevoice.user.domain.User;
 import com.onevoice.user.domain.repository.UserRepository;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,7 +34,6 @@ public class UserServiceImpl implements UserService{
         User user = User.createUser(command.email(), command.password(), UserRole.USER,
             passwordEncoder);
 
-
         User saved = userRepository.save(user);
 
         return Optional.of(FindUserQuery.of(saved));
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findByEmail(command.email())
             .orElseThrow(UserNotFoundException::new);
 
-        if(!user.getPassword().matches(command.password(), passwordEncoder)){
+        if (!user.getPassword().matches(command.password(), passwordEncoder)) {
             throw new PasswordNotMatchException();
         }
 
@@ -57,5 +57,28 @@ public class UserServiceImpl implements UserService{
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return Optional.of(FindUserQuery.of(user));
+    }
+
+    /*
+    User by OAuth2
+     */
+    @Override
+    public Optional<FindUserQuery> findUserByEmail(String email) {
+
+        // 찾는 유저가 없으면 사용자 등록을 진행해야 하므로 exception 을 던지지 않는다.
+        return userRepository.findByEmail(email)
+            .map(FindUserQuery::of);
+    }
+
+    @Override
+    public Optional<FindUserQuery> signupByOAuth2(OAuth2SignupRequestDto command) {
+
+        // email check 후 요청이므로
+        User user = User.createUser(command.email(), command.name(), UserRole.USER,
+            command.provider(), passwordEncoder);
+
+        User saved = userRepository.save(user);
+
+        return Optional.of(FindUserQuery.of(saved));
     }
 }
