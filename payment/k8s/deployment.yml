@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      containers:
+        - name: payment
+          image: joon97/payment-service:latest  # GitHub Actions에서 SHA로 치환됨
+          ports:
+            - name: payment-port
+              containerPort: 8007
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_HOST
+
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PORT
+
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_USERNAME
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: DB_PASSWORD
+
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:19000
+
+            - name: EUREKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: EUREKA_HOST
+
+            - name: KAFKA_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: KAFKA_HOST
+
+            - name: KAKAO_PAY_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: KAKAO_PAY_SECRET_KEY
+            - name: KAKAO_PAY_CID
+              value: TC0ONETIME
+
+            - name: KAKAO_PAY_HOST
+              value: http://localhost:8007
+
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: KAFKA_PASSWORD
+                  name: onevoice-secret
+
+            - name: SWAGGER_URL
+              value: "http://localhost:8080"

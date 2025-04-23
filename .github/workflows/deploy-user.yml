@@ -1,0 +1,62 @@
+name: Deploy User Service
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'user/**'
+      - '.github/workflows/deploy-user.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: ✅ Grant permission to gradlew
+        run: chmod +x ./gradlew
+
+      - name: 💾 Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: 🧪 Build project (user-service)
+        run: ./gradlew :user:clean :user:build -x test
+
+      - name: 🔖 Set Git SHA tag
+        id: vars
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: 🐳 Docker Build & Push
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service:${SHORT_SHA} -f user/Dockerfile .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/user-service:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/user-service:latest
+
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_USERNAME }}/user-service:${SHORT_SHA}
+          docker push ${{ secrets.DOCKER_USERNAME }}/user-service:latest
+
+      - name: 🧾 Decode and save kubeconfig
+        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+
+      - name: 🚀 Deploy to Kubernetes
+        run: |
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/user-service:${SHORT_SHA}|" user/k8s/deployment.yml
+          kubectl --kubeconfig=kubeconfig.yaml apply -f user/k8s/
+          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment user-service
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
