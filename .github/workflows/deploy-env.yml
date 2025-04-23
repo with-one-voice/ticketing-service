@@ -38,6 +38,7 @@ jobs:
             --from-literal=KAKAO_PAY_HOST=${{ secrets.KAKAO_PAY_HOST }} \
             --from-literal=REDIS_HOST=${{ secrets.REDIS_HOST }} \
             --from-literal=REDIS_PORT=${{ secrets.REDIS_PORT }} \
+            --from-literal=REDIS_PORT=${{ secrets.KAFKA_PASSWORD }} \
             --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yaml apply -f -
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
