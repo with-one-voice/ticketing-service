@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus
-  namespace: {{ .Values.namespace }}
+  namespace: {{.Values.namespace}}
 spec:
   selector:
     app: prometheus
   ports:
-    - port: {{ .Values.prometheus.service.port }}
-      targetPort: {{ .Values.prometheus.service.port }}
-  type: {{ .Values.prometheus.service.type }}
+    - port: {{.Values.prometheus.service.port}}
+      targetPort: {{.Values.prometheus.service.port}}
+  type: {{.Values.prometheus.service.type}}

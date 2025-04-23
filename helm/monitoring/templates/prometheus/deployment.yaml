@@ -15,12 +15,12 @@ spec:
     spec:
       containers:
         - name: prometheus
-          image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
+          image: "{{.Values.prometheus.image.repository}}:{{.Values.prometheus.image.tag}}"
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus"
           ports:
-            - containerPort: {{ .Values.prometheus.service.port }}
+            - containerPort: {{.Values.prometheus.service.port}}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/prometheus
