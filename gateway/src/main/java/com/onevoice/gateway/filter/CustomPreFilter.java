@@ -3,7 +3,6 @@ package com.onevoice.gateway.filter;
 import com.onevoice.gateway.jwt.JwtUtils;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -20,12 +19,11 @@ import reactor.core.publisher.Mono;
 @Component
 public class CustomPreFilter implements GlobalFilter, Ordered {
 
-    private static final Logger logger = Logger.getLogger(CustomPreFilter.class.getName());
-
     private final JwtUtils jwtUtils;
 
+    // prefixes
     private static final List<String> WHITELIST_PREFIXES = List.of(
-        "/signup", "/login",    // 로그인/회원가입 요청
+        "/signup", "/login", "/oauth2",     // 로그인/회원가입 요청
         "/v3/api-docs", "/swagger-ui", "/swagger-ui.html",
         "/swagger-resources", "/webjars",
         "/actuator/prometheus"
@@ -34,7 +32,7 @@ public class CustomPreFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-        String uri = exchange.getRequest().getURI().getPath().toString();
+        String uri = exchange.getRequest().getURI().getPath();
         log.info("PreFilter request uri :{}", uri);
 
         if (isWhitelisted(uri)) {
