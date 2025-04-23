@@ -11,6 +11,10 @@ spec:
     metadata:
       labels:
         app: show
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8003"
+        prometheus.io/path: "/actuator/prometheus"
     spec:
       containers:
         - name: show

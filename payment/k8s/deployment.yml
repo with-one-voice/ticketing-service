@@ -11,6 +11,10 @@ spec:
     metadata:
       labels:
         app: payment
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8007"
+        prometheus.io/path: "/actuator/prometheus"
     spec:
       containers:
         - name: payment
