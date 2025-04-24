@@ -12,9 +12,7 @@ spec:
       labels:
         app: payment
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8007"
-        prometheus.io/path: "/actuator/prometheus"
+        {{- include "monitoring.annotations" (dict "port" "8007") | nindent 4}}
     spec:
       containers:
         - name: payment

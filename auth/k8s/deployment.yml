@@ -12,9 +12,7 @@ spec:
       labels:
         app: auth
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8001"
-        prometheus.io/path: "/actuator/prometheus"
+        {{- include "monitoring.annotations" (dict "port" "8001") | nindent 4}}
     spec:
       containers:
         - name: auth
