@@ -40,7 +40,7 @@ public class SecurityConfig {
             .addFilterBefore(customAuthorizationFilter(),
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/signup", "/login", "/login/**", "/oauth2/**",
+                .requestMatchers("/signup", "/login", "/login/**", "/oauth2/**","/api/auth/signup","/api/auth/login",
                     "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**",
                     "/actuator/prometheus", "/actuator/health", 
                     "/metrics"
