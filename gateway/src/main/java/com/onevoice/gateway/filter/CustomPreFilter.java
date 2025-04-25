@@ -51,9 +51,16 @@ public class CustomPreFilter implements GlobalFilter, Ordered {
         String role = jwtUtils.getUserRole(token);
 
         ServerWebExchange mutatedExchange = exchange.mutate()
-            .request(builder -> builder
-                .header("X-User-Id", userId.toString())
-                .header("X-User-Role", role)
+            .request(builder -> {
+                    builder.header("X-User-Id", userId.toString());
+                    builder.header("X-User-Role", role);
+                    // logout 요청일 경우 blacklist 등록을 위해 jwt 를 보냄: bearer 제거한 순수 토큰값
+                    if (uri.contains("/logout")) {
+                        builder.header(HttpHeaders.AUTHORIZATION, token);
+                        builder.header("X-Token-Expires",
+                            String.valueOf(jwtUtils.getExpiration(token)));
+                    }
+                }
             )
             .build();
 
