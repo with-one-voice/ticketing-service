@@ -10,6 +10,7 @@ import java.security.Key;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -17,11 +18,14 @@ import org.springframework.stereotype.Component;
 public class JwtUtils {
 
     private final Key secretKey;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public JwtUtils(
-        @Value("${jwt.secret}") String secretKeyPlain
+        @Value("${jwt.secret}") String secretKeyPlain,
+        RedisTemplate<String, Object> redisTemplate
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secretKeyPlain.getBytes());
+        this.redisTemplate = redisTemplate;
     }
 
     /**
@@ -44,18 +48,29 @@ public class JwtUtils {
      */
     public boolean validateToken(String token) {
         try {
+            // black list check
+            String redisKey = "blacklist:" + token;
+            Boolean isBlacklisted = redisTemplate.hasKey(redisKey);
+            if (Boolean.TRUE.equals(isBlacklisted)) {
+                // 로그아웃된 토큰이면 401 응답
+                return false;
+            }
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.warn("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
-            log.warn("만료된 JWT입니다.");
+            log.warn("만료된 JWT 입니다.");
         } catch (UnsupportedJwtException e) {
-            log.warn("지원하지 않는 JWT입니다.");
+            log.warn("지원하지 않는 JWT 입니다.");
         } catch (IllegalArgumentException e) {
             log.warn("JWT 클레임이 비어 있습니다.");
         }
         return false;
+    }
+
+    public long getExpiration(String token) {
+        return parseClaims(token).getExpiration().getTime() - System.currentTimeMillis();
     }
 
     /**
