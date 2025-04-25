@@ -1,6 +1,7 @@
 package com.onevoice.auth.infrastructure.config;
 
-import com.onevoice.auth.infrastructure.RedisOAuth2Repository;
+import com.onevoice.auth.infrastructure.oauth2.OAuth2SuccessHandler;
+import com.onevoice.auth.infrastructure.oauth2.RedisOAuth2Repository;
 import com.onevoice.common.security.CustomAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
-
     private final RedisOAuth2Repository redisOAuth2Repository;
 
     @Bean
@@ -40,9 +40,11 @@ public class SecurityConfig {
             .addFilterBefore(customAuthorizationFilter(),
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/signup", "/login", "/login/**", "/oauth2/**",
-                    "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**",
-                    "/actuator/prometheus", "/actuator/health", 
+                .requestMatchers(
+                    "/signup", "/login", "/login/**", "/oauth2/**",
+                    "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                    "/swagger-resources/**", "/webjars/**",
+                    "/actuator/prometheus", "/actuator/health",
                     "/metrics"
                 ).permitAll()
                 .anyRequest().authenticated()
@@ -54,7 +56,10 @@ public class SecurityConfig {
             .oauth2Login(oauth2 -> oauth2
                 .authorizationEndpoint(auth -> auth
                     .authorizationRequestRepository(redisOAuth2Repository))
-                .successHandler(oAuth2SuccessHandler));
+                .successHandler(oAuth2SuccessHandler))
+            // /logout 경로를 security 가 가로채지 않게
+            .logout(AbstractHttpConfigurer::disable)
+        ;
 
         return http.build();
     }
