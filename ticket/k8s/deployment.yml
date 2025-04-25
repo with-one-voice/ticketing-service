@@ -12,7 +12,9 @@ spec:
       labels:
         app: ticket
       annotations:
-        {{- include "monitoring.annotations" (dict "port" "8005") | nindent 4}}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8005"
+        prometheus.io/path: "/actuator/prometheus"
     spec:
       containers:
         - name: ticket
