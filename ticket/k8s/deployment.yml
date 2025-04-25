@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: ticket
+      annotations:
+        {{- include "monitoring.annotations" (dict "port" "8005") | nindent 4}}
     spec:
       containers:
         - name: ticket

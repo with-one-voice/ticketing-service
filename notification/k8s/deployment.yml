@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: notification
+      annotations:
+        {{- include "monitoring.annotations" (dict "port" "8008") | nindent 4}}
     spec:
       containers:
         - name: notification

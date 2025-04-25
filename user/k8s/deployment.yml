@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: user
+      annotations:
+        {{- include "monitoring.annotations" (dict "port" "8002") | nindent 4}}
     spec:
       containers:
         - name: user

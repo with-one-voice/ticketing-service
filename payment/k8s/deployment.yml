@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: payment
+      annotations:
+        {{- include "monitoring.annotations" (dict "port" "8007") | nindent 4}}
     spec:
       containers:
         - name: payment

@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: gateway
+      annotations:
+        {{- include "monitoring.annotations" (dict "port" "8080") | nindent 4}}
     spec:
       containers:
         - name: gateway

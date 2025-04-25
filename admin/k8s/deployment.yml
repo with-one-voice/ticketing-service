@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: admin
+      annotations:
+        {{- include "monitoring.annotations" (dict "port" "8009") | nindent 4}}
     spec:
       containers:
         - name: admin

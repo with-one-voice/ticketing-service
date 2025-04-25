@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: venue
+      annotations:
+        {{- include "monitoring.annotations" (dict "port" "8004") | nindent 4}}
     spec:
       containers:
         - name: venue
