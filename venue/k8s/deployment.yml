@@ -12,7 +12,9 @@ spec:
       labels:
         app: venue
       annotations:
-        {{- include "monitoring.annotations" (dict "port" "8004") | nindent 4}}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8004"
+        prometheus.io/path: "/actuator/prometheus"
     spec:
       containers:
         - name: venue
