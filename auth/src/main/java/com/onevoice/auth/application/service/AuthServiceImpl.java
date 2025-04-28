@@ -6,6 +6,8 @@ import com.onevoice.auth.application.dto.FindUserQuery;
 import com.onevoice.auth.infrastructure.jwt.JwtTokenProvider;
 import com.onevoice.auth.presentation.dto.request.LoginRequestDto;
 import com.onevoice.auth.presentation.dto.request.SignupRequestDto;
+import com.onevoice.auth.presentation.dto.response.LoginResponseDto;
+import com.onevoice.auth.presentation.dto.response.LoginV2ResponseDto;
 import com.onevoice.auth.presentation.dto.response.SignupResponseDto;
 
 import com.onevoice.common.security.UserRole;
@@ -34,4 +36,12 @@ public class AuthServiceImpl implements AuthService {
 
         return jwtTokenProvider.createAccessToken(query.userId(), UserRole.from(query.role()));
     }
+    @Override
+    public LoginV2ResponseDto loginWithUserId(LoginRequestDto requestDto) {
+        FindUserQuery query = userClient.login(requestDto).orElseThrow();
+        String token = jwtTokenProvider.createAccessToken(query.userId(), UserRole.from(query.role()));
+
+        return LoginV2ResponseDto.of(query.userId(), token);
+    }
+
 }

@@ -4,6 +4,7 @@ import com.onevoice.auth.application.service.AuthService;
 import com.onevoice.auth.presentation.dto.request.LoginRequestDto;
 import com.onevoice.auth.presentation.dto.request.SignupRequestDto;
 import com.onevoice.auth.presentation.dto.response.LoginResponseDto;
+import com.onevoice.auth.presentation.dto.response.LoginV2ResponseDto;
 import com.onevoice.auth.presentation.dto.response.SignupResponseDto;
 import com.onevoice.common.dto.CommonResponse;
 import com.onevoice.common.dto.ResponseCode;
@@ -72,5 +73,19 @@ public class AuthController {
         return ResponseEntity.status(403)
             .body(CommonResponse.createCommonResponse(
                 ResponseCode.FORBIDDEN, "로그인 실패"));
+    }
+
+    @PostMapping("/login/v2")
+    public ResponseEntity<CommonResponse<LoginV2ResponseDto>> loginV2(
+            @RequestBody LoginRequestDto requestDto
+    ) {
+        LoginV2ResponseDto response = authService.loginWithUserId(requestDto);
+
+        CommonResponse<LoginV2ResponseDto> commonResponse = CommonResponse.success(response).getBody();
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + response.accessToken())
+                .body(commonResponse);
     }
 }
