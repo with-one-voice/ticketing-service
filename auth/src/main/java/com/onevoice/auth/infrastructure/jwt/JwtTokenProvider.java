@@ -19,7 +19,7 @@ public class JwtTokenProvider {
     private final Key secretKey;
 
     public JwtTokenProvider(
-       @Value("${jwt.secret}") String secretKeyPlain,
+        @Value("${jwt.secret}") String secretKeyPlain,
         @Value("${jwt.expiration}") long expirationMillis
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secretKeyPlain.getBytes());
@@ -36,10 +36,9 @@ public class JwtTokenProvider {
         return Jwts.builder()
             .setSubject(userId.toString())
             .setIssuedAt(now)
-            .claim("role",role.roleName())
+            .claim("role", role.roleName())
             .setExpiration(expiry)
             .signWith(secretKey, SignatureAlgorithm.HS256)
             .compact();
     }
-
 }

@@ -1,7 +1,8 @@
-package com.onevoice.auth.infrastructure.config;
+package com.onevoice.auth.infrastructure.oauth2;
 
 import com.onevoice.auth.application.client.UserClient;
 import com.onevoice.auth.application.dto.FindUserQuery;
+import com.onevoice.auth.application.service.RedisService;
 import com.onevoice.auth.infrastructure.jwt.JwtTokenProvider;
 import com.onevoice.auth.presentation.dto.request.OAuth2SignupRequestDto;
 import com.onevoice.common.security.Provider;
@@ -26,10 +27,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    private final RedisService redisService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserClient userClient;
-    private final RedisTemplate<String, String> redisTemplate;
-    private final Duration expiration = Duration.ofMinutes(5);
 
     @Override
     public void onAuthenticationSuccess(
@@ -65,8 +65,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 UserRole.from(query.role()));
 
             // redis 에 저장
-            String key = UUID.randomUUID().toString();
-            redisTemplate.opsForValue().set(key, token, expiration);
+            String key = redisService.store(token);
             String redirectUrl = UriComponentsBuilder.fromPath("/api/auth/oauth2/success")
                 .queryParam("key", key)
                 .build()

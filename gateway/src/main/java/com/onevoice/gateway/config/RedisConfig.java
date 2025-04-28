@@ -1,4 +1,4 @@
-package com.onevoice.auth.infrastructure.config;
+package com.onevoice.gateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

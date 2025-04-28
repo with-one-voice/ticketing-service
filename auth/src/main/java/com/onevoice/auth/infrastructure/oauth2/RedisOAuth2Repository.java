@@ -1,4 +1,4 @@
-package com.onevoice.auth.infrastructure;
+package com.onevoice.auth.infrastructure.oauth2;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
