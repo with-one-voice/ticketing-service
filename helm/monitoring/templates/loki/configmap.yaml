@@ -13,7 +13,7 @@ data:
     ingester:
       wal:
         enabled: true
-        dir: /etc/loki/wal
+        dir: /data/loki/wal
       lifecycler:
         ring:
           kvstore:
@@ -35,11 +35,11 @@ data:
 
     storage_config:
       boltdb_shipper:
-        active_index_directory: /etc/loki/index
-        cache_location: /etc/loki/cache
+        active_index_directory: /data/loki/index
+        cache_location: /data/loki/cache
         shared_store: filesystem
       filesystem:
-        directory: /etc/loki/chunks
+        directory: /data/loki/chunks
 
     limits_config:
       enforce_metric_name: false
@@ -47,5 +47,5 @@ data:
       reject_old_samples_max_age: 168h
 
     compactor:
-      working_directory: /etc/loki/compactor
+      working_directory: /data/loki/compactor
       shared_store: filesystem
