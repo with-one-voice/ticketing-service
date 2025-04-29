@@ -67,11 +67,15 @@ spec:
                 secretKeyRef:
                   name: onevoice-secret
                   key: KAKAO_PAY_SECRET_KEY
+
             - name: KAKAO_PAY_CID
               value: TC0ONETIME
 
             - name: KAKAO_PAY_HOST
-              value: http://localhost:8007
+              valueFrom:
+                secretKeyRef:
+                  name: onevoice-secret
+                  key: KAKAO_PAY_HOST
 
             - name: KAFKA_PASSWORD
               valueFrom:
