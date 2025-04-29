@@ -6,6 +6,7 @@ spec:
   selector:
     app: auth
   ports:
-    - port: 8001           # 외부에서 접근할 포트
+    - name: metrics
+      port: 8001           # 외부에서 접근할 포트
       targetPort: auth-port   # 컨테이너 내부 포트 (Deployment의 containerPort와 일치)
   type: ClusterIP        # 내부 서비스용 (기본값)
