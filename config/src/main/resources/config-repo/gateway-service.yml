@@ -1,9 +1,5 @@
 spring:
 
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
-
   cloud:
     gateway:
       default-filters:
@@ -160,3 +156,7 @@ springdoc:
         url: /api/users/v3/api-docs
       - name: venue-service
         url: /api/venues/v3/api-docs
+
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
