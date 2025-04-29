@@ -1,7 +1,11 @@
 loki:
   enabled: true
   persistence:
-    enabled: false  # Minikube에서는 볼륨 없이 실행
+    enabled: true
+    storageClassName: gp2         # Kops - AWS EBS(gp2)를 사용
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi                    # 초기에는 10Gi 정도로 시작 가능 (운영에 따라 조정)
 
 promtail:
   enabled: true
