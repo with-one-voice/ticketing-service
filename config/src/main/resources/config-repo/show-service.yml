@@ -45,7 +45,7 @@ springdoc:
     path: /v3/api-docs
 
 swagger:
-  server-url: http://${SWAGGER-URL:localhost:8080}/api/shows
+  server-url: ${SWAGGER_URL}/api/shows
 
 management:
   endpoints:

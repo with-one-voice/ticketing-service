@@ -49,7 +49,7 @@ springdoc:
     path: /v3/api-docs
 
 swagger:
-  server-url: http://${SWAGGER-URL:localhost:8080}/api/seats
+  server-url: ${SWAGGER_URL}/api/seats
 
 management:
   endpoints:
