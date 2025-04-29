@@ -34,3 +34,13 @@ spec:
                 secretKeyRef:
                   name: onevoice-secret
                   key: JWT_SECRET_KEY
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_HOST
+                  name: onevoice-secret
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_PORT
+                  name: onevoice-secret

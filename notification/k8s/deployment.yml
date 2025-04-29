@@ -46,7 +46,16 @@ spec:
                 secretKeyRef:
                   name: onevoice-secret
                   key: DB_PASSWORD
-
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_HOST
+                  name: onevoice-secret
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_PORT
+                  name: onevoice-secret
             - name: CONFIG_SERVER_URL
               value: http://config-server:19000
 
