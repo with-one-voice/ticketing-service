@@ -87,12 +87,13 @@ public class TicketServiceImpl implements TicketService {
                 showName
             );
 
+            Ticket saved = ticketRepository.save(ticket);
+
             for (UUID seatId : seatIdList) {
                 TicketSeat ticketSeat = new TicketSeat(ticket, seatId);
                 ticketSeatRepository.save(ticketSeat);
             }
 
-            Ticket saved = ticketRepository.save(ticket);
             return CreateTicketResponseDto.of(saved);
 
         } catch (DataIntegrityViolationException e) {
