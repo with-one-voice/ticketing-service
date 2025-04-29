@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-prometheus-stack-grafana-lb
+  namespace: monitoring
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: kube-prometheus-stack
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
