@@ -57,6 +57,6 @@ jobs:
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/ticket-service:${SHORT_SHA}|" ticket/k8s/deployment.yml
           kubectl --kubeconfig=kubeconfig.yaml apply -f ticket/k8s/
-          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment ticket-service
+          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment ticket-service -n onevoice --timeout=60s
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml

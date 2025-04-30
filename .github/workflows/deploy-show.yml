@@ -59,6 +59,6 @@ jobs:
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/show-service:${SHORT_SHA}|" show/k8s/deployment.yml
           kubectl --kubeconfig=kubeconfig.yaml apply -f show/k8s/
-          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment show-service
+          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment show-service -n onevoice --timeout=60s
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
