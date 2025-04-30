@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: gateway-service
   namespace: onevoice
+  labels:
+    app: gateway
 spec:
   selector:
     app: gateway
