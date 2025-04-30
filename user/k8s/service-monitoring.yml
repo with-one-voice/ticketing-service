@@ -2,6 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: user-service-monitor
+  namespace: monitoring
   labels:
     release: kube-prometheus-stack   # Prometheus Operator가 이걸 감지할 수 있는 라벨
 spec:
@@ -10,8 +11,8 @@ spec:
       app: user                      # service의 selector와 일치해야 함
   namespaceSelector:
     matchNames:
-      - default                      # service가 있는 namespace
+      - onevoice                      # service가 있는 namespace
   endpoints:
     - port: metrics                  # service에서 지정한 name과 반드시 일치
       path: /actuator/prometheus     # prometheus export path
-      interval: 45s
+      interval: 30s
