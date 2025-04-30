@@ -6,4 +6,7 @@ public record ListPaymentQuery(
     List<FindPaymentQuery> queryList
 ) {
 
+    public static ListPaymentQuery from(List<FindPaymentQuery> queryList) {
+        return new ListPaymentQuery(queryList);
+    }
 }
