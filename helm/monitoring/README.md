@@ -17,6 +17,18 @@ helm install loki grafana/loki-stack \
   -n monitoring -f helm/monitoring/loki-values.yaml
 ```
 
+## Prometheus UI 외부 접속(Port-Forwarding)
+
+```bash
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090
+```
+
+## Grafana 외부 접속 (Port-Forwarding)
+
+```bash
+ kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80
+```
+
 ## Grafana 외부 접속 (LoadBalancer 설정)
 
 ```bash
