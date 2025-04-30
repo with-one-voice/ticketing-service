@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gateway-service
+  namespace: onevoice
 spec:
   replicas: 1
   selector:
@@ -17,6 +18,7 @@ spec:
           image: joon97/gateway-service:latest
           ports:
             - containerPort: 8080
+              name: gateway-port
           env:
             - name: CONFIG_SERVER_URL
               value: http://config-server:19000
