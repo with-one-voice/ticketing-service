@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: auth-service
   namespace: onevoice
+  labels:
+    app: auth
 spec:
   selector:
     app: auth

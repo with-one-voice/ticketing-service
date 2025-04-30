@@ -32,18 +32,14 @@ grafana:
 
   dashboards:
     default:
-      kubernetes-cluster:
-        gnetId: 315
-        revision: 2
+      kubernetes-pod-metrics:
+        gnetId: 747
+        revision: 1
         datasource: Prometheus
       loki-logs:
         gnetId: 13639
         revision: 1
         datasource: Loki
-      spring-boot:
-        gnetId: 17175
-        revision: 1
-        datasource: Prometheus
       prometheus-stats:
         gnetId: 3662
         revision: 2

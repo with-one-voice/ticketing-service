@@ -15,4 +15,4 @@ spec:
   endpoints:
     - port: metrics                  # service에서 지정한 name과 반드시 일치
       path: /actuator/prometheus     # prometheus export path
-      interval: 15s
+      interval: 30s
