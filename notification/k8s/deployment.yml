@@ -91,7 +91,10 @@ spec:
                   key: DISCORD_WEBHOOK_URL
 
             - name: SWAGGER_URL
-              value: "http://localhost:8080"
+              valueFrom:
+                secretKeyRef:
+                  key: SWAGGER_URL
+                  name: onevoice-secret
 
             - name: KAFKA_PASSWORD
               valueFrom:

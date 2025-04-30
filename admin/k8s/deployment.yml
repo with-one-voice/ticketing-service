@@ -51,3 +51,10 @@ spec:
                 secretKeyRef:
                   name: onevoice-secret
                   key: EUREKA_HOST
+
+            - name: SWAGGER_URL
+              valueFrom:
+                secretKeyRef:
+                  key: SWAGGER_URL
+                  name: onevoice-secret
+

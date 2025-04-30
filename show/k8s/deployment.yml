@@ -59,7 +59,10 @@ spec:
                   key: KAFKA_HOST
 
             - name: SWAGGER_URL
-              value: "http://localhost:8080"
+              valueFrom:
+                secretKeyRef:
+                  key: SWAGGER_URL
+                  name: onevoice-secret
 
             - name: REDIS_HOST
               valueFrom:
