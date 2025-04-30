@@ -11,10 +11,6 @@ spec:
     metadata:
       labels:
         app: seat
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8006"
-        prometheus.io/path: "/actuator/prometheus"
     spec:
       containers:
         - name: seat

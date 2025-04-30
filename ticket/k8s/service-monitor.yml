@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ticket-service-monitor
+  labels:
+    release: kube-prometheus-stack   # Prometheus Operator가 이걸 감지할 수 있는 라벨
+spec:
+  selector:
+    matchLabels:
+      app: ticket                      # service의 selector와 일치해야 함
+  namespaceSelector:
+    matchNames:
+      - default                      # service가 있는 namespace
+  endpoints:
+    - port: metrics                  # service에서 지정한 name과 반드시 일치
+      path: /actuator/prometheus     # prometheus export path
+      interval: 15s

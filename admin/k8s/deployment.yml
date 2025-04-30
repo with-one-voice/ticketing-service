@@ -11,10 +11,6 @@ spec:
     metadata:
       labels:
         app: admin
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8009"
-        prometheus.io/path: "/actuator/prometheus"
     spec:
       containers:
         - name: admin
