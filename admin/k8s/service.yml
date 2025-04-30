@@ -2,6 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: admin-service
+  namespace: onevoice
+  labels:
+    app: admin
 spec:
   selector:
     app: admin
