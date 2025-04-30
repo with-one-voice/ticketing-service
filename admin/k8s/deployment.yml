@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: admin-service
+  namespace: onevoice
 spec:
   replicas: 1
   selector:
@@ -51,3 +52,10 @@ spec:
                 secretKeyRef:
                   name: onevoice-secret
                   key: EUREKA_HOST
+
+            - name: SWAGGER_URL
+              valueFrom:
+                secretKeyRef:
+                  key: SWAGGER_URL
+                  name: onevoice-secret
+
