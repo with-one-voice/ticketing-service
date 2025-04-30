@@ -57,6 +57,6 @@ jobs:
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/payment-service:${SHORT_SHA}|" payment/k8s/deployment.yml
           kubectl --kubeconfig=kubeconfig.yaml apply -f payment/k8s/
-          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment payment-service
+          kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment payment-service -n onevoice --timeout=60s
         env:
           KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml

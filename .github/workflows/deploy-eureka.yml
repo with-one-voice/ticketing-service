@@ -51,4 +51,4 @@ jobs:
           kubectl --kubeconfig=kubeconfig.yaml apply -f eureka/k8s/
 
       - name: 🔄 Restart Deployment
-        run: kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment eureka-server
+        run: kubectl --kubeconfig=kubeconfig.yaml rollout restart deployment eureka-server -n onevoice --timeout=60s
