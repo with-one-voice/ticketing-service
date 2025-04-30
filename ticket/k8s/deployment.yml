@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ticket-service
+  namespace: onevoice
 spec:
   replicas: 1
   selector:
@@ -71,7 +72,10 @@ spec:
                   name: onevoice-secret
 
             - name: SWAGGER_URL
-              value: "http://localhost:8080"
+              valueFrom:
+                secretKeyRef:
+                  key: SWAGGER_URL
+                  name: onevoice-secret
 
             - name: KAFKA_PASSWORD
               valueFrom:
