@@ -2,6 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: seat-service
+  namespace: onevoice
+  labels:
+    app: seat
 spec:
   selector:
     app: seat

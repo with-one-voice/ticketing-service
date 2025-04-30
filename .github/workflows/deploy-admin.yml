@@ -2,7 +2,7 @@ name: Deploy admin Service
 
 on:
   push:
-    branches: [develop, 'feature/**']
+    branches: [develop]
     paths:
       - 'admin/**'
       - '.github/workflows/deploy-admin.yml'

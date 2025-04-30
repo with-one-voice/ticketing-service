@@ -2,6 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ticket-service
+  namespace: onevoice
+  labels:
+    app: ticket
 spec:
   selector:
     app: ticket
