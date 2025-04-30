@@ -2,7 +2,6 @@ package com.onevoice.payment.infrastructure.jpa;
 
 import com.onevoice.payment.domain.Payment;
 import com.onevoice.payment.domain.PaymentStatus;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +17,6 @@ public interface PaymentJpaRepository extends JpaRepository<Payment, UUID> {
 
     Optional<Payment> findByPaymentIdAndDeletedAtIsNull(UUID paymentId);
 
-    List<Payment> findByPaymentIdAndPaymentStatusEqualsAndDeletedAtIsNull(UUID paymentId,
+    List<Payment> findByUserIdAndPaymentStatusEqualsAndDeletedAtIsNull(UUID userId,
         PaymentStatus paymentStatus);
 }

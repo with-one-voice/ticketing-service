@@ -47,9 +47,9 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public List<Payment> findByUserIdAndStatus(UUID userId, PaymentStatus status) {
-        return jpaRepository.findByPaymentIdAndPaymentStatusEqualsAndDeletedAtIsNull(userId,
-            status);
+    public List<Payment> findByUserIdAndPaymentStatus(UUID userId, PaymentStatus paymentStatus) {
+        return jpaRepository.findByUserIdAndPaymentStatusEqualsAndDeletedAtIsNull(userId,
+            paymentStatus);
     }
 
     @Override
