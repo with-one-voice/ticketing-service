@@ -56,7 +56,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<FindPaymentQuery> queryList = repository.findAllByUserId(userid, pageable).stream()
             .map(FindPaymentQuery::from)
             .toList();
-        return new ListPaymentQuery(queryList);
+        return ListPaymentQuery.from(queryList);
     }
 
     @Override
@@ -72,6 +72,15 @@ public class PaymentServiceImpl implements PaymentService {
         return repository.findByIdAndUserId(paymentId, userId)
             .map(FindPaymentQuery::from)
             .orElseThrow(PaymentNotFoundException::new);
+    }
+
+    @Override
+    public ListPaymentQuery readPGReady(UUID userId) {
+        List<FindPaymentQuery> queryList = repository.findByUserIdAndPaymentStatus(userId,
+                PaymentStatus.PG_READY).stream()
+            .map(FindPaymentQuery::from)
+            .toList();
+        return ListPaymentQuery.from(queryList);
     }
 
     @Override

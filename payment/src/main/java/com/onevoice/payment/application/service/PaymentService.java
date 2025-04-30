@@ -17,6 +17,8 @@ public interface PaymentService {
 
     FindPaymentQuery read(UUID userId, UUID paymentId);
 
+    ListPaymentQuery readPGReady(UUID userId);
+
     void update(UUID paymentId, PaymentStatus paymentStatus);
 
     void update(UUID paymentId, String pgKey, PaymentStatus paymentStatus);
