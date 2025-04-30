@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: notification-service
   namespace: onevoice
+  labels:
+    app: notification
 spec:
   selector:
     app: notification
