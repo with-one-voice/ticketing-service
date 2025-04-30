@@ -40,8 +40,8 @@ grafana:
         gnetId: 13639
         revision: 1
         datasource: Loki
-      spring-boot:
-        gnetId: 17175
+      springboot-3x-stats:
+        gnetId: 19004
         revision: 1
         datasource: Prometheus
       prometheus-stats:
