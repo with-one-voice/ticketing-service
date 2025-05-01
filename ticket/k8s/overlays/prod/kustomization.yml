@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: ticket-service
+    newTag: latest
+
