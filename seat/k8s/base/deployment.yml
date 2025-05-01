@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: seat
-          image: joon97/seat-service:latest  # GitHub Actions에서 SHA로 교체됨
+          image: joon97/seat-service
           ports:
             - name: seat-port
               containerPort: 8006
