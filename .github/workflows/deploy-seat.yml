@@ -1,4 +1,4 @@
-name: Deploy Seat Service
+name: Deploy seat service
 
 on:
   push:
@@ -8,11 +8,11 @@ on:
       - '.github/workflows/deploy-seat.yml'
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📆 Checkout code
+      - name: 📦 Checkout code
         uses: actions/checkout@v4
 
       - name: 🛠️ Set up JDK
@@ -34,7 +34,7 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: 🥚 Build project (seat-service)
+      - name: 🧪 Build project
         run: ./gradlew :seat:clean :seat:build -x test
 
       - name: 🔖 Set Git SHA tag
@@ -50,13 +50,26 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/seat-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/seat-service:latest
 
-      - name: 🧲 Decode and save kubeconfig
-        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
-
-      - name: 🚀 Deploy to Kubernetes
+      - name: 🔁 Push newTag to deploy with retry
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/seat-service:${SHORT_SHA}|" seat/k8s/deployment.yml
-          kubectl --kubeconfig=kubeconfig.yaml apply -f seat/k8s/
-          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment admin-service -n onevoice --timeout=60s
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+
+          git fetch origin deploy
+          git checkout deploy
+          git pull --rebase origin deploy
+
+          sed -i "s|newTag: .*|newTag: ${SHORT_SHA}|" seat/k8s/overlays/prod/kustomization.yml
+
+          git add seat/k8s/overlays/prod/kustomization.yml
+          git commit -m "chore: update seat-service tag to ${SHORT_SHA}" || exit 0
+
+          n=0
+          until [ $n -ge 3 ]
+          do
+            git push https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/with-one-voice/ticketing-service.git deploy && break
+            n=$((n+1))
+            echo "⚠️ Push failed. Retrying in 5 seconds... (attempt $n)"
+            sleep 5
+            git pull --rebase origin deploy
+          done
