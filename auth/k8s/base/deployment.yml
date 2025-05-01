@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: joon97/auth-service:latest  # Actions에서 sed로 SHA 버전으로 대체됨
+          image: joon97/auth-service
           ports:
             - containerPort: 8001
               name: auth-port
