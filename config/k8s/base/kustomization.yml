@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: config-server
+    newName: joon97/auth-service
+    newTag: latest

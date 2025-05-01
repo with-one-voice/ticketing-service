@@ -8,7 +8,7 @@ on:
       - '.github/workflows/deploy-config.yml'
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +34,7 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: 🧪 Build project (config-server)
+      - name: 🧪 Build project
         run: ./gradlew :config:clean :config:build -x test
 
       - name: 🔖 Set Git SHA tag
@@ -50,13 +50,26 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/config-server:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/config-server:latest
 
-      - name: 🧾 Decode and save kubeconfig
-        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
-
-      - name: 🚀 Deploy to Kubernetes
+      - name: 🔁 Push newTag to deploy with retry
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/config-server:${SHORT_SHA}|" config/k8s/deployment.yml
-          kubectl --kubeconfig=kubeconfig.yaml apply -f config/k8s/
-          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment admin-service -n onevoice --timeout=60s
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+
+          git fetch origin deploy
+          git checkout deploy
+          git pull --rebase origin deploy
+
+          sed -i "s|newTag: .*|newTag: ${SHORT_SHA}|" config/k8s/overlays/prod/kustomization.yml
+
+          git add config/k8s/overlays/prod/kustomization.yml
+          git commit -m "chore: update config-server tag to ${SHORT_SHA}" || exit 0
+
+          n=0
+          until [ $n -ge 3 ]
+          do
+            git push https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/with-one-voice/ticketing-service.git deploy && break
+            n=$((n+1))
+            echo "⚠️ Push failed. Retrying in 5 seconds... (attempt $n)"
+            sleep 5
+            git pull --rebase origin deploy
+          done

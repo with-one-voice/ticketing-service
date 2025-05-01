@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: config
-          image: joon97/config-server:latest
+          image: joon97/config-server
           ports:
             - name: config-port
               containerPort: 19000
