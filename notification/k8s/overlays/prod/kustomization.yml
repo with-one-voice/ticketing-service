@@ -3,5 +3,5 @@ resources:
 
 images:
   - name: notification-service
-    newTag: 7a83195
+    newTag: 018dcea
 
