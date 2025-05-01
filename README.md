@@ -92,3 +92,56 @@
 ## 트러블 슈팅
 
 ## CONTRIBUTORS
+
+
+
+<h3 align="center">✨ Tech Stack ✨</h3>
+<div align="center">
+
+  <!-- Frontend -->
+  <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=typescript&logoColor=white"/>
+  <img src="https://img.shields.io/badge/React-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black"/>
+
+  <!-- Backend -->
+  <img src="https://img.shields.io/badge/Java-ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-6DB33F.svg?style=for-the-badge&logo=springboot&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Spring%20Security-6DB33F.svg?style=for-the-badge&logo=springsecurity&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Spring%20WebFlux-6DB33F.svg?style=for-the-badge&logo=spring&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Spring%20Data%20JPA-59666C.svg?style=for-the-badge&logo=hibernate&logoColor=white"/>
+
+  <!-- MSA / DevOps -->
+  <img src="https://img.shields.io/badge/Spring%20Cloud-6DB33F.svg?style=for-the-badge&logo=spring&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Eureka-4FC08D.svg?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Feign-0052CC.svg?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Docker-2496ED.svg?style=for-the-badge&logo=docker&logoColor=white"/>
+  <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF.svg?style=for-the-badge&logo=githubactions&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Kubernetes-326CE5.svg?style=for-the-badge&logo=kubernetes&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Kops-326CE5.svg?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Helm-0F1689.svg?style=for-the-badge&logo=helm&logoColor=white"/>
+  <img src="https://img.shields.io/badge/ArgoCD-FB7A24.svg?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/AWS-232F3E.svg?style=for-the-badge&logo=amazonaws&logoColor=white"/>
+
+  <!-- DB / Cache -->
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1.svg?style=for-the-badge&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Redis-DC382D.svg?style=for-the-badge&logo=redis&logoColor=white"/>
+
+  <!-- Messaging -->
+  <img src="https://img.shields.io/badge/Kafka-231F20.svg?style=for-the-badge&logo=apachekafka&logoColor=white"/>
+  <img src="https://img.shields.io/badge/SMTP-FF8C00.svg?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Discord-5865F2.svg?style=for-the-badge&logo=discord&logoColor=white"/>
+
+  <!-- Monitoring -->
+  <img src="https://img.shields.io/badge/Prometheus-E6522C.svg?style=for-the-badge&logo=prometheus&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Grafana-F46800.svg?style=for-the-badge&logo=grafana&logoColor=white"/>
+  <img src="https://img.shields.io/badge/JMeter-D22128.svg?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Loki-0E5C89.svg?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Zipkin-000000.svg?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/ArgoCD_UI-FB7A24.svg?style=for-the-badge"/>
+
+  <!-- Collaboration -->
+  <img src="https://img.shields.io/badge/GitHub-181717.svg?style=for-the-badge&logo=github&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Notion-000000.svg?style=for-the-badge&logo=notion&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Swagger-85EA2D.svg?style=for-the-badge&logo=swagger&logoColor=black"/>
+
+</div>
+
