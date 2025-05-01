@@ -8,7 +8,7 @@ on:
       - '.github/workflows/deploy-admin.yml'
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,41 +21,41 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: ✅ Grant permission to gradlew
-        run: chmod +x ./gradlew
-
-      - name: 💾 Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-       
-
-      - name: 🧪 Build whole project
-        run: ./gradlew :admin:clean :admin:build -x test
-
       - name: 🔖 Set Git SHA tag
         id: vars
         run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: 🧪 Build project
+        run: ./gradlew :admin:clean :admin:build -x test
 
       - name: 🐳 Docker Build & Push
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA} -f admin/Dockerfile .
           docker tag ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/admin-service:latest
-          
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/admin-service:latest
 
-      - name: 🔧 Update kustomization image tag
+      - name: 🔁 Update image tag and push to deploy with retry
         run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+
+          git fetch origin
+          git checkout deploy
+          git pull --rebase origin deploy
+
           sed -i "s|newTag: .*|newTag: ${SHORT_SHA}|" admin/k8s/overlays/prod/kustomization.yml
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+
           git add admin/k8s/overlays/prod/kustomization.yml
-          git commit -m "chore: update admin-service tag to ${SHORT_SHA}"
-          git push origin develop
+          git commit -m "chore: update admin-service tag to ${SHORT_SHA}" || exit 0
+
+          n=0
+          until [ $n -ge 3 ]
+          do
+            git push https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/with-one-voice/ticketing-service.git deploy && break
+            n=$((n+1))
+            echo "⚠️ Push failed. Retrying in 5 seconds... (attempt $n)"
+            sleep 5
+            git pull --rebase origin deploy
+          done
