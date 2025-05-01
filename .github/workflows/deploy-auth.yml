@@ -1,4 +1,4 @@
-name: Deploy Auth Service
+name: Deploy auth Service
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - '.github/workflows/deploy-auth.yml'
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,42 +21,41 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: ✅ Grant permission to gradlew
-        run: chmod +x ./gradlew
-
-      - name: 💾 Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: 🧪 Build whole project
-        run: ./gradlew :auth:clean :auth:build -x test
-
       - name: 🔖 Set Git SHA tag
         id: vars
         run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: 🧪 Build project
+        run: ./gradlew :auth:clean :auth:build -x test
 
       - name: 🐳 Docker Build & Push
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA} -f auth/Dockerfile .
           docker tag ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/auth-service:latest
-          
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/auth-service:latest
 
-      - name: 🧾 Set up KUBECONFIG
-        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
-
-      - name: 🚀 Deploy to Kubernetes
+      - name: 🔁 Push newTag to deploy with retry
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/auth-service:${SHORT_SHA}|" auth/k8s/deployment.yml
-          kubectl --kubeconfig=kubeconfig.yaml apply -f auth/k8s/
-          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment admin-service -n onevoice --timeout=60s
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+
+          git fetch origin deploy
+          git checkout deploy
+          git pull --rebase origin deploy
+
+          sed -i "s|newTag: .*|newTag: ${SHORT_SHA}|" auth/k8s/overlays/prod/kustomization.yml
+
+          git add auth/k8s/overlays/prod/kustomization.yml
+          git commit -m "chore: update auth-service tag to ${SHORT_SHA}" || exit 0
+
+          n=0
+          until [ $n -ge 3 ]
+          do
+            git push https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/with-one-voice/ticketing-service.git deploy && break
+            n=$((n+1))
+            echo "⚠️ Push failed. Retrying in 5 seconds... (attempt $n)"
+            sleep 5
+            git pull --rebase origin deploy
+          done
