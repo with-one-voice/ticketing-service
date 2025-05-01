@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: show
-          image: joon97/show-service:latest  # GitHub Actions에서 SHA 버전으로 대체
+          image: joon97/show-service
           ports:
             - name: show-port
               containerPort: 8003
