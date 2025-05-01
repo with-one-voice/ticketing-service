@@ -3,5 +3,5 @@ resources:
 
 images:
   - name: admin-service
-    newName: joon97/admin-service
-    newTag: v1.0.0  # GitHub Actions에서 이 줄을 SHA로 자동 변경
+    newTag: 191aacf
+
