@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: payment-service
+    newTag: 7a83195
+

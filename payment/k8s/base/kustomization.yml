@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: payment-service
+    newName: joon97/payment-service
+    newTag: latest
