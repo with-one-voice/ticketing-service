@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: notification-service
+    newName: joon97/notification-service
+    newTag: latest

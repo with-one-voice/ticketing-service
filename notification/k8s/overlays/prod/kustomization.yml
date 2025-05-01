@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: notification-service
+    newTag: 7a83195
+
