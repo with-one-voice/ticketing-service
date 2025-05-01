@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: eureka-server
+    newName: joon97/eureka-server
+    newTag: latest
