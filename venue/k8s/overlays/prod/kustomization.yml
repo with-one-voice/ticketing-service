@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: venue-service
+    newTag: latest
+

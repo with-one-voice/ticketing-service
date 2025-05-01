@@ -1,4 +1,4 @@
-name: Deploy Venue Service
+name: Deploy venue service
 
 on:
   push:
@@ -8,11 +8,11 @@ on:
       - '.github/workflows/deploy-venue.yml'
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📆 Checkout code
+      - name: 📦 Checkout code
         uses: actions/checkout@v4
 
       - name: 🛠️ Set up JDK
@@ -34,7 +34,7 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: 🧪 Build project (venue-service)
+      - name: 🧪 Build project
         run: ./gradlew :venue:clean :venue:build -x test
 
       - name: 🔖 Set Git SHA tag
@@ -43,22 +43,33 @@ jobs:
 
       - name: 🐳 Docker Build & Push
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/venue-service:${SHORT_SHA} -f venue/Dockerfile .
-          docker tag ${{ secrets.DOCKER_USERNAME }}/venue-service:${SHORT_SHA} ${{ secrets.DOCKER_USERNAME }}/venue-service:latest
+          docker build -t ${{ secrets.DOCKER_venueNAME }}/venue-service:${SHORT_SHA} -f venue/Dockerfile .
+          docker tag ${{ secrets.DOCKER_venueNAME }}/venue-service:${SHORT_SHA} ${{ secrets.DOCKER_venueNAME }}/venue-service:latest
 
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker push ${{ secrets.DOCKER_USERNAME }}/venue-service:${SHORT_SHA}
-          docker push ${{ secrets.DOCKER_USERNAME }}/venue-service:latest
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_venueNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_venueNAME }}/venue-service:${SHORT_SHA}
+          docker push ${{ secrets.DOCKER_venueNAME }}/venue-service:latest
 
-      - name: 📃 Decode and save kubeconfig
-        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
-
-      - name: 🚀 Deploy to Kubernetes
+      - name: 🔁 Push newTag to deploy with retry
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/venue-service:${SHORT_SHA}|" venue/k8s/deployment.yml
-          kubectl --kubeconfig=kubeconfig.yaml apply -f venue/k8s/
-          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment admin-service -n onevoice --timeout=60s
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+          git config --global venue.name "$(git log -1 --pretty=format:'%an')"
+          git config --global venue.email "$(git log -1 --pretty=format:'%ae')"
+
+          git fetch origin deploy
+          git checkout deploy
+          git pull --rebase origin deploy
+
+          sed -i "s|newTag: .*|newTag: ${SHORT_SHA}|" venue/k8s/overlays/prod/kustomization.yml
+
+          git add venue/k8s/overlays/prod/kustomization.yml
+          git commit -m "chore: update venue-service tag to ${SHORT_SHA}" || exit 0
+
+          n=0
+          until [ $n -ge 3 ]
+          do
+            git push https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/with-one-voice/venueing-service.git deploy && break
+            n=$((n+1))
+            echo "⚠️ Push failed. Retrying in 5 seconds... (attempt $n)"
+            sleep 5
+            git pull --rebase origin deploy
+          done
