@@ -2,6 +2,6 @@ resources:
   - ../../base
 
 images:
-  - name: payment-service
+  - name: show-service
     newTag: f132969
 
