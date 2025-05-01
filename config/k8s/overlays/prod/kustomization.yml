@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: config-server
+    newName: joon97/config-server
+    newTag: v1.0.0  # GitHub Actions에서 이 줄을 SHA로 자동 변경
