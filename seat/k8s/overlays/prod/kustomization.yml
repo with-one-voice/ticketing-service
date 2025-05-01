@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: seat-service
+    newTag: latest
+

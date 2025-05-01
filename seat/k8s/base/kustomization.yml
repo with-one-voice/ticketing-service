@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: seat-service
+    newName: joon97/seat-service
+    newTag: latest
