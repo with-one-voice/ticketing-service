@@ -3,5 +3,5 @@ resources:
 
 images:
   - name: eureka-server
-    newTag: 00dd5ac
+    newTag: 018dcea
 
