@@ -3,5 +3,5 @@ resources:
 
 images:
   - name: show-service
-    newTag: f132969
+    newTag: 4792aaa
 
