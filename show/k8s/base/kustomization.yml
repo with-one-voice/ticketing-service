@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: show-service
+    newName: joon97/show-service
+    newTag: latest

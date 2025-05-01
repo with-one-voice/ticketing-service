@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: show-service
+    newTag: f132969
+
