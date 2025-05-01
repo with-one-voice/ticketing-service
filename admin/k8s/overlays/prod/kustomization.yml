@@ -3,4 +3,4 @@ resources:
 
 images:
   - name: admin-service
-    newTag: 0cd1b25
+    newTag: 1437c2c
