@@ -2,7 +2,6 @@ resources:
   - ../../base
 
 images:
-  - name: payment-service
+  - name: ticket-service
     newTag: latest
-
 

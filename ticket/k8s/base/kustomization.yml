@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: ticket-service
+    newName: joon97/ticket-service
+    newTag: latest
