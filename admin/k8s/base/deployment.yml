@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: admin
-          image: joon97/admin-service:latest
+          image: joon97/admin-service
           ports:
             - name: admin-port
               containerPort: 8009
