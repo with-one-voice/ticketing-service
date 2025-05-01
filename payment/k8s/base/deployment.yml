@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: payment
-          image: joon97/payment-service:latest  # GitHub Actions에서 SHA로 치환됨
+          image: joon97/payment-service
           ports:
             - name: payment-port
               containerPort: 8007
