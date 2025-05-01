@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: gateway-service
+    newTag: 7a83195
+
