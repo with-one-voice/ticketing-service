@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: user
-          image: joon97/user-service:latest  # GitHub Actions에서 SHA로 치환됨
+          image: joon97/user-service
           ports:
             - name: user-port
               containerPort: 8002

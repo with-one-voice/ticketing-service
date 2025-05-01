@@ -1,0 +1,7 @@
+resources:
+  - ../../base
+
+images:
+  - name: user-service
+    newTag: latest
+
