@@ -4,4 +4,4 @@ resources:
 images:
   - name: config-server
     newName: joon97/config-server
-    newTag: 073ebef
+    newTag: 00dd5ac
