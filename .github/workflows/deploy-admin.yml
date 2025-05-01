@@ -36,15 +36,12 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/admin-service:latest
 
-      - name: 🔁 Update image tag and push to deploy with retry
+      - name: 🔁 Push newTag to deploy with retry
         run: |
-          AUTHOR_NAME=$(git log -1 --pretty=format:'%an')
-          AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
 
-          git config --global user.name "$AUTHOR_NAME"
-          git config --global user.email "$AUTHOR_EMAIL"
-
-          git fetch origin
+          git fetch origin deploy
           git checkout deploy
           git pull --rebase origin deploy
 
