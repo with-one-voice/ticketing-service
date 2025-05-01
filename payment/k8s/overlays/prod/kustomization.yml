@@ -3,5 +3,5 @@ resources:
 
 images:
   - name: payment-service
-    newTag: 7a83195
+    newTag: 2134bbd
 
