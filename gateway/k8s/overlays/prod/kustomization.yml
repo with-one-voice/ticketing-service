@@ -3,5 +3,5 @@ resources:
 
 images:
   - name: gateway-service
-    newTag: 018dcea
+    newTag: 00dd5ac
 
