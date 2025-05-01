@@ -4,4 +4,4 @@ resources:
 images:
   - name: auth-service
     newName: joon97/auth-service
-    newTag: f75839e
+    newTag: 756f7e1
