@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: admin-service
+    newName: joon97/admin-service
+    newTag: latest

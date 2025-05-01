@@ -51,26 +51,11 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA}
           docker push ${{ secrets.DOCKER_USERNAME }}/admin-service:latest
 
-      - name: 🧾 Set up KUBECONFIG
-        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
-
-      - name: 🔐 Create Kubernetes Secret from GitHub Secrets
+      - name: 🔧 Update kustomization image tag
         run: |
-          kubectl --kubeconfig=kubeconfig.yaml create secret generic onevoice-secret \
-            --from-literal=DB_USERNAME=${{ secrets.DB_USERNAME }} \
-            --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            --from-literal=DB_HOST=${{ secrets.DB_HOST }} \
-            --from-literal=DB_PORT=${{ secrets.DB_PORT }} \
-            --from-literal=SWAGGER_URL=${{ secrets.SWAGGER_URL }} \
-            --from-literal=EUREKA_HOST=${{ secrets.EUREKA_HOST }} \
-            --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yaml apply -f -
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
-
-      - name: 🚀 Deploy to Kubernetes
-        run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/admin-service:${SHORT_SHA}|" admin/k8s/deployment.yml
-          kubectl --kubeconfig=kubeconfig.yaml apply -f admin/k8s/
-          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment admin-service -n onevoice --timeout=60s
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+          sed -i "s|newTag: .*|newTag: ${SHORT_SHA}|" admin/k8s/overlays/prod/kustomization.yml
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add admin/k8s/overlays/prod/kustomization.yml
+          git commit -m "chore: update admin-service tag to ${SHORT_SHA}"
+          git push origin develop
