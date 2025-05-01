@@ -1,0 +1,8 @@
+resources:
+  - deployment.yml
+  - service.yml
+
+images:
+  - name: gateway-service
+    newName: joon97/gateway-service
+    newTag: latest
