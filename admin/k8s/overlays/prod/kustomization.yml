@@ -3,4 +3,4 @@ resources:
 
 images:
   - name: admin-service
-    newTag: v1.0.0  # GitHub Actions에서 이 부분을 SHA로 자동 업데이트
+    newTag: 0cd1b25
