@@ -11,6 +11,10 @@ dependencies {
     // 선택적으로 이 모듈에서만 쓰는 라이브러리 있을 경우 여기에 추가
     // 예: security, kafka, redis 등
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.4'
+
     // thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
