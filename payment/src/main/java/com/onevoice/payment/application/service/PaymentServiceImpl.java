@@ -8,6 +8,7 @@ import com.onevoice.payment.application.dto.message.PaymentSuccessMessage;
 import com.onevoice.payment.application.dto.query.FindPaymentQuery;
 import com.onevoice.payment.application.dto.query.ListPaymentQuery;
 import com.onevoice.payment.application.event.GenericKafkaEvent;
+import com.onevoice.payment.application.event.PaymentTimeoutEvent;
 import com.onevoice.payment.domain.Payment;
 import com.onevoice.payment.domain.PaymentStatus;
 import com.onevoice.payment.domain.repository.PaymentRepository;
@@ -15,8 +16,12 @@ import com.onevoice.payment.exception.PaymentNotFoundException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RDelayedQueue;
+import org.redisson.api.RQueue;
+import org.redisson.api.RedissonClient;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository repository;
     private final ApplicationEventPublisher eventPublisher;
+    private final RedissonClient redissonClient;
 
     @Override
     public UUID create(CreatePaymentCommand command) {
@@ -46,6 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
         KafkaTopicType topicType = KafkaTopicType.PAYMENT_CREATE;
         PaymentCreateMessage payload = new PaymentCreateMessage(command.ticketId());
         eventPublish(topicType, payload);
+        requestPayment(saved.getPaymentId());
         return saved.getPaymentId();
     }
 
@@ -96,6 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
             topicType = KafkaTopicType.PAYMENT_SUCCESS;
             PaymentSuccessMessage payload = new PaymentSuccessMessage(payment.getTicketId());
             eventPublish(topicType, payload);
+            completePayment(paymentId);
         } else {
             topicType = KafkaTopicType.PAYMENT_FAIL;
             PaymentFailMessage payload = new PaymentFailMessage(payment.getTicketId());
@@ -169,4 +177,18 @@ public class PaymentServiceImpl implements PaymentService {
             payload);
         eventPublisher.publishEvent(event);
     }
+
+    private void requestPayment(UUID paymentId) {
+        // 15분후 만료 이벤트 등록
+        RQueue<PaymentTimeoutEvent> queue = redissonClient.getQueue("paymentTimeoutQueue");
+        RDelayedQueue<PaymentTimeoutEvent> delayedQueue = redissonClient.getDelayedQueue(queue);
+        delayedQueue.offer(new PaymentTimeoutEvent(paymentId), 15, TimeUnit.MINUTES);
+    }
+
+    private void completePayment(UUID paymentId) {
+        // 결제 완료시 15분 만료 이벤트 제거
+        RQueue<PaymentTimeoutEvent> queue = redissonClient.getQueue("paymentTimeoutQueue");
+        queue.removeIf(event -> event.paymentId().equals(paymentId));
+    }
+
 }
