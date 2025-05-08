@@ -3,5 +3,5 @@ resources:
 
 images:
   - name: ticket-service
-    newTag: 10e6555
+    newTag: 208a33b
 
