@@ -67,7 +67,7 @@ public class TicketDlqConsumer {
         log.warn("[payment_success] Received :{}", message);
     }
 
-    @KafkaListener(topics = "payment_fail.DLQ", groupId = "ticket-dlq-group")
+    @KafkaListener(topics = "seat_expired.DLQ", groupId = "ticket-dlq-group")
     public void consumeSeatExpiredDLQ(ConsumerRecord<String, String> record) throws JsonProcessingException {
         log.error("[DLQ] Failed message received: topic={}, partition={}, offset={}, key={}, value={}",
             record.topic(), record.partition(), record.offset(), record.key(), record.value());
