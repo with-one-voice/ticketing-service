@@ -147,7 +147,7 @@ public class SeatServiceImpl implements SeatService {
         SessionId sessionId = new SessionId(command.sessionId());
         List<UUID> seatIdList = command.seatIds();
         UUID userId = command.userId();
-        LocalDateTime expireAt = LocalDateTime.now().plusMinutes(5);
+        LocalDateTime expireAt = LocalDateTime.now().plusMinutes(15);
 
         //좌석 조회
         List<Seat> seats = seatIdList.stream()
@@ -201,7 +201,6 @@ public class SeatServiceImpl implements SeatService {
         }
         redisTemplate.delete(RedisKeyUtil.seatCacheKey(sessionId.getValue()));
         return HoldSeatResponseDto.success(expireAt, seatIdList);
-
     }
 
 
