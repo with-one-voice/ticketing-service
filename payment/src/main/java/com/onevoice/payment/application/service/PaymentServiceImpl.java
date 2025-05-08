@@ -179,14 +179,14 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void requestPayment(UUID paymentId) {
-        // 15분후 만료 이벤트 등록
+        // 10분후 만료 이벤트 등록
         RQueue<PaymentTimeoutEvent> queue = redissonClient.getQueue("paymentTimeoutQueue");
         RDelayedQueue<PaymentTimeoutEvent> delayedQueue = redissonClient.getDelayedQueue(queue);
         delayedQueue.offer(new PaymentTimeoutEvent(paymentId), 10, TimeUnit.MINUTES);
     }
 
     private void completePayment(UUID paymentId) {
-        // 결제 완료시 15분 만료 이벤트 제거
+        // 결제 완료시 10분 만료 이벤트 제거
         RQueue<PaymentTimeoutEvent> queue = redissonClient.getQueue("paymentTimeoutQueue");
         queue.removeIf(event -> event.paymentId().equals(paymentId));
     }
