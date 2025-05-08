@@ -182,7 +182,7 @@ public class PaymentServiceImpl implements PaymentService {
         // 15분후 만료 이벤트 등록
         RQueue<PaymentTimeoutEvent> queue = redissonClient.getQueue("paymentTimeoutQueue");
         RDelayedQueue<PaymentTimeoutEvent> delayedQueue = redissonClient.getDelayedQueue(queue);
-        delayedQueue.offer(new PaymentTimeoutEvent(paymentId), 15, TimeUnit.MINUTES);
+        delayedQueue.offer(new PaymentTimeoutEvent(paymentId), 10, TimeUnit.MINUTES);
     }
 
     private void completePayment(UUID paymentId) {
