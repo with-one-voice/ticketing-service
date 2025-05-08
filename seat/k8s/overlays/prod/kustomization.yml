@@ -3,5 +3,5 @@ resources:
 
 images:
   - name: seat-service
-    newTag: b55ff45
+    newTag: 76c6a5e
 
