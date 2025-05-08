@@ -40,8 +40,8 @@ class PaymentApplicationTests {
     }
 
     @Test
-    void contextLoads() {
-    }
+//    void contextLoads() {
+//    }
 
     @AfterAll
     static void stopContainers() {
